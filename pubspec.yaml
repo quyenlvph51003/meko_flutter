@@ -74,6 +74,16 @@ dev_dependencies:
 
 flutter:
 
-
   uses-material-design: true
+  assets:
+    - assets/icons/
+    - assets/images/
+    - assets/fonts/
 
+  fonts:
+    - family: Light
+      fonts:
+        - asset: assets/fonts/SF-Pro-Display-Light.otf
+    - family: LightItalic
+      fonts:
+        - asset: assets/fonts/SF-Pro-Display-LightItalic.otf

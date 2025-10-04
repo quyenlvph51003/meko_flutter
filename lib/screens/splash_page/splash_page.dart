@@ -1,49 +1,52 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meko_project/consts/app_images.dart';
-import 'package:meko_project/screens/splash_page/splash_vm.dart';
+import 'package:meko_project/screens/splash_page/splash_vm/splash_cubit.dart';
+import 'package:meko_project/screens/splash_page/splash_vm/splash_state.dart';
 
-class SplashPage extends StatefulWidget {
+class SplashPage extends StatelessWidget {
   const SplashPage({Key? key}) : super(key: key);
 
   @override
-  SplashPageState createState() => SplashPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => SplashCubit(),
+      child: const SplashPageView(),
+    );
+  }
 }
 
-class SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
-  SplashVm vm = Get.put<SplashVm>(SplashVm());
+class SplashPageView extends StatefulWidget {
+  const SplashPageView({Key? key}) : super(key: key);
 
+  @override
+  State<SplashPageView> createState() => _SplashPageViewState();
+}
+
+class _SplashPageViewState extends State<SplashPageView> {
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      vm.updateBrg();
-      vm.init();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<SplashCubit>().init(context);
     });
   }
 
   @override
-  void dispose() {
-    vm.dispose();
-    Get.delete<SplashVm>();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
-      backgroundColor: Color(0xFFF2F6FF),
+      backgroundColor: const Color(0xFFF2F6FF),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ValueListenableBuilder(
-              valueListenable: vm.flagOpacity,
-              builder: (context, bool check, child) {
+            BlocBuilder<SplashCubit, SplashState>(
+              builder: (context, state) {
                 return AnimatedOpacity(
-                  duration: Duration(milliseconds: 800),
-                  opacity: check ? 1 : 0,
+                  duration: const Duration(milliseconds: 800),
+                  opacity: state.showContent ? 1 : 0,
                   child: Image.asset(
                     AppImages.img_splash,
                     height: 125,
@@ -52,31 +55,29 @@ class SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                 );
               },
             ),
-            SizedBox(height: 4),
-            //  nameApp(),
-            SizedBox(height: 24),
+            const SizedBox(height: 4),
+            const SizedBox(height: 24),
             SizedBox(
-              width: Get.width * 0.5,
+              width: screenWidth * 0.5,
               height: 2.5,
               child: Stack(
                 children: [
                   Container(
-                    width: Get.width,
+                    width: screenWidth,
                     height: 2.5,
                     decoration: BoxDecoration(
-                      color: Color(0xFFE6EBF8),
+                      color: const Color(0xFFE6EBF8),
                       borderRadius: BorderRadius.circular(5),
                     ),
                   ),
-                  ValueListenableBuilder(
-                    valueListenable: vm.flagOpacity,
-                    builder: (context, bool check, child) {
+                  BlocBuilder<SplashCubit, SplashState>(
+                    builder: (context, state) {
                       return AnimatedContainer(
-                        duration: Duration(milliseconds: 1800),
-                        width: check ? Get.width : 0,
+                        duration: const Duration(milliseconds: 1800),
+                        width: state.showContent ? screenWidth : 0,
                         height: 2.5,
                         decoration: BoxDecoration(
-                          color: Color(0xFFFF2D2E),
+                          color: const Color(0xFFFF2D2E),
                           borderRadius: BorderRadius.circular(5),
                         ),
                       );
@@ -85,7 +86,7 @@ class SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
                 ],
               ),
             ),
-            SizedBox(height: Get.width * 0.28),
+            SizedBox(height: screenWidth * 0.28),
           ],
         ),
       ),
