@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meko_project/screens/login_page/login_page.dart';
 import 'package:meko_project/screens/splash_page/splash_page.dart';
+import 'package:meko_project/screens/tab/homes_page/home_page.dart';
 
 import 'app_router_paths.dart';
 
@@ -17,25 +18,19 @@ class AppRouter {
     return MaterialPageRoute<dynamic>(
       settings: settings,
       builder: (BuildContext context) {
-        return router(
-          context: context,
-          routeName: settings.name!,
-          data: settings.arguments,
-        );
+        return router(context: context, routeName: settings.name!, data: settings.arguments);
       },
     );
   }
 
-  Widget router({
-    required BuildContext context,
-    required String routeName,
-    Object? data,
-  }) {
+  Widget router({required BuildContext context, required String routeName, Object? data}) {
     switch (routeName) {
       case RouterPaths.splash:
         return SplashPage();
       case RouterPaths.login:
         return LoginPage();
+      case RouterPaths.homePage:
+        return HomePage();
       default:
         return SizedBox();
     }

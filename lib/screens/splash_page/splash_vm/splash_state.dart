@@ -1,14 +1,9 @@
-
-
 class SplashState {
-  final bool showContent;
+  bool showContent;
 
   SplashState({required this.showContent});
 
   SplashState copyWith({bool? showContent}) {
-    return SplashState(
-      showContent: showContent ?? this.showContent,
-    );
+    return SplashState(showContent: showContent ?? this.showContent);
   }
 }
-

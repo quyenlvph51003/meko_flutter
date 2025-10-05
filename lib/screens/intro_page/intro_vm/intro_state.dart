@@ -4,13 +4,10 @@ import 'package:meko_project/consts/app_consts.dart';
 import 'package:meko_project/global_data/data_local/shared_pref.dart';
 
 class IntroState {
-  final int currentIndex;
-  final PageController pageController;
+  int currentIndex;
+  PageController pageController;
 
-  IntroState({
-    required this.currentIndex,
-    required this.pageController,
-  });
+  IntroState({required this.currentIndex, required this.pageController});
 
   IntroState copyWith({int? currentIndex}) {
     return IntroState(
@@ -19,4 +16,3 @@ class IntroState {
     );
   }
 }
-

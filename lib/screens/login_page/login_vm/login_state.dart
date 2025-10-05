@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class LoginState {
-  final TextEditingController usernameCtrl;
-  final TextEditingController passwordCtrl;
-  final bool isLoading;
-  final String? errorMessage;
+  TextEditingController usernameCtrl;
+  TextEditingController passwordCtrl;
+  bool isLoading;
+  String? errorMessage;
 
   LoginState({
     required this.usernameCtrl,
@@ -13,10 +13,7 @@ class LoginState {
     this.errorMessage,
   });
 
-  LoginState copyWith({
-    bool? isLoading,
-    String? errorMessage,
-  }) {
+  LoginState copyWith({bool? isLoading, String? errorMessage}) {
     return LoginState(
       usernameCtrl: usernameCtrl,
       passwordCtrl: passwordCtrl,
