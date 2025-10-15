@@ -28,6 +28,7 @@ dependencies:
   # call api
   dio: ^4.0.4
   curl_logger_dio_interceptor: ^0.0.3
+  get_it: ^8.2.0
 
   # State management
   bloc: ^9.0.1

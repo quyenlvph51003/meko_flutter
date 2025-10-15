@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:meko_project/screens/tab/tab_%20manage_posting/tab_mage_posting_page.dart';
+import 'package:meko_project/consts/app_colcor.dart';
+import 'package:meko_project/consts/app_dimens.dart';
+import 'package:meko_project/screens/login_page/login_page.dart';
+import 'package:meko_project/screens/tab/tab_%20manage_posting/tab_posting_page.dart';
 import 'package:meko_project/screens/tab/tab_chat/tab_chat_page.dart';
 import 'package:meko_project/screens/tab/tab_home/tab_home_page.dart';
 import 'package:meko_project/screens/tab/tab_profile/tab_profile_page.dart';
@@ -14,7 +17,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => HomeCubit(),
-      child: const HomeView(),
+      child: HomeView(),
     );
   }
 }
@@ -27,20 +30,15 @@ class HomeView extends StatefulWidget {
 }
 
 class HomeViewState extends State<HomeView> {
-  late HomeCubit cubit;
+  late HomeCubit vm;
   int currentIndex = 0;
 
-  final List<Widget> pages = [
-    TabHomePage(),
-    TabMagePostingPage(),
-    TabChatPage(),
-    TabProfilePage(),
-  ];
 
   @override
   void initState() {
     super.initState();
-    cubit = context.read<HomeCubit>();
+    vm = context.read<HomeCubit>();
+    vm.isCheckLogin();
   }
 
   @override
@@ -48,107 +46,119 @@ class HomeViewState extends State<HomeView> {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return BlocListener<HomeCubit, HomeState>(
-      listenWhen: (prev, curr) => curr.shouldShowPostSheet,
+      listenWhen: (prev, curr) {
+        return curr.shouldShowPostSheet;
+      },
       listener: (context, state) {
         if (state.shouldShowPostSheet) {
           showPostSheet(context);
         }
       },
-      child: Scaffold(
-        body: Stack(
-          children: [
-            IndexedStack(
-              index: currentIndex,
-              children: pages,
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                height: 65 + bottomPadding,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 4,
-                      offset: const Offset(0, -1),
-                    ),
-                  ],
+      child: BlocBuilder<HomeCubit, HomeState>(
+        builder: (context, state) {
+          final pages = <Widget>[
+            TabHomePage(),
+            TabMagePostingPage(),
+            TabChatPage(),
+            TabProfilePage(),
+          ];
+          return Scaffold(
+            body: Stack(
+              children: [
+                IndexedStack(
+                  index: currentIndex,
+                  children: pages,
                 ),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 65,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          buildNavItem(
-                            index: 0,
-                            icon: Icons.home_outlined,
-                            activeIcon: Icons.home_rounded,
-                            label: 'Trang chủ',
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    height: 65 + bottomPadding,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 4,
+                          offset: const Offset(0, -1),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 65,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              buildNavItem(
+                                index: 0,
+                                icon: Icons.home_outlined,
+                                activeIcon: Icons.home_rounded,
+                                label: 'Trang chủ',
+                              ),
+                              buildNavItem(
+                                index: 1,
+                                icon: Icons.label_outline,
+                                activeIcon: Icons.label,
+                                label: 'Quản lý tin',
+                              ),
+                              const SizedBox(width: 56),
+                              buildNavItem(
+                                index: 2,
+                                icon: Icons.chat_bubble_outline,
+                                activeIcon: Icons.chat_bubble,
+                                label: 'Chat',
+                              ),
+                              buildNavItem(
+                                index: 3,
+                                icon: Icons.person_outline,
+                                activeIcon: Icons.person,
+                                label: 'Tài khoản',
+                              ),
+                            ],
                           ),
-                          buildNavItem(
-                            index: 1,
-                            icon: Icons.label_outline,
-                            activeIcon: Icons.label,
-                            label: 'Quản lý tin',
-                          ),
-                          const SizedBox(width: 56),
-                          buildNavItem(
-                            index: 2,
-                            icon: Icons.chat_bubble_outline,
-                            activeIcon: Icons.chat_bubble,
-                            label: 'Chat',
-                          ),
-                          buildNavItem(
-                            index: 3,
-                            icon: Icons.person_outline,
-                            activeIcon: Icons.person,
-                            label: 'Tài khoản',
+                        ),
+                        SizedBox(height: bottomPadding),
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: MediaQuery.of(context).size.width / 2 - 28,
+                  bottom: 35 + bottomPadding,
+                  child: GestureDetector(
+                    onTap: () {
+                      HapticFeedback.mediumImpact();
+                      vm.openPostSheet();
+                    },
+                    child: Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColor.cMain,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColor.color8.withOpacity(0.4),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
                           ),
                         ],
                       ),
-                    ),
-                    SizedBox(height: bottomPadding),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              left: MediaQuery.of(context).size.width / 2 - 28,
-              bottom: 35 + bottomPadding,
-              child: GestureDetector(
-                onTap: () {
-                  HapticFeedback.mediumImpact();
-                  cubit.openPostSheet();
-                },
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFFFFCF00),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFFFFCF00).withOpacity(0.4),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
+                      child: const Icon(
+                        Icons.add_rounded,
+                        color: Colors.white,
+                        size: 32,
                       ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.add_rounded,
-                    color: Colors.white,
-                    size: 32,
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          );
+        }
       ),
     );
   }
@@ -162,26 +172,36 @@ class HomeViewState extends State<HomeView> {
     final isActive = currentIndex == index;
     return Expanded(
       child: InkWell(
-        onTap: () {
+        onTap: () async {
           HapticFeedback.lightImpact();
+
+          if (index == 1 && !context.read<HomeCubit>().state.isLoggedIn) {
+            final ok = await openLoginFullScreen(context);
+            if (ok) {
+              await context.read<HomeCubit>().isCheckLogin();
+              setState(() => currentIndex = 1); // chỉ nhảy tab khi login OK
+            }
+            return; // nếu không OK, giữ nguyên tab cũ
+          }
           setState(() {
             currentIndex = index;
           });
         },
+
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               isActive ? activeIcon : icon,
               size: 24,
-              color: isActive ? const Color(0xFFFFCF00) : Colors.grey,
+              color: isActive ? AppColor.cMain : Colors.grey,
             ),
             const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
                 fontSize: 11,
-                color: isActive ? const Color(0xFFFFCF00) : Colors.grey,
+                color: isActive ? AppColor.cMain : Colors.grey,
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
               ),
             ),
@@ -189,6 +209,28 @@ class HomeViewState extends State<HomeView> {
         ),
       ),
     );
+  }
+  Future<bool> openLoginFullScreen(BuildContext context) async {
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => const LoginPage(showBack: true),
+      ),
+    );
+    return result ?? false;
+  }
+  Future<bool> showLoginSheet(BuildContext context) async {
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return
+          Expanded(child: LoginPage());
+      },
+    );
+    return result ?? true;
   }
 
   void showPostSheet(BuildContext context) {

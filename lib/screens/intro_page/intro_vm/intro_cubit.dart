@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:meko_project/consts/app_consts.dart';
 import 'package:meko_project/global_data/data_local/shared_pref.dart';
+import 'package:meko_project/routers/app_router_paths.dart';
 
 import 'intro_state.dart';
 
@@ -38,7 +39,7 @@ class IntroCubit extends Cubit<IntroState> {
       );
     } else {
       SharedPref.instance.setBool(AppConsts.keyIntro, true);
-      Navigator.pushReplacementNamed(context, '/homePage');
+      Navigator.pushReplacementNamed(context, RouterPaths.homePage);
     }
   }
 
