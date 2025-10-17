@@ -28,7 +28,7 @@ class AppRouter {
       case RouterPaths.splash:
         return SplashPage();
       case RouterPaths.login:
-        return LoginPage();
+        return LoginPage(onSuccess: () {}, onTapRegister: () {  },);
       case RouterPaths.homePage:
         return HomePage();
       default:

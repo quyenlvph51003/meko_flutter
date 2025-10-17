@@ -4,10 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meko_project/consts/app_colcor.dart';
 import 'package:meko_project/consts/app_dimens.dart';
 import 'package:meko_project/screens/login_page/login_page.dart';
+import 'package:meko_project/screens/sign_up_page/sign_up_page.dart';
 import 'package:meko_project/screens/tab/tab_%20manage_posting/tab_posting_page.dart';
 import 'package:meko_project/screens/tab/tab_chat/tab_chat_page.dart';
 import 'package:meko_project/screens/tab/tab_home/tab_home_page.dart';
 import 'package:meko_project/screens/tab/tab_profile/tab_profile_page.dart';
+import 'package:meko_project/utils/login_global/login_global.dart';
 import 'home_vm/home_cubit.dart';
 
 class HomePage extends StatelessWidget {
@@ -126,7 +128,7 @@ class HomeViewState extends State<HomeView> {
                   ),
                 ),
                 Positioned(
-                  left: MediaQuery.of(context).size.width / 2 - 28,
+                  left: AppDimens.getWidth(context) / 2 - 28,
                   bottom: 35 + bottomPadding,
                   child: GestureDetector(
                     onTap: () {
@@ -147,7 +149,7 @@ class HomeViewState extends State<HomeView> {
                           ),
                         ],
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.add_rounded,
                         color: Colors.white,
                         size: 32,
@@ -174,14 +176,28 @@ class HomeViewState extends State<HomeView> {
       child: InkWell(
         onTap: () async {
           HapticFeedback.lightImpact();
-
+          final goRegister = () => DefaultTabController.of(context).animateTo(1);
           if (index == 1 && !context.read<HomeCubit>().state.isLoggedIn) {
-            final ok = await openLoginFullScreen(context);
+            final ok = await showAuthBottomSheet(
+              context,
+              loginPage: LoginPage(onSuccess: () {
+                Navigator.pop(context, true);
+              }, onTapRegister: () {
+                goRegister();
+              },),
+              registerPage: SignUpPage(onSuccess: () {
+                Navigator.pop(context, true);
+              }),
+            );
+            if (ok) {
+
+            }
+
             if (ok) {
               await context.read<HomeCubit>().isCheckLogin();
-              setState(() => currentIndex = 1); // chỉ nhảy tab khi login OK
+              setState(() => currentIndex = 1);
             }
-            return; // nếu không OK, giữ nguyên tab cũ
+            return;
           }
           setState(() {
             currentIndex = index;
@@ -210,28 +226,30 @@ class HomeViewState extends State<HomeView> {
       ),
     );
   }
-  Future<bool> openLoginFullScreen(BuildContext context) async {
-    final result = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(
-        fullscreenDialog: true,
-        builder: (_) => const LoginPage(showBack: true),
-      ),
-    );
-    return result ?? false;
-  }
-  Future<bool> showLoginSheet(BuildContext context) async {
-    final result = await showModalBottomSheet<bool>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) {
-        return
-          Expanded(child: LoginPage());
-      },
-    );
-    return result ?? true;
-  }
+  // Future<bool> openLoginFullScreen(BuildContext context) async {
+  //   final result = await Navigator.of(context).push<bool>(
+  //     MaterialPageRoute(
+  //       fullscreenDialog: true,
+  //       builder: (_) {
+  //         return LoginPage(showBack: true);
+  //       },
+  //     ),
+  //   );
+  //   return result ?? false;
+  // }
+  // Future<bool> showLoginSheet(BuildContext context) async {
+  //   final result = await showModalBottomSheet<bool>(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     useSafeArea: true,
+  //     backgroundColor: Colors.transparent,
+  //     builder: (ctx) {
+  //       return
+  //         Expanded(child: LoginPage());
+  //     },
+  //   );
+  //   return result ?? true;
+  // }
 
   void showPostSheet(BuildContext context) {
     showModalBottomSheet(
@@ -240,7 +258,7 @@ class HomeViewState extends State<HomeView> {
       isScrollControlled: true,
       showDragHandle: true,
       backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) {
