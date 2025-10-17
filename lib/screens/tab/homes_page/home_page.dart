@@ -40,7 +40,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final pages = const [TabHomePage(), TabMagePostingPage(), TabChatPage(), TabProfilePage()];
+    final pages = const [TabHomePage(), PostManagerPage(), TabChatPage(), TabProfilePage()];
 
     return BlocListener<HomeCubit, HomeState>(
       listenWhen: (p, c) => c.shouldShowPostSheet,
