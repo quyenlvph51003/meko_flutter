@@ -28,11 +28,13 @@ dependencies:
   # call api
   dio: ^4.0.4
   curl_logger_dio_interceptor: ^0.0.3
+  get_it: ^8.2.0
 
   # State management
   bloc: ^9.0.1
   flutter_bloc: ^9.1.1
   get: ^4.7.2
+  equatable: ^2.0.7
   # Log
   logger: ^1.1.0
 
@@ -66,6 +68,7 @@ dependencies:
 #  firebase_messaging: ^16.0.2
 #  firebase_crashlytics: ^5.0.2
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -74,6 +77,16 @@ dev_dependencies:
 
 flutter:
 
-
   uses-material-design: true
+  assets:
+    - assets/icons/
+    - assets/images/
+    - assets/fonts/
 
+  fonts:
+    - family: Light
+      fonts:
+        - asset: assets/fonts/SF-Pro-Display-Light.otf
+    - family: LightItalic
+      fonts:
+        - asset: assets/fonts/SF-Pro-Display-LightItalic.otf

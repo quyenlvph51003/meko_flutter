@@ -17,6 +17,7 @@ class AppConsts {
   /// key sharePreference
   static const String languageCode = 'languageCode';
   static const String keyIntro = 'key_intro';
+  static const String keyLoginSuccess = 'key_login';
   static const String keyToken = 'key_token';
   static const String keyRefreshToken = 'key_refresh_token';
   static const String keyDeviceId = 'key_device_id';

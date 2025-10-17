@@ -1,118 +1,115 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meko_project/consts/app_colcor.dart';
 import 'package:meko_project/consts/app_images.dart';
-import 'package:meko_project/screens/intro_page/intro_page_vm.dart';
+import 'package:meko_project/widget/app_button/app_button.dart';
 
-class IntroPage extends StatefulWidget {
+import 'intro_vm/intro_cubit.dart';
+import 'intro_vm/intro_state.dart';
+
+class IntroPage extends StatelessWidget {
   const IntroPage({super.key});
 
   @override
-  State<IntroPage> createState() => _IntroPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(create: (context) => IntroCubit(), child: const IntroPageView());
+  }
 }
 
-class _IntroPageState extends State<IntroPage> {
-  IntroPageVm vm = Get.put<IntroPageVm>(IntroPageVm());
-  int index = 0;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
+class IntroPageView extends StatelessWidget {
+  const IntroPageView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<IntroCubit>();
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: Colors.blue,
       body: Column(
         children: [
-          SizedBox(height: 32),
+          const SizedBox(height: 32),
           Expanded(
             child: PageView(
               pageSnapping: true,
               padEnds: false,
               allowImplicitScrolling: false,
-              controller: vm.pageCtrl,
-              onPageChanged: (i) {},
+              controller: cubit.state.pageController,
+              onPageChanged: cubit.onPageChanged,
               children: [
                 buildOnboard(
-                  'Explore a wide range of products',
-                  'Explore a wide range of products at your fingertips.QuickMart offers an extensive \n'
-                      'collection to suit your needs.',
+                  'Mua bán đồ cũ dễ dàng',
+                  'Khám phá hàng ngàn sản phẩm đã qua sử dụng\nchất lượng với giá tốt nhất. Tiết kiệm và thân thiện\nvới môi trường.',
                 ),
                 buildOnboard(
-                  'Unlock exclusive offers and discounts',
-                  'Get access to limited-time deals and special\n'
-                      ' promotions available only to our valued \n customers.',
+                  'Giao dịch an toàn & tin cậy',
+                  'Hệ thống xác thực người dùng và đánh giá uy tín\ngiúp bạn mua bán yên tâm. Mọi giao dịch đều được\nbảo vệ.',
                 ),
                 buildOnboard(
-                  'Safe and secure \n payments',
-                  'QuickMart employs industry-leading encryption \n '
-                      'and trusted payment gateways to safeguard your\n '
-                      ' financial information.',
+                  'Đăng tin nhanh chóng',
+                  'Chụp ảnh, mô tả và đăng tin chỉ trong vài phút.\nTiếp cận hàng nghìn người mua tiềm năng ngay\nlập tức.',
                 ),
               ],
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(
-              3,
-              (i) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                  child: AnimatedContainer(
-                    curve: Curves.easeIn,
-                    duration: Duration(milliseconds: 450),
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: index == i ?  AppColor.cGreen70: AppColor.cGray70,
-                      borderRadius: BorderRadius.circular(20),
+          BlocBuilder<IntroCubit, IntroState>(
+            builder: (context, state) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(3, (i) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 3),
+                    child: AnimatedContainer(
+                      curve: Curves.easeIn,
+                      duration: const Duration(milliseconds: 450),
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: state.currentIndex == i ? AppColor.white : AppColor.cGray,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                     ),
-                  ),
-                );
-              },
-            ),
+                  );
+                }),
+              );
+            },
           ),
-          SizedBox(height: 24),
-          Container(
+          const SizedBox(height: 24),
+          buildButton(cubit, screenWidth),
+          const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
+
+  BlocBuilder<IntroCubit, IntroState> buildButton(IntroCubit cubit, double screenWidth) {
+    return BlocBuilder<IntroCubit, IntroState>(
+      builder: (context, state) {
+        return AppButton(
+          onTap: (){
+            return cubit.nextTap(context);
+          },
+          child: Container(
             height: 60,
-            child: GestureDetector(
-              onTap: () {
-                vm.nextTap();
-                // }
-              },
-              child: Container(
-                height: 60,
-                width: Get.width,
-                margin: EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.red,
-                ),
-                child: Center(
-                  child: Text(
-                    vm.getTitleBtn(1),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                      color: AppColor.cGreen70,
-                    ),
-                  ),
+            width: screenWidth,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: AppColor.color34,
+            ),
+            child: Center(
+              child: Text(
+                cubit.getTitleBtn(),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  color: Colors.white,
                 ),
               ),
             ),
           ),
-          SizedBox(height: 32),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -120,49 +117,54 @@ class _IntroPageState extends State<IntroPage> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        SizedBox(height: 44),
-        buildHeader(
-          AppImages.img_magic_brush,
-          'QuickMart',
-          'Skip for now',
-        ),
-        SizedBox(height: 24),
+        const SizedBox(height: 44),
+        buildHeader(AppImages.img_magic_brush, 'Meko', 'Bỏ qua'),
+        const SizedBox(height: 24),
         Text(
-          '$title',
-          style: TextStyle(
+          title,
+          style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w700,
             color: AppColor.cGreen70,
           ),
           textAlign: TextAlign.center,
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         Text(
-          '$subtitle',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-          ),
+          subtitle,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.black87),
           textAlign: TextAlign.center,
         ),
-        SizedBox(height: 24),
-        //buildButtonNextPage(),
+        const SizedBox(height: 24),
       ],
     );
   }
 
   Widget buildHeader(String images, String title, String action) {
-    return Container(
-      width: Get.width * 0.9,
-      height: 408,
-      margin: EdgeInsets.only(right: 16, left: 16),
-      decoration: BoxDecoration(
-        color: AppColor.cGreen70,
-        borderRadius: BorderRadius.circular(32),
-      ),
-      child: Stack(
-        children: [],
-      ),
+    return Builder(
+      builder: (context) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        return Container(
+          width: screenWidth * 0.9,
+          height: 408,
+          margin: const EdgeInsets.only(right: 16, left: 16),
+          decoration: BoxDecoration(
+            color: AppColor.cGreen70,
+            borderRadius: BorderRadius.circular(32),
+          ),
+          child: Stack(
+            children: [
+              Center(
+                child: Icon(
+                  Icons.shopping_bag_outlined,
+                  size: 120,
+                  color: Colors.white.withOpacity(0.3),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
