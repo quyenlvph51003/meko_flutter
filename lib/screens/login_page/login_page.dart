@@ -4,7 +4,7 @@ import 'package:meko_project/consts/app_colcor.dart';
 import 'package:meko_project/consts/app_dimens.dart';
 import 'package:meko_project/consts/app_images.dart';
 import 'package:meko_project/domains/dependency_injection/service_locator.dart';
-import 'package:meko_project/repository/auth_repository/auth_repo.dart';
+import 'package:meko_project/repository/auth/auth_repo.dart';
 import 'package:meko_project/widget/app_button/app_button.dart';
 import 'package:meko_project/widget/app_button/app_button_common.dart';
 import 'package:meko_project/widget/app_text_field/app_text_field.dart';

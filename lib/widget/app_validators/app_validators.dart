@@ -1,5 +1,5 @@
 class AppValidators {
-  // Email validation
+  /// Email validation
   static String? email(String? value) {
     if (value == null || value.isEmpty) {
       return 'Vui lòng nhập email';
@@ -13,7 +13,7 @@ class AppValidators {
     return null;
   }
 
-  // Phone validation (Vietnam)
+  /// Phone validation (Vietnam)
   static String? phone(String? value) {
     if (value == null || value.isEmpty) {
       return 'Vui lòng nhập số điện thoại';
@@ -25,7 +25,7 @@ class AppValidators {
     return null;
   }
 
-  // Password validation
+  /// Password validation
   static String? password(String? value, {int minLength = 6}) {
     if (value == null || value.isEmpty) {
       return 'Vui lòng nhập mật khẩu';
@@ -36,7 +36,7 @@ class AppValidators {
     return null;
   }
 
-  // Required field
+  /// Required field
   static String? required(String? value, {String? fieldName}) {
     if (value == null || value.trim().isEmpty) {
       return 'Vui lòng nhập ${fieldName ?? "thông tin"}';
@@ -44,7 +44,7 @@ class AppValidators {
     return null;
   }
 
-  // Min length
+  /// Min length
   static String? minLength(String? value, int min, {String? fieldName}) {
     if (value == null || value.isEmpty) {
       return 'Vui lòng nhập ${fieldName ?? "thông tin"}';
@@ -55,7 +55,7 @@ class AppValidators {
     return null;
   }
 
-  // Max length
+  /// Max length
   static String? maxLength(String? value, int max, {String? fieldName}) {
     if (value != null && value.length > max) {
       return '${fieldName ?? "Thông tin"} không được vượt quá $max ký tự';
@@ -63,7 +63,7 @@ class AppValidators {
     return null;
   }
 
-  // Number only
+  /// Number only
   static String? numberOnly(String? value) {
     if (value == null || value.isEmpty) {
       return 'Vui lòng nhập số';
@@ -74,7 +74,7 @@ class AppValidators {
     return null;
   }
 
-  // Price validation
+  /// Price validation
   static String? price(String? value) {
     if (value == null || value.isEmpty) {
       return 'Vui lòng nhập giá';
@@ -86,7 +86,7 @@ class AppValidators {
     return null;
   }
 
-  // Combine multiple validators
+  /// Combine multiple validators
   static String? Function(String?) combine(
       List<String? Function(String?)> validators,
       ) {

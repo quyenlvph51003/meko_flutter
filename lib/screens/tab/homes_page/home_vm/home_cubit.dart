@@ -6,7 +6,7 @@ import 'package:meko_project/global_data/data_local/shared_pref.dart';
 part 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
-  HomeCubit() : super(HomeState());
+  HomeCubit() : super(const HomeState());
 
   void openPostSheet() {
     emit(state.copyWith(shouldShowPostSheet: true));
@@ -16,5 +16,9 @@ class HomeCubit extends Cubit<HomeState> {
   Future<void> isCheckLogin() async {
     final logged = await SharedPref.instance.getBool(AppConsts.keyLoginSuccess) ?? false;
     emit(state.copyWith(isLoggedIn: logged));
+  }
+
+  void changeTab(int index) {
+    emit(state.copyWith(currentIndex: index));
   }
 }

@@ -1,7 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:meko_project/domains/api_path/app_config.dart';
 import 'package:meko_project/domains/rest_client/rest_client.dart';
-import 'package:meko_project/repository/auth_repository/auth_repo.dart';
+import 'package:meko_project/repository/auth/auth_repo.dart';
 
 final getIt = GetIt.instance;
 

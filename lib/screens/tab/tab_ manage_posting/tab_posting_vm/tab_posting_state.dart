@@ -1,3 +1,4 @@
+
 import 'package:equatable/equatable.dart';
 
 class TabPostingState extends Equatable {

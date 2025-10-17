@@ -1,18 +1,28 @@
 part of 'home_cubit.dart';
 
 class HomeState extends Equatable {
-   bool shouldShowPostSheet;
-   bool isLoggedIn;
+  final bool shouldShowPostSheet;
+  final bool isLoggedIn;
+  final int currentIndex;
 
-   HomeState({this.shouldShowPostSheet = false, this.isLoggedIn = false});
+  const HomeState({
+    this.shouldShowPostSheet = false,
+    this.isLoggedIn = false,
+    this.currentIndex = 0,
+  });
 
-  HomeState copyWith({bool? shouldShowPostSheet, bool? isLoggedIn}) {
+  HomeState copyWith({
+    bool? shouldShowPostSheet,
+    bool? isLoggedIn,
+    int? currentIndex,
+  }) {
     return HomeState(
       shouldShowPostSheet: shouldShowPostSheet ?? this.shouldShowPostSheet,
       isLoggedIn: isLoggedIn ?? this.isLoggedIn,
+      currentIndex: currentIndex ?? this.currentIndex,
     );
   }
 
   @override
-  List<Object?> get props => [shouldShowPostSheet, isLoggedIn];
+  List<Object?> get props => [shouldShowPostSheet, isLoggedIn, currentIndex];
 }

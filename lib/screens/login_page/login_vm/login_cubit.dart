@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meko_project/consts/app_consts.dart';
-import 'package:meko_project/domains/dependency_injection/service_locator.dart';
 import 'package:meko_project/global_data/data_local/shared_pref.dart';
-import 'package:meko_project/repository/auth_repository/auth_repo.dart';
+import 'package:meko_project/repository/auth/auth_repo.dart';
 import 'login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {

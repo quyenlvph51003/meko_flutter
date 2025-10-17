@@ -17,10 +17,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => HomeCubit(),
-      child: HomeView(),
-    );
+    return BlocProvider(create: (_) => HomeCubit()..isCheckLogin(), child: const HomeView());
   }
 }
 
@@ -28,182 +25,186 @@ class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
   @override
-  State<HomeView> createState() => HomeViewState();
+  State<HomeView> createState() => _HomeViewState();
 }
 
-class HomeViewState extends State<HomeView> {
+class _HomeViewState extends State<HomeView> {
   late HomeCubit vm;
-  int currentIndex = 0;
-
 
   @override
   void initState() {
     super.initState();
     vm = context.read<HomeCubit>();
-    vm.isCheckLogin();
   }
 
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final pages = const [TabHomePage(), TabMagePostingPage(), TabChatPage(), TabProfilePage()];
 
     return BlocListener<HomeCubit, HomeState>(
-      listenWhen: (prev, curr) {
-        return curr.shouldShowPostSheet;
-      },
+      listenWhen: (p, c) => c.shouldShowPostSheet,
       listener: (context, state) {
         if (state.shouldShowPostSheet) {
           showPostSheet(context);
+          return;
         }
       },
-      child: BlocBuilder<HomeCubit, HomeState>(
-        builder: (context, state) {
-          final pages = <Widget>[
-            TabHomePage(),
-            TabMagePostingPage(),
-            TabChatPage(),
-            TabProfilePage(),
-          ];
-          return Scaffold(
-            body: Stack(
-              children: [
-                IndexedStack(
-                  index: currentIndex,
-                  children: pages,
-                ),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: Container(
-                    height: 65 + bottomPadding,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 4,
-                          offset: const Offset(0, -1),
-                        ),
-                      ],
+      child: Scaffold(
+        body: Stack(
+          children: [
+            BlocBuilder<HomeCubit, HomeState>(
+              buildWhen: (p, c) => p.currentIndex != c.currentIndex,
+              builder: (context, state) {
+                return IndexedStack(index: state.currentIndex, children: pages);
+              },
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                height: 65 + bottomPadding,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 4,
+                      offset: const Offset(0, -1),
                     ),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 65,
-                          child: Row(
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 65,
+                      child: BlocBuilder<HomeCubit, HomeState>(
+                        buildWhen: (p, c) => p.currentIndex != c.currentIndex,
+                        builder: (context, state) {
+                          return Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               buildNavItem(
+                                context,
                                 index: 0,
                                 icon: Icons.home_outlined,
                                 activeIcon: Icons.home_rounded,
                                 label: 'Trang chủ',
+                                isActive: state.currentIndex == 0,
                               ),
                               buildNavItem(
+                                context,
                                 index: 1,
                                 icon: Icons.label_outline,
                                 activeIcon: Icons.label,
                                 label: 'Quản lý tin',
+                                isActive: state.currentIndex == 1,
                               ),
                               const SizedBox(width: 56),
                               buildNavItem(
+                                context,
                                 index: 2,
                                 icon: Icons.chat_bubble_outline,
                                 activeIcon: Icons.chat_bubble,
                                 label: 'Chat',
+                                isActive: state.currentIndex == 2,
                               ),
                               buildNavItem(
+                                context,
                                 index: 3,
                                 icon: Icons.person_outline,
                                 activeIcon: Icons.person,
                                 label: 'Tài khoản',
+                                isActive: state.currentIndex == 3,
                               ),
                             ],
-                          ),
-                        ),
-                        SizedBox(height: bottomPadding),
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: AppDimens.getWidth(context) / 2 - 28,
-                  bottom: 35 + bottomPadding,
-                  child: GestureDetector(
-                    onTap: () {
-                      HapticFeedback.mediumImpact();
-                      vm.openPostSheet();
-                    },
-                    child: Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColor.cMain,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColor.color8.withOpacity(0.4),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.add_rounded,
-                        color: Colors.white,
-                        size: 32,
+                          );
+                        },
                       ),
                     ),
-                  ),
+                    SizedBox(height: bottomPadding),
+                  ],
                 ),
-              ],
+              ),
             ),
-          );
-        }
+            Positioned(
+              left: AppDimens.getWidth(context) / 2 - 28,
+              bottom: 35 + bottomPadding,
+              child: GestureDetector(
+                onTap: () {
+                  HapticFeedback.mediumImpact();
+                  vm.openPostSheet();
+                  return;
+                },
+                child: Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColor.cMain,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColor.color8.withOpacity(0.4),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.add_rounded, color: Colors.white, size: 32),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget buildNavItem({
+  Widget buildNavItem(
+    BuildContext context, {
     required int index,
     required IconData icon,
     required IconData activeIcon,
     required String label,
+    required bool isActive,
   }) {
-    final isActive = currentIndex == index;
     return Expanded(
       child: InkWell(
         onTap: () async {
           HapticFeedback.lightImpact();
-          final goRegister = () => DefaultTabController.of(context).animateTo(1);
-          if (index == 1 && !context.read<HomeCubit>().state.isLoggedIn) {
+          if (index == 1 && !vm.state.isLoggedIn) {
             final ok = await showAuthBottomSheet(
               context,
-              loginPage: LoginPage(onSuccess: () {
-                Navigator.pop(context, true);
-              }, onTapRegister: () {
-                goRegister();
-              },),
-              registerPage: SignUpPage(onSuccess: () {
-                Navigator.pop(context, true);
-              }),
+              loginPage: LoginPage(
+                onSuccess: () {
+                  Navigator.pop(context, true);
+                  return;
+                },
+                onTapRegister: () {
+                  DefaultTabController.of(context).animateTo(1);
+                  return;
+                },
+              ),
+              registerPage: SignUpPage(
+                onSuccess: () {
+                  DefaultTabController.of(context).animateTo(0);
+                  return;
+                },
+                onBackToLogin: () {
+                  DefaultTabController.of(context).animateTo(0);
+                },
+              ),
             );
-            if (ok) {
-
-            }
-
-            if (ok) {
-              await context.read<HomeCubit>().isCheckLogin();
-              setState(() => currentIndex = 1);
+            if (ok == true) {
+              await vm.isCheckLogin();
+              vm.changeTab(1);
             }
             return;
           }
-          setState(() {
-            currentIndex = index;
-          });
+          vm.changeTab(index);
+          return;
         },
-
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -226,30 +227,6 @@ class HomeViewState extends State<HomeView> {
       ),
     );
   }
-  // Future<bool> openLoginFullScreen(BuildContext context) async {
-  //   final result = await Navigator.of(context).push<bool>(
-  //     MaterialPageRoute(
-  //       fullscreenDialog: true,
-  //       builder: (_) {
-  //         return LoginPage(showBack: true);
-  //       },
-  //     ),
-  //   );
-  //   return result ?? false;
-  // }
-  // Future<bool> showLoginSheet(BuildContext context) async {
-  //   final result = await showModalBottomSheet<bool>(
-  //     context: context,
-  //     isScrollControlled: true,
-  //     useSafeArea: true,
-  //     backgroundColor: Colors.transparent,
-  //     builder: (ctx) {
-  //       return
-  //         Expanded(child: LoginPage());
-  //     },
-  //   );
-  //   return result ?? true;
-  // }
 
   void showPostSheet(BuildContext context) {
     showModalBottomSheet(
@@ -258,7 +235,7 @@ class HomeViewState extends State<HomeView> {
       isScrollControlled: true,
       showDragHandle: true,
       backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) {
@@ -272,17 +249,12 @@ class HomeViewState extends State<HomeView> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'Đăng tin',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
-              ),
+              const Text('Đăng tin', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
               const SizedBox(height: 16),
               TextField(
                 decoration: InputDecoration(
                   labelText: 'Tiêu đề',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
               const SizedBox(height: 12),
@@ -290,9 +262,7 @@ class HomeViewState extends State<HomeView> {
                 maxLines: 3,
                 decoration: InputDecoration(
                   labelText: 'Mô tả',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
               const SizedBox(height: 16),
@@ -301,6 +271,7 @@ class HomeViewState extends State<HomeView> {
                 child: ElevatedButton.icon(
                   onPressed: () {
                     Navigator.pop(ctx);
+                    return;
                   },
                   icon: const Icon(Icons.cloud_upload_outlined),
                   label: const Text('Đăng ngay'),
@@ -308,9 +279,7 @@ class HomeViewState extends State<HomeView> {
                     backgroundColor: const Color(0xFFFFCF00),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
               ),
@@ -318,6 +287,7 @@ class HomeViewState extends State<HomeView> {
               TextButton(
                 onPressed: () {
                   Navigator.pop(ctx);
+                  return;
                 },
                 child: const Text('Để sau'),
               ),

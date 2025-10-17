@@ -1,58 +1,37 @@
-// repository/auth_repository/auth_repo.dart
 import 'package:dio/dio.dart';
 import 'package:meko_project/domains/api_path/api_path.dart';
 import 'package:meko_project/domains/rest_client/rest_client.dart';
 import 'package:meko_project/domains/rest_client/rest_client_extension.dart';
 import 'package:meko_project/models/body/auth/auth_token.dart';
+import 'package:meko_project/models/response_common.dart';
 
 class AuthRepository {
   final RestClient restClient;
 
-  // Constructor nhận restClient từ dependency injection
   AuthRepository({required this.restClient});
 
-  Future<Response?> register({
+  Future<ResponseCommon<void>> register({
     required String email,
     required String password,
-    required String name,
+    required String username,
   }) async {
+    final res = await restClient.post(
+      ApiPath.authRegister,
+      data: {'email': email, 'password': password, 'username': username},
+    );
+    return ResponseCommon<void>.fromJson(res.data, (_) => null);
+  }
+
+  Future<Response?> login({required String email, required String password}) async {
     try {
-      return await restClient.post(
-        ApiPath.authRegister,
-        data: {
-          'email': email,
-          'password': password,
-          'name': name,
-        },
-      );
+      return await restClient.post(ApiPath.authLogin, data: {'email': email, 'password': password});
     } catch (e) {
       print(e);
       return null;
     }
   }
 
-  Future<Response?> login({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      return await restClient.post(
-        ApiPath.authLogin,
-        data: {
-          'email': email,
-          'password': password,
-        },
-      );
-    } catch (e) {
-      print(e);
-      return null;
-    }
-  }
-
-  Future<bool> loginAndSaveToken({
-    required String email,
-    required String password,
-  }) async {
+  Future<bool> loginAndSaveToken({required String email, required String password}) async {
     try {
       final response = await login(email: email, password: password);
       if (response != null && response.statusCode == 200) {
@@ -69,10 +48,7 @@ class AuthRepository {
 
   Future<Response?> refreshToken(String refreshToken) async {
     try {
-      return await restClient.post(
-        ApiPath.authRefresh,
-        data: {'refreshToken': refreshToken},
-      );
+      return await restClient.post(ApiPath.authRefresh, data: {'refreshToken': refreshToken});
     } catch (e) {
       print(e);
       return null;
