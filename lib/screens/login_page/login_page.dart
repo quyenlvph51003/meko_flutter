@@ -5,6 +5,8 @@ import 'package:meko_project/consts/app_dimens.dart';
 import 'package:meko_project/consts/app_images.dart';
 import 'package:meko_project/domains/dependency_injection/service_locator.dart';
 import 'package:meko_project/repository/auth/auth_repo.dart';
+import 'package:meko_project/routers/app_router.dart';
+import 'package:meko_project/routers/app_router_paths.dart';
 import 'package:meko_project/widget/app_button/app_button.dart';
 import 'package:meko_project/widget/app_button/app_button_common.dart';
 import 'package:meko_project/widget/app_text_field/app_text_field.dart';
@@ -186,7 +188,7 @@ class _LoginPageViewState extends State<LoginPageView> {
                                 alignment: Alignment.centerRight,
                                 child: AppButton(
                                   onTap: () {
-                                    print('Quên mật khẩu');
+                                    Navigator.pushNamed(context, RouterPaths.requestOtpPage);
                                   },
                                   child: const Text(
                                     'Quên mật khẩu?',
@@ -217,12 +219,10 @@ class _LoginPageViewState extends State<LoginPageView> {
                                 text: 'Đăng ký tài khoản',
                                 onPressed: () async {
                                   DefaultTabController.of(context).animateTo(1);
-
                                 },
                                 type: AppButtonType.outlined,
                                 size: AppButtonSize.large,
                               ),
-
                               const SizedBox(height: 24),
                             ],
                           ),

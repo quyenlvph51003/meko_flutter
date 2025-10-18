@@ -3,4 +3,5 @@ class RouterPaths {
   static const String onBoarding = '/onBoarding';
   static const String login = '/login';
   static const String homePage = '/homePage';
+  static const String requestOtpPage = '/requestOtpPage';
 }

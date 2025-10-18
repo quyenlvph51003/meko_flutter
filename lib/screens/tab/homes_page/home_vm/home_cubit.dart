@@ -21,4 +21,9 @@ class HomeCubit extends Cubit<HomeState> {
   void changeTab(int index) {
     emit(state.copyWith(currentIndex: index));
   }
+
+  void refreshHome() {
+    emit(state.copyWith(uiRev: state.uiRev + 1));
+  }
 }
+

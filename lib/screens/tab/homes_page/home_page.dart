@@ -12,23 +12,15 @@ import 'package:meko_project/screens/tab/tab_profile/tab_profile_page.dart';
 import 'package:meko_project/utils/login_global/login_global.dart';
 import 'home_vm/home_cubit.dart';
 
-class HomePage extends StatelessWidget {
+
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocProvider(create: (_) => HomeCubit()..isCheckLogin(), child: const HomeView());
-  }
+  State<HomePage> createState() => _HomePageState();
 }
 
-class HomeView extends StatefulWidget {
-  const HomeView({super.key});
-
-  @override
-  State<HomeView> createState() => _HomeViewState();
-}
-
-class _HomeViewState extends State<HomeView> {
+class _HomePageState extends State<HomePage> {
   late HomeCubit vm;
 
   @override
@@ -54,7 +46,10 @@ class _HomeViewState extends State<HomeView> {
         body: Stack(
           children: [
             BlocBuilder<HomeCubit, HomeState>(
-              buildWhen: (p, c) => p.currentIndex != c.currentIndex,
+              buildWhen: (p, c) =>
+                  p.currentIndex != c.currentIndex ||
+                  p.isLoggedIn != c.isLoggedIn ||
+                  p.uiRev != c.uiRev,
               builder: (context, state) {
                 return IndexedStack(index: state.currentIndex, children: pages);
               },
@@ -80,7 +75,10 @@ class _HomeViewState extends State<HomeView> {
                     SizedBox(
                       height: 65,
                       child: BlocBuilder<HomeCubit, HomeState>(
-                        buildWhen: (p, c) => p.currentIndex != c.currentIndex,
+                        buildWhen: (p, c) =>
+                            p.currentIndex != c.currentIndex ||
+                            p.isLoggedIn != c.isLoggedIn ||
+                            p.uiRev != c.uiRev,
                         builder: (context, state) {
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -173,7 +171,8 @@ class _HomeViewState extends State<HomeView> {
       child: InkWell(
         onTap: () async {
           HapticFeedback.lightImpact();
-          if (index == 1 && !vm.state.isLoggedIn) {
+          final needAuth = (index == 1 || index == 2 || index == 3);
+          if (needAuth && !vm.state.isLoggedIn) {
             final ok = await showAuthBottomSheet(
               context,
               loginPage: LoginPage(
@@ -198,13 +197,14 @@ class _HomeViewState extends State<HomeView> {
             );
             if (ok == true) {
               await vm.isCheckLogin();
-              vm.changeTab(1);
+              vm.changeTab(index);
             }
             return;
           }
           vm.changeTab(index);
           return;
         },
+
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meko_project/screens/forgot_pass_page/request_otp_page.dart';
 import 'package:meko_project/screens/login_page/login_page.dart';
 import 'package:meko_project/screens/splash_page/splash_page.dart';
 import 'package:meko_project/screens/tab/homes_page/home_page.dart';
@@ -28,9 +29,11 @@ class AppRouter {
       case RouterPaths.splash:
         return SplashPage();
       case RouterPaths.login:
-        return LoginPage(onSuccess: () {}, onTapRegister: () {  },);
+        return LoginPage(onSuccess: () {}, onTapRegister: () {});
       case RouterPaths.homePage:
         return HomePage();
+      case RouterPaths.requestOtpPage:
+        return RequestOtpPage();
       default:
         return SizedBox();
     }

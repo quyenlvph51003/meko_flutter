@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
-
-class AccountState {
+class TabProfileState {
   final String name;
   final int followers;
   final int following;
@@ -8,7 +6,7 @@ class AccountState {
   final bool headerReady;
   final bool retrying;
 
-  AccountState({
+  TabProfileState({
     required this.name,
     required this.followers,
     required this.following,
@@ -17,9 +15,9 @@ class AccountState {
     required this.retrying,
   });
 
-  factory AccountState.initial() {
-    return AccountState(
-      name: 'Trần Dương PH 5 0 7 4 8',
+  factory TabProfileState.initial() {
+    return TabProfileState(
+      name: 'Vương Toàn Quyền',
       followers: 0,
       following: 0,
       coins: 0,
@@ -28,7 +26,7 @@ class AccountState {
     );
   }
 
-  AccountState copyWith({
+  TabProfileState copyWith({
     String? name,
     int? followers,
     int? following,
@@ -36,7 +34,7 @@ class AccountState {
     bool? headerReady,
     bool? retrying,
   }) {
-    return AccountState(
+    return TabProfileState(
       name: name ?? this.name,
       followers: followers ?? this.followers,
       following: following ?? this.following,

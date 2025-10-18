@@ -11,7 +11,7 @@ class TokenStore {
     refreshExp = t.refreshTokenExpired;
   }
 
-  void clear() {
+  Future<void> clear() async {
     accessToken = refreshToken = null;
     accessExp = refreshExp = null;
   }

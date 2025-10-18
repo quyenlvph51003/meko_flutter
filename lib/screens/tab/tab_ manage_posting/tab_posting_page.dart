@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meko_project/consts/app_colcor.dart';
+import 'package:meko_project/consts/app_dimens.dart';
 import 'package:meko_project/screens/tab/tab_%20manage_posting/tab_posting_vm/tab_posting_cubit.dart';
 import 'package:meko_project/screens/tab/tab_%20manage_posting/tab_posting_vm/tab_posting_state.dart';
 
@@ -164,7 +166,7 @@ class HeaderStrip extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 16,
-                    backgroundColor: Colors.orange.shade400,
+                    backgroundColor: AppColor.cMain,
                     child: const Text('V', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
                   ),
                   const SizedBox(width: 8),
@@ -172,10 +174,10 @@ class HeaderStrip extends StatelessWidget {
                     child: Text('Vương Toàn Quyền', style: TextStyle(fontWeight: FontWeight.w600)),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.orange, width: 1)),
-                    child: Row(children: const [
-                      Icon(Icons.monetization_on, size: 16, color: Colors.orange),
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColor.cMain, width: 1)),
+                    child: Row(children: [
+                      Icon(Icons.monetization_on, size: 16, color: AppColor.cMain),
                       SizedBox(width: 4),
                       Text('DT'),
                     ]),
@@ -200,15 +202,6 @@ class HeaderStrip extends StatelessWidget {
                     },
                   ),
                 ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 60, top: 4),
-              child: InkWell(
-                onTap: () {
-                  return;
-                },
-                child: const Text('+ Tạo cửa hàng', style: TextStyle(color: Colors.blue)),
               ),
             ),
           ],
@@ -268,10 +261,10 @@ class TabBarStrip extends StatelessWidget {
         builder: (context, state) {
           return Row(
             children: [
-              Expanded(child: tabItem(context, 'ĐANG HIỂN THỊ (0)', PostTab.dangHienThi, state.currentTab)),
-              Expanded(child: tabItem(context, 'HẾT HẠN (0)', PostTab.hetHan, state.currentTab)),
-              Expanded(child: tabItem(context, 'BỊ TỪ CHỐI (0)', PostTab.biTuChoi, state.currentTab)),
-              Expanded(child: tabItem(context, 'CẦN BỔ SUNG (0)', PostTab.canBoSung, state.currentTab)),
+              Expanded(child: tabItem(context, 'ĐANG HIỂN THỊ', PostTab.dangHienThi, state.currentTab)),
+              Expanded(child: tabItem(context, 'HẾT HẠN', PostTab.hetHan, state.currentTab)),
+              Expanded(child: tabItem(context, 'BỊ TỪ CHỐI', PostTab.biTuChoi, state.currentTab)),
+              Expanded(child: tabItem(context, 'CẦN BỔ SUNG', PostTab.canBoSung, state.currentTab)),
             ],
           );
         },
@@ -289,7 +282,7 @@ class TabBarStrip extends StatelessWidget {
         alignment: Alignment.center,
         height: 44,
         decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: isActive ? Colors.orange : Colors.transparent, width: 2)),
+          border: Border(bottom: BorderSide(color: isActive ? AppColor.cMain : Colors.transparent, width: 2)),
         ),
         child: Text(
           label,
@@ -309,11 +302,13 @@ class EmptyState extends StatelessWidget {
     return Container(
       alignment: Alignment.center,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+
         children: [
+        SizedBox(
+          height: AppDimens.getHeight(context)*0.1,
+        ),
           Container(
-            width: 220,
-            height: 160,
+            padding: EdgeInsets.symmetric(horizontal: 100, vertical: 60),
             decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(12)),
             child: const Icon(Icons.image_outlined, size: 64, color: Colors.grey),
           ),
@@ -326,7 +321,7 @@ class EmptyState extends StatelessWidget {
             onPressed: () {
               return;
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColor.cMain, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
             child: const Text('Đăng tin', style: TextStyle(fontWeight: FontWeight.w600)),
           ),
         ],

@@ -3,7 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meko_project/routers/app_router.dart';
 import 'package:meko_project/routers/app_router_paths.dart';
+import 'package:meko_project/screens/tab/homes_page/home_vm/home_cubit.dart';
+import 'package:meko_project/widget/app_dialog/app_dialog.dart';
 
+import 'domains/dependency_injection/service_locator.dart';
 import 'main_cubit/main_cubit.dart';
 import 'main_cubit/main_state.dart';
 
@@ -18,8 +21,11 @@ class MainApp extends StatelessWidget {
       DeviceOrientation.portraitDown,
     ]);
 
-    return BlocProvider(
-      create: (context) => MainCubit(),
+    return  MultiBlocProvider(
+      providers: [
+        BlocProvider<MainCubit>(create: (_) => MainCubit()),
+        BlocProvider<HomeCubit>.value(value: getIt<HomeCubit>()),
+      ],
       child: BlocBuilder<MainCubit, MainState>(
         builder: (context, state) {
           return MaterialApp(
@@ -31,18 +37,7 @@ class MainApp extends StatelessWidget {
               return AppRouter.instance.onGenerateRoute(settings);
             },
             debugShowCheckedModeBanner: false,
-
-            // Uncomment khi cần localization
-            // localizationsDelegates: [
-            //   S.delegate,
-            //   GlobalMaterialLocalizations.delegate,
-            //   GlobalWidgetsLocalizations.delegate,
-            //   GlobalCupertinoLocalizations.delegate,
-            // ],
-            // supportedLocales: const [
-            //   Locale('en', 'US'),
-            //   Locale('vi', 'VN'),
-            // ],
+            navigatorKey: appNavigatorKey,
           );
         },
       ),
