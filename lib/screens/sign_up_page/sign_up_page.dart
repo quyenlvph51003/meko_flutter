@@ -72,7 +72,7 @@ class SignUpPageViewState extends State<SignUpPageView> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFF2F6FF),
+        backgroundColor: AppColor.white,
         body: GestureDetector(
           onTap: () {
             FocusScope.of(context).unfocus();

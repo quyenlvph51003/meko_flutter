@@ -1,99 +1,49 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:meko_project/models/body/category/category_model.dart';
 
 class TabHomeState extends Equatable {
   final String selectedTab;
   final bool isAppBarCollapsed;
-  final List<CategoryItem> categories;
+  final List<Category> categories;
+  final bool categoriesLoading;
+  final String? categoriesError;
   final int productCount;
 
   const TabHomeState({
     required this.selectedTab,
     required this.isAppBarCollapsed,
     required this.categories,
+    required this.categoriesLoading,
+    this.categoriesError,
     required this.productCount,
   });
 
   factory TabHomeState.initial() {
-    return TabHomeState(
+    return const TabHomeState(
       selectedTab: 'Dành cho bạn',
       isAppBarCollapsed: false,
-      categories: [
-        CategoryItem(
-          icon: '🏠',
-          title: 'Bất động sản',
-          subtitle: 'NHẤT TỐT',
-          color: const Color(0xFFFF6B35),
-        ),
-        CategoryItem(
-          icon: '🚗',
-          title: 'Xe cộ',
-          subtitle: 'chợ TỐT XE',
-          color: const Color(0xFF4ECDC4),
-        ),
-        CategoryItem(
-          icon: '🐕',
-          title: 'Thú cưng',
-          subtitle: '',
-          color: const Color(0xFFFFB84D),
-        ),
-        CategoryItem(
-          icon: '🛋️',
-          title: 'Đồ gia dụng, nội thất, cá...',
-          subtitle: '',
-          color: const Color(0xFFFF8C42),
-        ),
-        CategoryItem(
-          icon: '🎮',
-          title: 'Giải trí, Thể thao,...',
-          subtitle: '',
-          color: const Color(0xFF95E1D3),
-        ),
-        CategoryItem(
-          icon: '👔',
-          title: 'Việc làm',
-          subtitle: 'VIỆC TỐT',
-          color: const Color(0xFFFECA57),
-        ),
-        CategoryItem(
-          icon: '📱',
-          title: 'Đồ điện tử',
-          subtitle: '',
-          color: const Color(0xFF9B59B6),
-        ),
-        CategoryItem(
-          icon: '❄️',
-          title: 'Tủ lạnh, máy lạnh, máy giặt',
-          subtitle: '',
-          color: const Color(0xFF3498DB),
-        ),
-        CategoryItem(
-          icon: '🖨️',
-          title: 'Đồ dùng văn phòng, côn...',
-          subtitle: '',
-          color: const Color(0xFF95A5A6),
-        ),
-        CategoryItem(
-          icon: '👗',
-          title: 'Thời trang, Đồ dù...',
-          subtitle: '',
-          color: const Color(0xFFE74C3C),
-        ),
-      ],
-      productCount: 20,
+      categories: [],
+      categoriesLoading: true,
+      categoriesError: null,
+      productCount: 0,
     );
   }
 
   TabHomeState copyWith({
     String? selectedTab,
     bool? isAppBarCollapsed,
-    List<CategoryItem>? categories,
+    List<Category>? categories,
+    bool? categoriesLoading,
+    String? categoriesError,
     int? productCount,
   }) {
     return TabHomeState(
       selectedTab: selectedTab ?? this.selectedTab,
       isAppBarCollapsed: isAppBarCollapsed ?? this.isAppBarCollapsed,
       categories: categories ?? this.categories,
+      categoriesLoading: categoriesLoading ?? this.categoriesLoading,
+      categoriesError: categoriesError ?? this.categoriesError,
       productCount: productCount ?? this.productCount,
     );
   }
@@ -103,23 +53,8 @@ class TabHomeState extends Equatable {
     selectedTab,
     isAppBarCollapsed,
     categories,
+    categoriesLoading,
+    categoriesError,
     productCount,
   ];
-}
-
-class CategoryItem extends Equatable {
-  final String icon;
-  final String title;
-  final String subtitle;
-  final Color color;
-
-  const CategoryItem({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.color,
-  });
-
-  @override
-  List<Object?> get props => [icon, title, subtitle, color];
 }

@@ -69,10 +69,9 @@ class RequestOtpPageState extends State<RequestOtpPage> {
             );
           }
         },
-
         builder: (context, state) {
           return Scaffold(
-            backgroundColor: const Color(0xFFF2F6FF),
+            backgroundColor:  AppColor.white,
             body: GestureDetector(
               onTap: () {
                 FocusScope.of(context).unfocus();

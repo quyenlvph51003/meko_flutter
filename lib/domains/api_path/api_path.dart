@@ -4,4 +4,5 @@ class ApiPath {
   static const String authRefresh = 'auth/refresh-token';
   static const String authRequestOtp = 'auth/request-otp';
   static const String authVerifyOtp = 'auth/verify-otp';
+  static const String categoryList = 'category/list';
 }

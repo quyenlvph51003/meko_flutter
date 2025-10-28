@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meko_project/screens/forgot_pass_page/forgot_pass_page.dart';
 import 'package:meko_project/screens/forgot_pass_page/request_otp_page.dart';
 import 'package:meko_project/screens/login_page/login_page.dart';
 import 'package:meko_project/screens/splash_page/splash_page.dart';
@@ -34,6 +35,8 @@ class AppRouter {
         return HomePage();
       case RouterPaths.requestOtpPage:
         return RequestOtpPage();
+      case RouterPaths.forgotPassPage:
+        return ForgotPassPage();
       default:
         return SizedBox();
     }

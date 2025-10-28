@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'forgot_pass_state.dart';
+import 'package:meko_project/repository/auth/auth_repo.dart';
 
 typedef SendResetEmail = Future<void> Function(String email);
 typedef VerifyOtpFn = Future<void> Function(String email, String otp);
@@ -11,10 +12,12 @@ class ForgotPassCubit extends Cubit<ForgotPassState> {
   ForgotPassCubit({
     required this.sendResetEmail,
     required this.verifyOtpFn,
+    this.authRepository,
   }) : super(ForgotPassState.initial());
 
   final SendResetEmail sendResetEmail;
   final VerifyOtpFn verifyOtpFn;
+  final AuthRepository? authRepository;
 
   factory ForgotPassCubit.forRequest({required SendResetEmail sendResetEmail}) {
     return ForgotPassCubit(sendResetEmail: sendResetEmail, verifyOtpFn: noopVerifyOtpFn);
@@ -22,6 +25,14 @@ class ForgotPassCubit extends Cubit<ForgotPassState> {
 
   factory ForgotPassCubit.forVerify({required VerifyOtpFn verifyOtpFn, String? initialEmail}) {
     final c = ForgotPassCubit(sendResetEmail: noopSendResetEmail, verifyOtpFn: verifyOtpFn);
+    if (initialEmail != null && initialEmail.isNotEmpty) {
+      c.onEmailChanged(initialEmail);
+    }
+    return c;
+  }
+
+  factory ForgotPassCubit.forVerifyWithRepo({required AuthRepository repo, String? initialEmail}) {
+    final c = ForgotPassCubit(sendResetEmail: noopSendResetEmail, verifyOtpFn: noopVerifyOtpFn, authRepository: repo);
     if (initialEmail != null && initialEmail.isNotEmpty) {
       c.onEmailChanged(initialEmail);
     }
@@ -37,7 +48,7 @@ class ForgotPassCubit extends Cubit<ForgotPassState> {
   }
 
   Future<void> submit() async {
-    if (state.loading) { return; }
+    if (state.loading) return;
     final email = state.email.trim();
     if (email.isEmpty) {
       emit(state.copyWith(errorMessage: 'Vui lòng nhập email'));
@@ -53,7 +64,7 @@ class ForgotPassCubit extends Cubit<ForgotPassState> {
   }
 
   Future<void> verify() async {
-    if (state.loading) { return; }
+    if (state.loading) return;
     final email = state.email.trim();
     final otp = state.otp.trim();
     if (email.isEmpty) {
@@ -65,7 +76,22 @@ class ForgotPassCubit extends Cubit<ForgotPassState> {
       return;
     }
     emit(state.copyWith(loading: true, errorMessage: null, verified: false));
+
     try {
+      if (authRepository != null) {
+        final res = await authRepository!.verifyOtp(email: email, otp: otp);
+        final ok = (res.success == true);
+        if (!ok) {
+          final msg = (res.message is String && (res.message as String).isNotEmpty)
+              ? res.message as String
+              : 'Xác thực OTP thất bại';
+          emit(state.copyWith(loading: false, errorMessage: msg, verified: false));
+          return;
+        }
+        emit(state.copyWith(loading: false, verified: true));
+        return;
+      }
+
       await verifyOtpFn(email, otp);
       emit(state.copyWith(loading: false, verified: true));
     } catch (_) {

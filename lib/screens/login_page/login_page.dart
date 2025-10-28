@@ -15,6 +15,8 @@ import 'package:meko_project/widget/app_validators/app_validators.dart';
 import 'login_vm/login_cubit.dart';
 import 'login_vm/login_state.dart';
 
+
+
 class LoginPage extends StatelessWidget {
   const LoginPage({
     Key? key,
@@ -78,7 +80,7 @@ class _LoginPageViewState extends State<LoginPageView> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFF2F6FF),
+        backgroundColor:  AppColor.white,
         body: GestureDetector(
           onTap: () {
             FocusScope.of(context).unfocus();
