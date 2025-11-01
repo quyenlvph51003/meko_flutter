@@ -1,12 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meko_project/models/body/category/category_model.dart';
 import 'package:meko_project/repository/category/category_repo.dart';
+import 'package:meko_project/repository/post/post_repo.dart';
+import 'package:meko_project/routers/app_router_paths.dart';
 import 'tab_home_state.dart';
 
 class TabHomeCubit extends Cubit<TabHomeState> {
   final CategoryRepository categoryRepository;
+  final PostRepo postRepository;
 
-  TabHomeCubit({required this.categoryRepository}) : super(TabHomeState.initial());
+  TabHomeCubit({required this.categoryRepository, required this.postRepository}) : super(TabHomeState.initial());
 
   Future<void> initCubit() async {
     await fetchCategories();
@@ -32,17 +36,41 @@ class TabHomeCubit extends Cubit<TabHomeState> {
     }
   }
 
-  void changeTab(String tabName) {
-    if (state.selectedTab != tabName) {
-      emit(state.copyWith(selectedTab: tabName));
+  Future<void> fetchPosts() async {
+    emit(state.copyWith(postsLoading: true, postsError: null));
+
+    final result = await postRepository.getPosts();
+
+    if (result.success && result.data != null) {
+      emit(state.copyWith(
+        posts: result.data!.content,
+        postsPagination: result.data!.pagination,
+        postsLoading: false,
+        postsError: null,
+      ));
+    } else {
+      emit(state.copyWith(
+        postsLoading: false,
+        postsError: result.message,
+        posts: [],
+      ));
     }
   }
 
-  void updateAppBarCollapsed(bool isCollapsed) {
-    if (state.isAppBarCollapsed != isCollapsed) {
-      emit(state.copyWith(isAppBarCollapsed: isCollapsed));
-    }
+  void onProductTap(BuildContext context, int index) {
+    final item = state.posts[index];
+    print('Click post: ${item.title}');
+
+    Navigator.pushNamed(
+      context,
+      RouterPaths.postDetailPage,
+      arguments: item,
+    );
   }
+
+  void changeTab(String tabName) {
+  }
+
 
   void requestLocationPermission() {
   }
@@ -53,8 +81,6 @@ class TabHomeCubit extends Cubit<TabHomeState> {
   void onCategoryTap(Category category) {
   }
 
-  void onProductTap(int index) {
-  }
 
   void onFavoriteTap(int index) {
   }

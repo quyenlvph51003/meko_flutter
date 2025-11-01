@@ -5,4 +5,5 @@ class RouterPaths {
   static const String homePage = '/homePage';
   static const String requestOtpPage = '/requestOtpPage';
   static const String forgotPassPage = '/forgotPassPage';
+  static const String postDetailPage = '/PostDetailPage';
 }

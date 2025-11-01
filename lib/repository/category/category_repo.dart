@@ -11,7 +11,7 @@ class CategoryRepository {
 
   Future<ResponseCommon<Category>> getAllCategory() async {
     try {
-      final response = await restClient.get(ApiPath.categoryList);
+      final response = await restClient.get(ApiPath.categoryList,queryParameters: {'isActive': 1},);
       return ResponseCommon<Category>.fromJsonList(
         response.data,
             (json) => Category.fromJson(json),

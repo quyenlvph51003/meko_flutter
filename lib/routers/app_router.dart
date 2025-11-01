@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:meko_project/models/body/post/listing_item_model.dart';
 import 'package:meko_project/screens/forgot_pass_page/forgot_pass_page.dart';
 import 'package:meko_project/screens/forgot_pass_page/request_otp_page.dart';
 import 'package:meko_project/screens/login_page/login_page.dart';
 import 'package:meko_project/screens/splash_page/splash_page.dart';
 import 'package:meko_project/screens/tab/homes_page/home_page.dart';
 
+import '../screens/post_detail_page/post_detail_page.dart';
 import 'app_router_paths.dart';
 
 class AppRouter {
@@ -37,6 +39,9 @@ class AppRouter {
         return RequestOtpPage();
       case RouterPaths.forgotPassPage:
         return ForgotPassPage();
+      case RouterPaths.postDetailPage:
+        ListingItem item = data as ListingItem;
+        return PostDetailPage(item: item);
       default:
         return SizedBox();
     }

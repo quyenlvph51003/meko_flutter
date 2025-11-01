@@ -1,703 +1,15 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:meko_project/screens/tab/tab_home/tab_home_vm/tab_home_cubit.dart';
-// import 'package:meko_project/screens/tab/tab_home/tab_home_vm/tab_home_state.dart';
-//
-// class TabHomePage extends StatefulWidget {
-//   const TabHomePage({super.key});
-//
-//   @override
-//   State<TabHomePage> createState() => _TabHomePageState();
-// }
-//
-// class _TabHomePageState extends State<TabHomePage> {
-//   late ScrollController scrollController;
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     scrollController = ScrollController();
-//     scrollController.addListener(onScrollListener);
-//   }
-//
-//   @override
-//   void dispose() {
-//     scrollController.removeListener(onScrollListener);
-//     scrollController.dispose();
-//     super.dispose();
-//   }
-//
-//   void onScrollListener() {
-//     final cubit = context.read<TabHomeCubit>();
-//     if (scrollController.hasClients) {
-//       final isCollapsed = scrollController.offset > 100;
-//       cubit.updateAppBarCollapsed(isCollapsed);
-//     }
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     final bottomPadding = MediaQuery.of(context).padding.bottom;
-//
-//     return BlocProvider(
-//       create: (context) {
-//         return TabHomeCubit();
-//       },
-//       child: Scaffold(
-//         backgroundColor: Colors.white,
-//         body: Stack(
-//           children: [
-//             CustomScrollView(
-//               controller: scrollController,
-//               slivers: [
-//                 SliverToBoxAdapter(
-//                   child: Container(
-//                     decoration: const BoxDecoration(
-//                       gradient: LinearGradient(
-//                         begin: Alignment.topLeft,
-//                         end: Alignment.bottomRight,
-//                         colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)],
-//                       ),
-//                     ),
-//                     child: Column(
-//                       children: [
-//                         SafeArea(
-//                           top: true,
-//                           child: Container(
-//                             child: Padding(
-//                               padding: EdgeInsets.symmetric(horizontal: 16),
-//                               child: Row(
-//                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                                 children: [
-//                                   const Icon(Icons.menu, color: Colors.white, size: 28),
-//                                   Row(
-//                                     children: [
-//                                       Container(
-//                                         padding: const EdgeInsets.all(8),
-//                                         child: const Icon(
-//                                           Icons.favorite_border,
-//                                           color: Colors.white,
-//                                           size: 26,
-//                                         ),
-//                                       ),
-//                                       const SizedBox(width: 8),
-//                                       Container(
-//                                         padding: const EdgeInsets.all(8),
-//                                         child: const Icon(
-//                                           Icons.notifications_outlined,
-//                                           color: Colors.white,
-//                                           size: 26,
-//                                         ),
-//                                       ),
-//                                     ],
-//                                   ),
-//                                 ],
-//                               ),
-//                             ),
-//                           ),
-//                         ),
-//                         buildHeaderSection(),
-//                         buildSearchBar(),
-//                         const SizedBox(height: 16),
-//                       ],
-//                     ),
-//                   ),
-//                 ),
-//                 SliverToBoxAdapter(
-//                   child: Container(
-//                     color: Colors.white,
-//                     child: Column(
-//                       children: [
-//                         buildCategoryGrid(),
-//                         const SizedBox(height: 16),
-//                         buildTabBar(),
-//                         buildInfoBanner(),
-//                       ],
-//                     ),
-//                   ),
-//                 ),
-//                 SliverPadding(
-//                   padding: EdgeInsets.only(left: 16, right: 16, bottom: 80 + bottomPadding),
-//                   sliver: buildProductGrid(),
-//                 ),
-//               ],
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-//
-//   Widget buildFloatingAppBar(double topPadding) {
-//     return BlocBuilder<TabHomeCubit, TabHomeState>(
-//       buildWhen: (previous, current) {
-//         return previous.isAppBarCollapsed != current.isAppBarCollapsed;
-//       },
-//       builder: (context, state) {
-//         return AnimatedContainer(
-//           duration: const Duration(milliseconds: 200),
-//           height: topPadding + 60,
-//           decoration: BoxDecoration(
-//             gradient: state.isAppBarCollapsed
-//                 ? const LinearGradient(
-//               begin: Alignment.topLeft,
-//               end: Alignment.bottomRight,
-//               colors: [
-//                 Color(0xFF4CAF50),
-//                 Color(0xFF66BB6A),
-//               ],
-//             )
-//                 : null,
-//             boxShadow: state.isAppBarCollapsed
-//                 ? [
-//               BoxShadow(
-//                 color: Colors.black.withOpacity(0.1),
-//                 blurRadius: 8,
-//                 offset: const Offset(0, 2),
-//               ),
-//             ]
-//                 : null,
-//           ),
-//           child: SafeArea(
-//             child: Padding(
-//               padding: const EdgeInsets.symmetric(horizontal: 16),
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                 children: [
-//                   const Icon(
-//                     Icons.menu,
-//                     color: Colors.white,
-//                     size: 28,
-//                   ),
-//                   if (state.isAppBarCollapsed)
-//                     const Expanded(
-//                       child: Padding(
-//                         padding: EdgeInsets.symmetric(horizontal: 16),
-//                         child: Text(
-//                           'Bạn muốn mua gì?',
-//                           style: TextStyle(
-//                             fontSize: 18,
-//                             fontWeight: FontWeight.bold,
-//                             color: Colors.white,
-//                           ),
-//                           overflow: TextOverflow.ellipsis,
-//                         ),
-//                       ),
-//                     ),
-//                   Row(
-//                     children: [
-//                       Container(
-//                         padding: const EdgeInsets.all(8),
-//                         child: const Icon(
-//                           Icons.favorite_border,
-//                           color: Colors.white,
-//                           size: 26,
-//                         ),
-//                       ),
-//                       const SizedBox(width: 8),
-//                       Container(
-//                         padding: const EdgeInsets.all(8),
-//                         child: const Icon(
-//                           Icons.notifications_outlined,
-//                           color: Colors.white,
-//                           size: 26,
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         );
-//       },
-//     );
-//   }
-//
-//   Widget buildHeaderSection() {
-//     return const Padding(
-//       padding: EdgeInsets.symmetric(horizontal: 16),
-//       child: Row(
-//         children: [
-//           Expanded(
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 SizedBox(height: 24),
-//                 Text(
-//                   'Bạn muốn mua gì?',
-//                   style: TextStyle(
-//                     fontSize: 24,
-//                     fontWeight: FontWeight.bold,
-//                     color: Colors.white,
-//                   ),
-//                 ),
-//                 SizedBox(height: 4),
-//                 Text(
-//                   'Mua thì hỏi, bán thì lời',
-//                   style: TextStyle(
-//                     fontSize: 14,
-//                     color: Colors.white,
-//                   ),
-//                 ),
-//                 SizedBox(height: 16),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget buildSearchBar() {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(horizontal: 16),
-//       child: Container(
-//         height: 56,
-//         decoration: BoxDecoration(
-//           color: Colors.white,
-//           borderRadius: BorderRadius.circular(28),
-//           boxShadow: [
-//             BoxShadow(
-//               color: Colors.black.withOpacity(0.1),
-//               blurRadius: 8,
-//               offset: const Offset(0, 2),
-//             ),
-//           ],
-//         ),
-//         child: Row(
-//           children: [
-//             Container(
-//               padding: const EdgeInsets.symmetric(horizontal: 16),
-//               constraints: const BoxConstraints(minWidth: 80),
-//               child: Row(
-//                 mainAxisSize: MainAxisSize.min,
-//                 children: [
-//                   const Flexible(
-//                     child: Text(
-//                       'Danh mục',
-//                       style: TextStyle(
-//                         fontSize: 15,
-//                         fontWeight: FontWeight.w500,
-//                       ),
-//                       overflow: TextOverflow.ellipsis,
-//                     ),
-//                   ),
-//                   const SizedBox(width: 4),
-//                   Icon(
-//                     Icons.keyboard_arrow_down,
-//                     size: 20,
-//                     color: Colors.grey[700],
-//                   ),
-//                 ],
-//               ),
-//             ),
-//             Container(
-//               width: 1,
-//               height: 24,
-//               color: Colors.grey[300],
-//             ),
-//             const Expanded(
-//               child: TextField(
-//                 decoration: InputDecoration(
-//                   hintText: 'Tìm kiếm...',
-//                   hintStyle: TextStyle(
-//                     color: Colors.grey,
-//                     fontSize: 15,
-//                   ),
-//                   border: InputBorder.none,
-//                   contentPadding: EdgeInsets.symmetric(horizontal: 16),
-//                 ),
-//               ),
-//             ),
-//             Container(
-//               margin: const EdgeInsets.all(4),
-//               decoration: const BoxDecoration(
-//                 color: Color(0xFF4CAF50),
-//                 shape: BoxShape.circle,
-//               ),
-//               child: IconButton(
-//                 icon: const Icon(
-//                   Icons.search,
-//                   color: Colors.white,
-//                 ),
-//                 onPressed: () {
-//                   context.read<TabHomeCubit>().onSearchTap();
-//                 },
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-//
-//   Widget buildCategoryGrid() {
-//     return BlocBuilder<TabHomeCubit, TabHomeState>(
-//       buildWhen: (previous, current) {
-//         return previous.categories != current.categories;
-//       },
-//       builder: (context, state) {
-//         return Container(
-//           padding: const EdgeInsets.symmetric(horizontal: 8),
-//           child: LayoutBuilder(
-//             builder: (context, constraints) {
-//               int crossAxisCount = 5;
-//               if (constraints.maxWidth < 360) {
-//                 crossAxisCount = 4;
-//               }
-//
-//               return GridView.builder(
-//                 shrinkWrap: true,
-//                 physics: const NeverScrollableScrollPhysics(),
-//                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-//                   crossAxisCount: crossAxisCount,
-//                   childAspectRatio: 0.75,
-//                   crossAxisSpacing: 8,
-//                   mainAxisSpacing: 8,
-//                 ),
-//                 itemCount: state.categories.length,
-//                 itemBuilder: (context, index) {
-//                   final category = state.categories[index];
-//                   return buildCategoryItem(category);
-//                 },
-//               );
-//             },
-//           ),
-//         );
-//       },
-//     );
-//   }
-//
-//   Widget buildCategoryItem(CategoryItem category) {
-//     return GestureDetector(
-//       onTap: () {
-//         context.read<TabHomeCubit>().onCategoryTap(category);
-//       },
-//       child: LayoutBuilder(
-//         builder: (context, constraints) {
-//           return Column(
-//             mainAxisSize: MainAxisSize.min,
-//             children: [
-//               Container(
-//                 width: constraints.maxWidth * 0.8,
-//                 height: constraints.maxWidth * 0.8,
-//                 constraints: const BoxConstraints(
-//                   maxWidth: 56,
-//                   maxHeight: 56,
-//                 ),
-//                 decoration: BoxDecoration(
-//                   color: category.color.withOpacity(0.15),
-//                   borderRadius: BorderRadius.circular(12),
-//                 ),
-//                 child: Center(
-//                   child: FittedBox(
-//                     fit: BoxFit.scaleDown,
-//                     child: Text(
-//                       category.icon,
-//                       style: const TextStyle(fontSize: 28),
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//               const SizedBox(height: 6),
-//               Flexible(
-//                 child: Text(
-//                   category.title,
-//                   textAlign: TextAlign.center,
-//                   maxLines: 2,
-//                   overflow: TextOverflow.ellipsis,
-//                   style: const TextStyle(
-//                     fontSize: 11,
-//                     height: 1.2,
-//                   ),
-//                 ),
-//               ),
-//               if (category.subtitle.isNotEmpty)
-//                 Flexible(
-//                   child: Text(
-//                     category.subtitle,
-//                     textAlign: TextAlign.center,
-//                     maxLines: 1,
-//                     overflow: TextOverflow.ellipsis,
-//                     style: TextStyle(
-//                       fontSize: 9,
-//                       color: category.color,
-//                       fontWeight: FontWeight.bold,
-//                     ),
-//                   ),
-//                 ),
-//             ],
-//           );
-//         },
-//       ),
-//     );
-//   }
-//
-//   Widget buildTabBar() {
-//     return BlocBuilder<TabHomeCubit, TabHomeState>(
-//       buildWhen: (previous, current) {
-//         return previous.selectedTab != current.selectedTab;
-//       },
-//       builder: (context, state) {
-//         return SingleChildScrollView(
-//           scrollDirection: Axis.horizontal,
-//           padding: const EdgeInsets.symmetric(horizontal: 16),
-//           child: Row(
-//             children: [
-//               buildTab('Dành cho bạn', state.selectedTab),
-//               const SizedBox(width: 24),
-//               buildTab('Gần bạn', state.selectedTab),
-//               const SizedBox(width: 24),
-//               buildTab('Mới nhất', state.selectedTab),
-//               const SizedBox(width: 24),
-//               buildTab('Video', state.selectedTab),
-//             ],
-//           ),
-//         );
-//       },
-//     );
-//   }
-//
-//   Widget buildTab(String title, String selectedTab) {
-//     final isSelected = selectedTab == title;
-//     return GestureDetector(
-//       onTap: () {
-//         context.read<TabHomeCubit>().changeTab(title);
-//       },
-//       child: Column(
-//         children: [
-//           Text(
-//             title,
-//             style: TextStyle(
-//               fontSize: 15,
-//               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-//               color: isSelected ? Colors.black : Colors.grey[600],
-//             ),
-//           ),
-//           const SizedBox(height: 8),
-//           if (isSelected)
-//             Container(
-//               height: 3,
-//               width: 24,
-//               decoration: BoxDecoration(
-//                 color: const Color(0xFF4CAF50),
-//                 borderRadius: BorderRadius.circular(2),
-//               ),
-//             )
-//           else
-//             const SizedBox(height: 3),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget buildInfoBanner() {
-//     return Container(
-//       margin: const EdgeInsets.all(16),
-//       padding: const EdgeInsets.all(16),
-//       decoration: BoxDecoration(
-//         color: const Color(0xFFE3F2FD),
-//         borderRadius: BorderRadius.circular(12),
-//       ),
-//       child: Row(
-//         children: [
-//           Container(
-//             padding: const EdgeInsets.all(8),
-//             decoration: const BoxDecoration(
-//               color: Colors.blue,
-//               shape: BoxShape.circle,
-//             ),
-//             child: const Icon(
-//               Icons.info_outline,
-//               color: Colors.white,
-//               size: 20,
-//             ),
-//           ),
-//           const SizedBox(width: 12),
-//           Expanded(
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 const Text(
-//                   'Cho phép Chợ Tốt truy cập vị trí hiện tại để được gợi ý các tin đăng gần bạn nhé',
-//                   style: TextStyle(
-//                     fontSize: 13,
-//                     color: Colors.black87,
-//                   ),
-//                 ),
-//                 const SizedBox(height: 4),
-//                 GestureDetector(
-//                   onTap: () {
-//                     context.read<TabHomeCubit>().requestLocationPermission();
-//                   },
-//                   child: const Text(
-//                     'Cho phép truy cập vị trí',
-//                     style: TextStyle(
-//                       fontSize: 13,
-//                       color: Colors.blue,
-//                       fontWeight: FontWeight.w600,
-//                     ),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget buildProductGrid() {
-//     return BlocBuilder<TabHomeCubit, TabHomeState>(
-//       buildWhen: (previous, current) {
-//         return previous.productCount != current.productCount ||
-//             previous.selectedTab != current.selectedTab;
-//       },
-//       builder: (context, state) {
-//         return SliverGrid(
-//           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-//             crossAxisCount: 2,
-//             childAspectRatio: 0.75,
-//             crossAxisSpacing: 12,
-//             mainAxisSpacing: 12,
-//           ),
-//           delegate: SliverChildBuilderDelegate(
-//                 (context, index) {
-//               return buildProductCard(index);
-//             },
-//             childCount: state.productCount,
-//           ),
-//         );
-//       },
-//     );
-//   }
-//
-//   Widget buildProductCard(int index) {
-//     return GestureDetector(
-//       onTap: () {
-//         context.read<TabHomeCubit>().onProductTap(index);
-//       },
-//       child: Container(
-//         decoration: BoxDecoration(
-//           color: Colors.white,
-//           borderRadius: BorderRadius.circular(8),
-//           border: Border.all(color: Colors.grey[200]!),
-//         ),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Expanded(
-//               flex: 3,
-//               child: Container(
-//                 decoration: BoxDecoration(
-//                   color: Colors.grey[200],
-//                   borderRadius: const BorderRadius.vertical(
-//                     top: Radius.circular(8),
-//                   ),
-//                 ),
-//                 child: Stack(
-//                   children: [
-//                     Center(
-//                       child: Icon(
-//                         Icons.image_outlined,
-//                         size: 50,
-//                         color: Colors.grey[400],
-//                       ),
-//                     ),
-//                     Positioned(
-//                       top: 8,
-//                       right: 8,
-//                       child: GestureDetector(
-//                         onTap: () {
-//                           context.read<TabHomeCubit>().onFavoriteTap(index);
-//                         },
-//                         child: Container(
-//                           padding: const EdgeInsets.all(4),
-//                           decoration: BoxDecoration(
-//                             color: Colors.white.withOpacity(0.9),
-//                             shape: BoxShape.circle,
-//                           ),
-//                           child: const Icon(
-//                             Icons.favorite_border,
-//                             size: 16,
-//                             color: Colors.grey,
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//             Expanded(
-//               flex: 2,
-//               child: Padding(
-//                 padding: const EdgeInsets.all(8),
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     Flexible(
-//                       child: Text(
-//                         'Sản phẩm ${index + 1}',
-//                         maxLines: 2,
-//                         overflow: TextOverflow.ellipsis,
-//                         style: const TextStyle(
-//                           fontSize: 13,
-//                           fontWeight: FontWeight.w500,
-//                         ),
-//                       ),
-//                     ),
-//                     const Spacer(),
-//                     Text(
-//                       '${(index + 1) * 1000}.000 đ',
-//                       maxLines: 1,
-//                       overflow: TextOverflow.ellipsis,
-//                       style: const TextStyle(
-//                         fontSize: 14,
-//                         fontWeight: FontWeight.bold,
-//                         color: Color(0xFF4CAF50),
-//                       ),
-//                     ),
-//                     const SizedBox(height: 2),
-//                     Row(
-//                       children: [
-//                         Icon(
-//                           Icons.location_on_outlined,
-//                           size: 11,
-//                           color: Colors.grey[600],
-//                         ),
-//                         const SizedBox(width: 2),
-//                         Expanded(
-//                           child: Text(
-//                             'Hà Nội',
-//                             style: TextStyle(
-//                               fontSize: 11,
-//                               color: Colors.grey[600],
-//                             ),
-//                             overflow: TextOverflow.ellipsis,
-//                             maxLines: 1,
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meko_project/consts/app_colcor.dart';
+import 'package:meko_project/consts/app_dimens.dart';
+import 'package:meko_project/consts/app_paths.dart';
 import 'package:meko_project/domains/dependency_injection/service_locator.dart';
+import 'package:meko_project/models/body/post/listing_item_model.dart';
 import 'package:meko_project/repository/category/category_repo.dart';
+import 'package:meko_project/repository/post/post_repo.dart';
 import 'package:meko_project/screens/tab/tab_home/tab_home_vm/tab_home_cubit.dart';
 import 'package:meko_project/screens/tab/tab_home/tab_home_vm/tab_home_state.dart';
+import 'package:meko_project/widget/app_loading/app_loader.dart';
 
 class TabHomePage extends StatelessWidget {
   const TabHomePage({super.key});
@@ -707,6 +19,7 @@ class TabHomePage extends StatelessWidget {
     return BlocProvider(
       create: (context) => TabHomeCubit(
         categoryRepository: getIt<CategoryRepository>(),
+        postRepository: getIt<PostRepo>(),
       ),
       child: const _TabHomePageContent(),
     );
@@ -729,38 +42,35 @@ class _TabHomePageContentState extends State<_TabHomePageContent> {
     super.initState();
     vm = context.read<TabHomeCubit>();
     scrollController = ScrollController();
-    scrollController.addListener(onScrollListener);
     vm.fetchCategories();
+    vm.fetchPosts();
   }
 
   @override
   void dispose() {
-    scrollController.removeListener(onScrollListener);
     scrollController.dispose();
     super.dispose();
-  }
-
-  void onScrollListener() {
-    if (scrollController.hasClients) {
-      final isCollapsed = scrollController.offset > 100;
-      vm.updateAppBarCollapsed(isCollapsed);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-
+    const overlap = 20.0;
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          CustomScrollView(
-            controller: scrollController,
-            slivers: [
-              SliverToBoxAdapter(
-                child: Container(
+
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      bottomRight: Radius.circular(24),
+                      bottomLeft: Radius.circular(24),
+                    ),
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -771,64 +81,205 @@ class _TabHomePageContentState extends State<_TabHomePageContent> {
                     children: [
                       SafeArea(
                         top: true,
-                        child: Container(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Icon(Icons.menu, color: Colors.white, size: 28),
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      child: const Icon(
-                                        Icons.favorite_border,
-                                        color: Colors.white,
-                                        size: 26,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      child: const Icon(
-                                        Icons.notifications_outlined,
-                                        color: Colors.white,
-                                        size: 26,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                        child: Row(
+                          children: const [
+                            Icon(Icons.menu, color: Colors.white, size: 28),
+                            Spacer(),
+                            Padding(
+                              padding: EdgeInsets.all(8),
+                              child: Icon(Icons.favorite_border, color: Colors.white, size: 26),
                             ),
-                          ),
+                            SizedBox(width: 8),
+                            Padding(
+                              padding: EdgeInsets.all(8),
+                              child: Icon(
+                                Icons.notifications_outlined,
+                                color: Colors.white,
+                                size: 26,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
+                      SizedBox(height: 24),
                       buildHeaderSection(),
-                      buildSearchBar(),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
-              ),
-              SliverToBoxAdapter(
-                child: Container(
-                  color: Colors.white,
-                  child: Column(
-                    children: [
-                      buildCategoryGrid(),
-                      const SizedBox(height: 16),
-                      buildTabBar(),
-                      buildInfoBanner(),
-                    ],
+                Transform.translate(
+                  offset: const Offset(0, -overlap),
+                  child: GestureDetector(
+                    onTap: () {
+                      print('sdfsdfsd');
+                    },
+                    child: buildSearchBar(),
                   ),
                 ),
-              ),
-              SliverPadding(
-                padding: EdgeInsets.only(left: 16, right: 16, bottom: 80 + bottomPadding),
-                sliver: buildProductGrid(),
-              ),
-            ],
+                const SizedBox(height: overlap),
+              ],
+            ),
+            buildCategoryGrid(),
+            SizedBox(height: 16),
+            Container(width: AppDimens.getWidth(context), height: 10, color: AppColor.cGray70),
+            SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(width: 16),
+                Text(
+                  'Danh sách bài viết',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: AppColor.cBlack,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16),
+            buildListItemPost(),
+            SizedBox(height: bottomPadding + 80),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildListItemPost() {
+    return BlocBuilder<TabHomeCubit, TabHomeState>(
+      buildWhen: (p, c) {
+        return p.postsLoading != c.postsLoading || p.posts != c.posts || p.postsError != c.postsError;
+      },
+      builder: (context, state) {
+        if (state.postsLoading) {
+          return const AppLoader();
+        }
+        if (state.postsError != null) {
+          return Center(
+            child: Text('Lỗi tải bài viết', style: TextStyle(color: Colors.red)),
+          );
+        }
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: GridView.builder(
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.63,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+            ),
+            itemCount: state.posts.length,
+            itemBuilder: (context, index) {
+              final item = state.posts[index];
+              return buildProductCard(context, item, index);
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildProductCard(BuildContext context, ListingItem item, int index) {
+    return GestureDetector(
+      onTap: () {
+        vm.onProductTap(context, index);
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: AppDimens.getHeight(context) * 0.17,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    child: Image.network(
+                      item.images.isNotEmpty ? item.images.first : AppPaths.img_splash,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) {
+                        return Container(
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.image, size: 32),
+                      );
+                      },
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: GestureDetector(
+                    onTap: () {
+                      vm.onFavoriteTap(index);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.9),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.favorite_border, size: 16, color: Colors.grey),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF111111),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  item.status, // ví dụ "APPROVED"
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${item.price} đ',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFFE53935),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(Icons.location_on_outlined, size: 12, color: Colors.grey[600]),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        item.address,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -836,80 +287,70 @@ class _TabHomePageContentState extends State<_TabHomePageContent> {
   }
 
   Widget buildHeaderSection() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 24),
-                Text(
-                  'Bạn muốn mua gì?',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Mua thì hỏi, bán thì lời',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 16),
-              ],
-            ),
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Bạn muốn mua gì?',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+              SizedBox(height: 4),
+              Text('Mua thì hời, bán thì lời', style: TextStyle(fontSize: 14, color: Colors.white)),
+              SizedBox(height: 16),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget buildSearchBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: GestureDetector(
-        onTap: () {
-          vm.onSearchTap();
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+    return GestureDetector(
+      onTap: () {
+        vm.onSearchTap();
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 12, bottom: 12, left: 4, right: 12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              SizedBox(width: 8),
+              Text(
+                'Danh mục',
+                style: TextStyle(color: AppColor.cBlack, fontSize: 13, fontWeight: FontWeight.w400),
+              ),
+              SizedBox(width: 2),
+              Container(width: 11, height: 10, child: Image.asset(AppPaths.ic_drop_down)),
+              SizedBox(width: 10),
+              Container(width: 0.5, height: 15, color: AppColor.cGray),
+              SizedBox(width: 25),
+              Expanded(
+                child: Text('Tìm kiếm..', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+              ),
+              SizedBox(width: 3),
+              Container(
+                decoration: BoxDecoration(color: AppColor.cMain, shape: BoxShape.circle),
+                padding: EdgeInsets.all(4),
+                child: Icon(Icons.search, color: AppColor.cBlack, size: 18),
               ),
             ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.search,
-                  color: Colors.grey,
-                  size: 22,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Bạn muốn mua gì?',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ),
-              ],
-            ),
           ),
         ),
       ),
@@ -925,27 +366,15 @@ class _TabHomePageContentState extends State<_TabHomePageContent> {
       },
       builder: (context, state) {
         if (state.categoriesLoading) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24),
-            child: SizedBox(
-              height: 100,
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
-          );
+          return const AppLoader();
         }
-
         if (state.categoriesError != null) {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Center(
               child: Column(
                 children: [
-                  Text(
-                    'Lỗi tải danh mục',
-                    style: TextStyle(color: Colors.red),
-                  ),
+                  Text('Lỗi tải danh mục', style: TextStyle(color: Colors.red)),
                   const SizedBox(height: 8),
                   ElevatedButton(
                     onPressed: () {
@@ -958,342 +387,75 @@ class _TabHomePageContentState extends State<_TabHomePageContent> {
             ),
           );
         }
-
-        if (state.categories.isEmpty) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 24),
-            child: Center(
-              child: Text('Không có danh mục'),
-            ),
-          );
-        }
-
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              childAspectRatio: 1.0,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-            ),
-            itemCount: state.categories.length,
-            itemBuilder: (context, index) {
-              final category = state.categories[index];
-              return _buildCategoryItem(category);
-            },
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildCategoryItem(dynamic category) {
-    return GestureDetector(
-      onTap: () {
-        vm.onCategoryTap(category);
-      },
-      child: Column(
-        children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[200]!),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  category.avatar ?? '',
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Center(
-                      child: Icon(
-                        Icons.image_not_supported,
-                        color: Colors.grey[400],
-                        size: 32,
-                      ),
-                    );
-                  },
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                            : null,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            category.name ?? '',
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildTabBar() {
-    return BlocBuilder<TabHomeCubit, TabHomeState>(
-      buildWhen: (previous, current) {
-        return previous.selectedTab != current.selectedTab;
-      },
-      builder: (context, state) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              buildTab('Dành cho bạn', state.selectedTab),
-              buildTab('Theo dõi', state.selectedTab),
-              buildTab('Flash Deal', state.selectedTab),
-              buildTab('Video', state.selectedTab),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget buildTab(String title, String selectedTab) {
-    final isSelected = selectedTab == title;
-    return GestureDetector(
-      onTap: () {
-        vm.changeTab(title);
-      },
-      child: Column(
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: isSelected ? Colors.black : Colors.grey[600],
-            ),
-          ),
-          const SizedBox(height: 8),
-          if (isSelected)
-            Container(
-              height: 3,
-              width: 24,
-              decoration: BoxDecoration(
-                color: const Color(0xFF4CAF50),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            )
-          else
-            const SizedBox(height: 3),
-        ],
-      ),
-    );
-  }
-
-  Widget buildInfoBanner() {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE3F2FD),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              color: Colors.blue,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.info_outline,
-              color: Colors.white,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Cho phép Chợ Tốt truy cập vị trí hiện tại để được gợi ý các tin đăng gần bạn nhé',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                GestureDetector(
-                  onTap: () {
-                    vm.requestLocationPermission();
-                  },
-                  child: const Text(
-                    'Cho phép truy cập vị trí',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.blue,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildProductGrid() {
-    return BlocBuilder<TabHomeCubit, TabHomeState>(
-      buildWhen: (previous, current) {
-        return previous.productCount != current.productCount ||
-            previous.selectedTab != current.selectedTab;
-      },
-      builder: (context, state) {
-        return SliverGrid(
+        return GridView.builder(
+          shrinkWrap: true,
+          padding: EdgeInsets.zero,
+          physics: const BouncingScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 0.75,
-            crossAxisSpacing: 12,
+            crossAxisCount: 3,
+            childAspectRatio: 1.2,
+            crossAxisSpacing: 24,
             mainAxisSpacing: 12,
           ),
-          delegate: SliverChildBuilderDelegate(
-                (context, index) {
-              return buildProductCard(index);
-            },
-            childCount: state.productCount,
-          ),
+          itemCount: state.categories.length,
+          itemBuilder: (context, index) {
+            final category = state.categories[index];
+            return buildCategoryItem(category);
+          },
         );
       },
     );
   }
 
-  Widget buildProductCard(int index) {
+  Widget buildCategoryItem(dynamic category) {
     return GestureDetector(
       onTap: () {
-        vm.onProductTap(index);
+        // vm.onCategoryTap(category);
+        print('dasdsdfsdfsd');
       },
       child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey[200]!),
-        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              flex: 3,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(8),
-                  ),
-                ),
+            SizedBox(
+              width: 70,
+              height: 80,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
                 child: Stack(
+                  fit: StackFit.expand,
                   children: [
-                    Center(
-                      child: Icon(
-                        Icons.image_outlined,
-                        size: 50,
-                        color: Colors.grey[400],
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey[200]!),
                       ),
                     ),
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: GestureDetector(
-                        onTap: () {
-                          vm.onFavoriteTap(index);
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.9),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.favorite_border,
-                            size: 16,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ),
+                    Image.network(
+                      category.avatar ?? '',
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(Icons.image_not_supported, color: Colors.grey[400], size: 32);
+                      },
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const Center(child: AppLoader(size: 20));
+                      },
                     ),
                   ],
                 ),
               ),
             ),
+
+            const SizedBox(height: 8),
             Expanded(
-              flex: 2,
               child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        'Sản phẩm ${index + 1}',
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      '${(index + 1) * 1000}.000 đ',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF4CAF50),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.location_on_outlined,
-                          size: 11,
-                          color: Colors.grey[600],
-                        ),
-                        const SizedBox(width: 2),
-                        Expanded(
-                          child: Text(
-                            'Hà Nội',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.grey[600],
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                child: Text(
+                  category.name ?? '',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
                 ),
               ),
             ),
@@ -1302,4 +464,127 @@ class _TabHomePageContentState extends State<_TabHomePageContent> {
       ),
     );
   }
+
+  // Widget buildProductCard(BuildContext context, int index) {
+  //   return GestureDetector(
+  //     onTap: () {
+  //       // vm.onProductTap(index);
+  //       print('Click item post');
+  //     },
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Container(
+  //           height: AppDimens.getHeight(context)*0.17,
+  //           decoration: BoxDecoration(
+  //             borderRadius: BorderRadius.all(Radius.circular(8)),
+  //           ),
+  //           child: Stack(
+  //             children: [
+  //               Positioned.fill(
+  //                 child: Image.asset(
+  //                   AppPaths.img_splash,
+  //                   fit: BoxFit.cover,
+  //                 ),
+  //               ),
+  //               Positioned(
+  //                 top: 8,
+  //                 right: 8,
+  //                 child: GestureDetector(
+  //                   onTap: () {
+  //                     vm.onFavoriteTap(index);
+  //                   },
+  //                   child: Container(
+  //                     padding: const EdgeInsets.all(4),
+  //                     decoration: BoxDecoration(
+  //                       color: Colors.white.withOpacity(0.9),
+  //                       shape: BoxShape.circle,
+  //                     ),
+  //                     child: const Icon(
+  //                       Icons.favorite_border,
+  //                       size: 16,
+  //                       color: Colors.grey,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //         Padding(
+  //           padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               // Tiêu đề (tối đa 2 dòng)
+  //               Text(
+  //                 'CẦN PASS LẠI BÀN LÀM VIỆC LỚN',
+  //                 maxLines: 2,
+  //                 overflow: TextOverflow.ellipsis,
+  //                 style: const TextStyle(
+  //                   fontSize: 13,
+  //                   fontWeight: FontWeight.w600,
+  //                   color: Color(0xFF111111),
+  //                 ),
+  //               ),
+  //
+  //               const SizedBox(height: 2),
+  //
+  //               // Trạng thái / mô tả ngắn (nhỏ, màu xám)
+  //               Text(
+  //                 'Mới',
+  //                 maxLines: 1,
+  //                 overflow: TextOverflow.ellipsis,
+  //                 style: TextStyle(
+  //                   fontSize: 11,
+  //                   color: Colors.grey[600],
+  //                 ),
+  //               ),
+  //
+  //               const SizedBox(height: 4),
+  //
+  //               // Giá (đỏ, đậm)
+  //               Text(
+  //                 '3.300.000 đ',
+  //                 maxLines: 1,
+  //                 overflow: TextOverflow.ellipsis,
+  //                 style: const TextStyle(
+  //                   fontSize: 15,
+  //                   fontWeight: FontWeight.w700,
+  //                   color: Color(0xFFE53935), // đỏ giống mẫu
+  //                 ),
+  //               ),
+  //
+  //               const SizedBox(height: 4),
+  //
+  //               // Địa điểm (icon + text xám, 1 dòng)
+  //               Row(
+  //                 children: [
+  //                   Icon(
+  //                     Icons.location_on_outlined,
+  //                     size: 12,
+  //                     color: Colors.grey[600],
+  //                   ),
+  //                   const SizedBox(width: 4),
+  //                   Expanded(
+  //                     child: Text(
+  //                       'Tp Hồ Chí Minh',
+  //                       maxLines: 1,
+  //                       overflow: TextOverflow.ellipsis,
+  //                       style: TextStyle(
+  //                         fontSize: 11,
+  //                         color: Colors.grey[600],
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //         )
+  //
+  //       ],
+  //     ),
+  //   );
+  // }
 }

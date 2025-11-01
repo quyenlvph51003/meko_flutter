@@ -1,13 +1,23 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:meko_project/models/body/category/category_model.dart';
+import 'package:meko_project/models/body/post/listing_item_model.dart';
+import 'package:meko_project/models/paginated_result_common.dart';
 
 class TabHomeState extends Equatable {
   final String selectedTab;
   final bool isAppBarCollapsed;
+
+  // Danh mục
   final List<Category> categories;
   final bool categoriesLoading;
   final String? categoriesError;
+
+  // Bài viết
+  final List<ListingItem> posts;
+  final bool postsLoading;
+  final String? postsError;
+  final Pagination? postsPagination;
+
   final int productCount;
 
   const TabHomeState({
@@ -16,6 +26,10 @@ class TabHomeState extends Equatable {
     required this.categories,
     required this.categoriesLoading,
     this.categoriesError,
+    required this.posts,
+    required this.postsLoading,
+    this.postsError,
+    this.postsPagination,
     required this.productCount,
   });
 
@@ -26,6 +40,10 @@ class TabHomeState extends Equatable {
       categories: [],
       categoriesLoading: true,
       categoriesError: null,
+      posts: [],
+      postsLoading: false,
+      postsError: null,
+      postsPagination: null,
       productCount: 0,
     );
   }
@@ -36,6 +54,10 @@ class TabHomeState extends Equatable {
     List<Category>? categories,
     bool? categoriesLoading,
     String? categoriesError,
+    List<ListingItem>? posts,
+    bool? postsLoading,
+    String? postsError,
+    Pagination? postsPagination,
     int? productCount,
   }) {
     return TabHomeState(
@@ -44,6 +66,10 @@ class TabHomeState extends Equatable {
       categories: categories ?? this.categories,
       categoriesLoading: categoriesLoading ?? this.categoriesLoading,
       categoriesError: categoriesError ?? this.categoriesError,
+      posts: posts ?? this.posts,
+      postsLoading: postsLoading ?? this.postsLoading,
+      postsError: postsError ?? this.postsError,
+      postsPagination: postsPagination ?? this.postsPagination,
       productCount: productCount ?? this.productCount,
     );
   }
@@ -55,6 +81,10 @@ class TabHomeState extends Equatable {
     categories,
     categoriesLoading,
     categoriesError,
+    posts,
+    postsLoading,
+    postsError,
+    postsPagination,
     productCount,
   ];
 }

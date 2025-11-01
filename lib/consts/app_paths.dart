@@ -7,4 +7,5 @@ class AppPaths {
   static const String img_sticker_bgr = 'assets/images/img_sticker_bgr.png';
   static const String img_merry_christmas = 'assets/images/img_merry_christmas.png';
   static const String image_filter = 'assets/images/image_filter.jpg';
+  static const String ic_drop_down = 'assets/icons/ic_drop_down.png';
 }

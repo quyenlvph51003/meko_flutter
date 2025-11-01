@@ -5,4 +5,5 @@ class ApiPath {
   static const String authRequestOtp = 'auth/request-otp';
   static const String authVerifyOtp = 'auth/verify-otp';
   static const String categoryList = 'category/list';
+  static const String searchPost = 'post/search-post';
 }

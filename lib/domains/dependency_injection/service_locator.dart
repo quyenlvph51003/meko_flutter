@@ -4,6 +4,7 @@ import 'package:meko_project/domains/rest_client/rest_client.dart';
 import 'package:meko_project/global_data/data_local/shared_pref.dart';
 import 'package:meko_project/repository/auth/auth_repo.dart';
 import 'package:meko_project/repository/category/category_repo.dart';
+import 'package:meko_project/repository/post/post_repo.dart';
 
 final getIt = GetIt.instance;
 
@@ -12,12 +13,12 @@ class ServiceLocator {
     getIt.registerLazySingleton<RestClient>(() {
       return RestClient(AppConfig.instance.baseUrl);
     });
-
     getIt.registerLazySingleton<AuthRepository>(() {
       return AuthRepository(restClient: getIt<RestClient>(), sharedPref: SharedPref.instance);
     });
     getIt.registerSingleton<CategoryRepository>(
       CategoryRepository(restClient: getIt<RestClient>()),
     );
+    getIt.registerSingleton<PostRepo>(PostRepo(restClient: getIt<RestClient>()));
   }
 }

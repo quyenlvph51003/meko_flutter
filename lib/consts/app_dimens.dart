@@ -11,6 +11,14 @@ class AppDimens {
     return MediaQuery.of(context).size.height;
   }
 
+  static double getBottom(context) {
+    return  MediaQuery.of(context).padding.bottom;
+  }
+
+  static double getTop(context) {
+    return  MediaQuery.of(context).padding.top;
+  }
+
   static Widget kHeightBottom(BuildContext context) {
     return SafeArea(
       top: false,
