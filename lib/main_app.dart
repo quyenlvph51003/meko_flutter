@@ -32,7 +32,7 @@ class MainApp extends StatelessWidget {
             title: 'Meko Project',
             color: Colors.transparent,
             locale: state.locale,
-            initialRoute: RouterPaths.splash,
+            initialRoute: AppRouterPaths.splash,
             onGenerateRoute: (settings) {
               return AppRouter.instance.onGenerateRoute(settings);
             },

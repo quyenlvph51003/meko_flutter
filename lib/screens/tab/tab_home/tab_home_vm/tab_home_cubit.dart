@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meko_project/models/body/category/category_model.dart';
 import 'package:meko_project/repository/category/category_repo.dart';
 import 'package:meko_project/repository/post/post_repo.dart';
+import 'package:meko_project/routers/app_router.dart';
 import 'package:meko_project/routers/app_router_paths.dart';
 import 'tab_home_state.dart';
 
@@ -59,14 +60,16 @@ class TabHomeCubit extends Cubit<TabHomeState> {
 
   void onProductTap(BuildContext context, int index) {
     final item = state.posts[index];
-    print('Click post: ${item.title}');
-
     Navigator.pushNamed(
       context,
-      RouterPaths.postDetailPage,
-      arguments: item,
+      AppRouterPaths.postDetailPage,
+      arguments: {
+        'item': item,
+        'loader': (int id) => postRepository.getPostDetailItem(id),
+      },
     );
   }
+
 
   void changeTab(String tabName) {
   }
@@ -76,6 +79,7 @@ class TabHomeCubit extends Cubit<TabHomeState> {
   }
 
   void onSearchTap() {
+    // Navigator.pushNamed(context, AppRouterPaths.)
   }
 
   void onCategoryTap(Category category) {

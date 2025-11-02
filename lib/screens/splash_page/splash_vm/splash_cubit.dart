@@ -15,7 +15,7 @@ class SplashCubit extends Cubit<SplashState> {
       bool? check = await SharedPref.instance.getBool(AppConsts.keyIntro);
 
       if(check == true){
-        Navigator.pushReplacementNamed(context, RouterPaths.homePage);
+        Navigator.pushReplacementNamed(context, AppRouterPaths.homePage);
       }else{
         Navigator.pushReplacement(
           context,

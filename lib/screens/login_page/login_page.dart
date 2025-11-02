@@ -190,7 +190,7 @@ class _LoginPageViewState extends State<LoginPageView> {
                                 alignment: Alignment.centerRight,
                                 child: AppButton(
                                   onTap: () {
-                                    Navigator.pushNamed(context, RouterPaths.requestOtpPage);
+                                    Navigator.pushNamed(context, AppRouterPaths.requestOtpPage);
                                   },
                                   child: const Text(
                                     'Quên mật khẩu?',

@@ -39,7 +39,7 @@ class IntroCubit extends Cubit<IntroState> {
       );
     } else {
       SharedPref.instance.setBool(AppConsts.keyIntro, true);
-      Navigator.pushReplacementNamed(context, RouterPaths.homePage);
+      Navigator.pushReplacementNamed(context, AppRouterPaths.homePage);
     }
   }
 

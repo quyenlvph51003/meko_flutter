@@ -29,19 +29,21 @@ class AppRouter {
 
   Widget router({required BuildContext context, required String routeName, Object? data}) {
     switch (routeName) {
-      case RouterPaths.splash:
+      case AppRouterPaths.splash:
         return SplashPage();
-      case RouterPaths.login:
+      case AppRouterPaths.login:
         return LoginPage(onSuccess: () {}, onTapRegister: () {});
-      case RouterPaths.homePage:
+      case AppRouterPaths.homePage:
         return HomePage();
-      case RouterPaths.requestOtpPage:
+      case AppRouterPaths.requestOtpPage:
         return RequestOtpPage();
-      case RouterPaths.forgotPassPage:
+      case AppRouterPaths.forgotPassPage:
         return ForgotPassPage();
-      case RouterPaths.postDetailPage:
-        ListingItem item = data as ListingItem;
-        return PostDetailPage(item: item);
+      case AppRouterPaths.postDetailPage:
+        final map = data as Map<String, dynamic>;
+        final ListingItem item = map['item'] as ListingItem;
+        final Future<ListingItem> Function(int) loader = map['loader'] as Future<ListingItem> Function(int);
+        return PostDetailPage(item: item, loadDetail: loader);
       default:
         return SizedBox();
     }

@@ -9,6 +9,7 @@ import 'package:meko_project/repository/category/category_repo.dart';
 import 'package:meko_project/repository/post/post_repo.dart';
 import 'package:meko_project/screens/tab/tab_home/tab_home_vm/tab_home_cubit.dart';
 import 'package:meko_project/screens/tab/tab_home/tab_home_vm/tab_home_state.dart';
+import 'package:meko_project/widget/app_button/app_button.dart';
 import 'package:meko_project/widget/app_loading/app_loader.dart';
 
 class TabHomePage extends StatelessWidget {
@@ -21,19 +22,19 @@ class TabHomePage extends StatelessWidget {
         categoryRepository: getIt<CategoryRepository>(),
         postRepository: getIt<PostRepo>(),
       ),
-      child: const _TabHomePageContent(),
+      child: const _TabHomeView(),
     );
   }
 }
 
-class _TabHomePageContent extends StatefulWidget {
-  const _TabHomePageContent({Key? key}) : super(key: key);
+class _TabHomeView extends StatefulWidget {
+  const _TabHomeView({Key? key}) : super(key: key);
 
   @override
-  State<_TabHomePageContent> createState() => _TabHomePageContentState();
+  State<_TabHomeView> createState() => _TabHomeViewState();
 }
 
-class _TabHomePageContentState extends State<_TabHomePageContent> {
+class _TabHomeViewState extends State<_TabHomeView> {
   late ScrollController scrollController;
   late TabHomeCubit vm;
 
@@ -58,7 +59,6 @@ class _TabHomePageContentState extends State<_TabHomePageContent> {
     const overlap = 20.0;
     return Scaffold(
       backgroundColor: Colors.white,
-
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -332,9 +332,14 @@ class _TabHomePageContentState extends State<_TabHomePageContent> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               SizedBox(width: 8),
-              Text(
-                'Danh mục',
-                style: TextStyle(color: AppColor.cBlack, fontSize: 13, fontWeight: FontWeight.w400),
+              AppButton(
+                onTap: (){
+                  showCategorySheet(context);
+                },
+                child: Text(
+                  'Danh mục',
+                  style: TextStyle(color: AppColor.cBlack, fontSize: 13, fontWeight: FontWeight.w400),
+                ),
               ),
               SizedBox(width: 2),
               Container(width: 11, height: 10, child: Image.asset(AppPaths.ic_drop_down)),
@@ -348,7 +353,7 @@ class _TabHomePageContentState extends State<_TabHomePageContent> {
               Container(
                 decoration: BoxDecoration(color: AppColor.cMain, shape: BoxShape.circle),
                 padding: EdgeInsets.all(4),
-                child: Icon(Icons.search, color: AppColor.cBlack, size: 18),
+                child: Icon(Icons.search, color: AppColor.white, size: 18),
               ),
             ],
           ),
@@ -445,8 +450,6 @@ class _TabHomePageContentState extends State<_TabHomePageContent> {
                 ),
               ),
             ),
-
-            const SizedBox(height: 8),
             Expanded(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 12),
@@ -462,6 +465,83 @@ class _TabHomePageContentState extends State<_TabHomePageContent> {
           ],
         ),
       ),
+    );
+  }
+  void showCategorySheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        final bottomPadding = MediaQuery.of(ctx).padding.bottom;
+        return BlocProvider.value(value: vm, child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: EdgeInsets.only(bottom: bottomPadding),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 8),
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.black12, borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Danh mục',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 8),
+
+                // Danh sách tên danh mục: category.name ?? ''
+                Flexible(
+                  child: BlocBuilder<TabHomeCubit, TabHomeState>(
+                    builder: (context, state) {
+                      // Loading / lỗi: giữ nguyên logic bên ngoài, ở đây chỉ hiển thị danh sách có sẵn
+                      final items = state.categories;
+                      if (items.isEmpty) {
+                        return const Padding(
+                          padding: EdgeInsets.all(24),
+                          child: Text('Chưa có danh mục'),
+                        );
+                      }
+                      return ListView.separated(
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        itemCount: items.length,
+                        separatorBuilder: (_, __) => const Divider(height: 1),
+                        itemBuilder: (context, index) {
+                          final category = items[index];
+                          return ListTile(
+                            dense: true,
+                            title: Text(
+                              category.name ?? '',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                            ),
+                            onTap: () {
+                              // Giữ nguyên logic hiện tại (chưa dùng onCategoryTap)
+                              // Nếu sau này bạn muốn chọn danh mục để lọc, thêm gọi vm.onCategoryTap(category) ở đây
+                              Navigator.of(context).pop();
+                            },
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),);
+      },
     );
   }
 

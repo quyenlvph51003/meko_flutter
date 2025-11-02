@@ -49,7 +49,7 @@ class VerifyOtpPageState extends State<VerifyOtpPage> {
             return;
           }
           if (state.verified) {
-            Navigator.pushNamed(context, RouterPaths.forgotPassPage);
+            Navigator.pushNamed(context, AppRouterPaths.forgotPassPage);
           }
         },
         builder: (context, state) {
