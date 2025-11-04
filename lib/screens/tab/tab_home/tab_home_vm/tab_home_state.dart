@@ -17,7 +17,8 @@ class TabHomeState extends Equatable {
   final bool postsLoading;
   final String? postsError;
   final Pagination? postsPagination;
-
+  final int? page;
+  final bool? noMore;
   final int productCount;
 
   const TabHomeState({
@@ -30,6 +31,8 @@ class TabHomeState extends Equatable {
     required this.postsLoading,
     this.postsError,
     this.postsPagination,
+    this.page,
+    this.noMore,
     required this.productCount,
   });
 
@@ -44,6 +47,7 @@ class TabHomeState extends Equatable {
       postsLoading: false,
       postsError: null,
       postsPagination: null,
+      page: 0,
       productCount: 0,
     );
   }
@@ -58,6 +62,8 @@ class TabHomeState extends Equatable {
     bool? postsLoading,
     String? postsError,
     Pagination? postsPagination,
+    int? page,
+    bool? noMore,
     int? productCount,
   }) {
     return TabHomeState(
@@ -70,6 +76,8 @@ class TabHomeState extends Equatable {
       postsLoading: postsLoading ?? this.postsLoading,
       postsError: postsError ?? this.postsError,
       postsPagination: postsPagination ?? this.postsPagination,
+      page: page ?? this.page,
+      noMore: noMore ?? this.noMore,
       productCount: productCount ?? this.productCount,
     );
   }
@@ -85,6 +93,8 @@ class TabHomeState extends Equatable {
     postsLoading,
     postsError,
     postsPagination,
+    page,
+    noMore,
     productCount,
   ];
 }

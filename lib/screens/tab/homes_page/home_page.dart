@@ -12,7 +12,6 @@ import 'package:meko_project/screens/tab/tab_profile/tab_profile_page.dart';
 import 'package:meko_project/utils/login_global/login_global.dart';
 import 'home_vm/home_cubit.dart';
 
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -32,7 +31,12 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final pages = const [TabHomePage(), PostManagerPage(), TabChatPage(), TabProfilePage()];
+    final pages = const [
+      TabHomePage(),
+      PostManagerPage(),
+      TabChatPage(),
+      TabProfilePage(),
+    ];
 
     return BlocListener<HomeCubit, HomeState>(
       listenWhen: (p, c) => c.shouldShowPostSheet,
@@ -80,41 +84,35 @@ class _HomePageState extends State<HomePage> {
                             p.isLoggedIn != c.isLoggedIn ||
                             p.uiRev != c.uiRev,
                         builder: (context, state) {
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              buildNavItem(
-                                context,
-                                index: 0,
-                                icon: Icons.home_outlined,
-                                activeIcon: Icons.home_rounded,
+                          return BottomNavigationBar(
+                            currentIndex: state.currentIndex,
+                            onTap: (index) {
+                              context.read<HomeCubit>().changeTab(index);
+                            },
+                            type: BottomNavigationBarType.fixed,
+                            selectedItemColor: AppColor.cMain,
+                            unselectedItemColor: Colors.grey,
+                            showUnselectedLabels: true,
+                            items: const [
+                              BottomNavigationBarItem(
+                                icon: Icon(Icons.home_outlined),
+                                activeIcon: Icon(Icons.home_rounded),
                                 label: 'Trang chủ',
-                                isActive: state.currentIndex == 0,
                               ),
-                              buildNavItem(
-                                context,
-                                index: 1,
-                                icon: Icons.label_outline,
-                                activeIcon: Icons.label,
+                              BottomNavigationBarItem(
+                                icon: Icon(Icons.label_outline),
+                                activeIcon: Icon(Icons.label),
                                 label: 'Quản lý tin',
-                                isActive: state.currentIndex == 1,
                               ),
-                              const SizedBox(width: 56),
-                              buildNavItem(
-                                context,
-                                index: 2,
-                                icon: Icons.chat_bubble_outline,
-                                activeIcon: Icons.chat_bubble,
+                              BottomNavigationBarItem(
+                                icon: Icon(Icons.chat_bubble_outline),
+                                activeIcon: Icon(Icons.chat_bubble),
                                 label: 'Chat',
-                                isActive: state.currentIndex == 2,
                               ),
-                              buildNavItem(
-                                context,
-                                index: 3,
-                                icon: Icons.person_outline,
-                                activeIcon: Icons.person,
+                              BottomNavigationBarItem(
+                                icon: Icon(Icons.person_outline),
+                                activeIcon: Icon(Icons.person),
                                 label: 'Tài khoản',
-                                isActive: state.currentIndex == 3,
                               ),
                             ],
                           );
@@ -149,7 +147,11 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.add_rounded, color: Colors.white, size: 32),
+                  child: const Icon(
+                    Icons.add_rounded,
+                    color: Colors.white,
+                    size: 32,
+                  ),
                 ),
               ),
             ),
@@ -249,12 +251,17 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('Đăng tin', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+              const Text(
+                'Đăng tin',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+              ),
               const SizedBox(height: 16),
               TextField(
                 decoration: InputDecoration(
                   labelText: 'Tiêu đề',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -262,7 +269,9 @@ class _HomePageState extends State<HomePage> {
                 maxLines: 3,
                 decoration: InputDecoration(
                   labelText: 'Mô tả',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -279,7 +288,9 @@ class _HomePageState extends State<HomePage> {
                     backgroundColor: const Color(0xFFFFCF00),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               ),

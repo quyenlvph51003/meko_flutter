@@ -3,11 +3,11 @@ import 'rest_client.dart';
 
 extension RestClientExtension on RestClient {
   Future<Response> get(
-      String path, {
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-      }) async {
+    String path, {
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+  }) async {
     return await dio.get(
       path,
       queryParameters: queryParameters,
@@ -17,12 +17,12 @@ extension RestClientExtension on RestClient {
   }
 
   Future<Response> post(
-      String path, {
-        dynamic data,
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-      }) async {
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+  }) async {
     return await dio.post(
       path,
       data: data,
@@ -33,12 +33,12 @@ extension RestClientExtension on RestClient {
   }
 
   Future<Response> put(
-      String path, {
-        dynamic data,
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-      }) async {
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+  }) async {
     return await dio.put(
       path,
       data: data,
@@ -49,12 +49,12 @@ extension RestClientExtension on RestClient {
   }
 
   Future<Response> patch(
-      String path, {
-        dynamic data,
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-      }) async {
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+  }) async {
     return await dio.patch(
       path,
       data: data,
@@ -65,12 +65,12 @@ extension RestClientExtension on RestClient {
   }
 
   Future<Response> delete(
-      String path, {
-        dynamic data,
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-        CancelToken? cancelToken,
-      }) async {
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+  }) async {
     return await dio.delete(
       path,
       data: data,
@@ -81,30 +81,26 @@ extension RestClientExtension on RestClient {
   }
 
   Future<Response> uploadFile(
-      String path,
-      String filePath, {
-        String fileKey = 'file',
-        Map<String, dynamic>? data,
-        ProgressCallback? onSendProgress,
-      }) async {
+    String path,
+    String filePath, {
+    String fileKey = 'file',
+    Map<String, dynamic>? data,
+    ProgressCallback? onSendProgress,
+  }) async {
     final formData = FormData.fromMap({
       ...?data,
       fileKey: await MultipartFile.fromFile(filePath),
     });
 
-    return await dio.post(
-      path,
-      data: formData,
-      onSendProgress: onSendProgress,
-    );
+    return await dio.post(path, data: formData, onSendProgress: onSendProgress);
   }
 
   Future<Response> downloadFile(
-      String urlPath,
-      String savePath, {
-        ProgressCallback? onReceiveProgress,
-        CancelToken? cancelToken,
-      }) async {
+    String urlPath,
+    String savePath, {
+    ProgressCallback? onReceiveProgress,
+    CancelToken? cancelToken,
+  }) async {
     return await dio.download(
       urlPath,
       savePath,
@@ -112,4 +108,10 @@ extension RestClientExtension on RestClient {
       cancelToken: cancelToken,
     );
   }
+
+  // void logError(DioError error) {
+  //   if (kDebugMode) {
+  //     debugPrint(error.toString());
+  //   }
+  // }
 }

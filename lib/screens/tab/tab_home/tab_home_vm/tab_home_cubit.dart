@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meko_project/common/enum_common.dart';
+import 'package:meko_project/consts/app_images.dart';
 import 'package:meko_project/models/body/category/category_model.dart';
 import 'package:meko_project/repository/category/category_repo.dart';
 import 'package:meko_project/repository/post/post_repo.dart';
@@ -11,7 +13,8 @@ class TabHomeCubit extends Cubit<TabHomeState> {
   final CategoryRepository categoryRepository;
   final PostRepo postRepository;
 
-  TabHomeCubit({required this.categoryRepository, required this.postRepository}) : super(TabHomeState.initial());
+  TabHomeCubit({required this.categoryRepository, required this.postRepository})
+    : super(TabHomeState.initial());
 
   Future<void> initCubit() async {
     await fetchCategories();
@@ -21,40 +24,127 @@ class TabHomeCubit extends Cubit<TabHomeState> {
     emit(state.copyWith(categoriesLoading: true, categoriesError: null));
 
     final result = await categoryRepository.getAllCategory();
-
     if (result.isSuccess && result.content != null) {
-      emit(state.copyWith(
-        categories: result.content,
-        categoriesLoading: false,
-        categoriesError: null,
-      ));
+      final categories = List<Category>.from(result.content!);
+
+      categories.add(
+        Category(
+          id: 0,
+          name: 'Tất cả danh mục',
+          avatar: AppImages.icon_all_categories,
+          is_active: 1,
+        ),
+      );
+
+      emit(
+        state.copyWith(
+          categories: categories,
+          categoriesLoading: false,
+          categoriesError: null,
+        ),
+      );
     } else {
-      emit(state.copyWith(
-        categoriesLoading: false,
-        categoriesError: result.message,
-        categories: [],
-      ));
+      emit(
+        state.copyWith(
+          categoriesLoading: false,
+          categoriesError: result.message,
+          categories: [],
+        ),
+      );
     }
   }
 
-  Future<void> fetchPosts() async {
-    emit(state.copyWith(postsLoading: true, postsError: null));
-
-    final result = await postRepository.getPosts();
+  Future<void> fetchPosts({int page = 0, bool? isLoadMore = false}) async {
+    if (isLoadMore ?? false) {
+      emit(state.copyWith(page: page));
+    } else {
+      emit(state.copyWith(postsLoading: true, postsError: null, page: page));
+    }
+    final result = await postRepository.getPosts(
+      page: page,
+      size: 10,
+      postSearchRequest: PostSearchRequest(status: PostStatus.APPROVED),
+    );
 
     if (result.success && result.data != null) {
-      emit(state.copyWith(
-        posts: result.data!.content,
-        postsPagination: result.data!.pagination,
-        postsLoading: false,
-        postsError: null,
-      ));
+      if (isLoadMore ?? false) {
+        print(result.data!.content.isEmpty);
+        emit(
+          state.copyWith(
+            posts: [...state.posts, ...result.data!.content],
+            postsPagination: result.data!.pagination,
+            postsLoading: false,
+            postsError: null,
+            noMore: result.data!.content.isEmpty ? true : false,
+          ),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            posts: result.data!.content,
+            postsPagination: result.data!.pagination,
+            postsLoading: false,
+            postsError: null,
+          ),
+        );
+      }
     } else {
-      emit(state.copyWith(
-        postsLoading: false,
-        postsError: result.message,
-        posts: [],
-      ));
+      emit(
+        state.copyWith(
+          postsLoading: false,
+          postsError: result.message,
+          posts: [],
+        ),
+      );
+    }
+  }
+
+  Future<void> onRefresh() async {
+    emit(
+      state.copyWith(
+        categoriesLoading: true,
+        categoriesError: null,
+        postsLoading: true,
+        postsError: null,
+        noMore: false,
+      ),
+    );
+
+    final resultCategories = await categoryRepository.getAllCategory();
+    final resultPosts = await postRepository.getPosts(
+      page: 0,
+      size: 10,
+      postSearchRequest: PostSearchRequest(status: PostStatus.APPROVED),
+    );
+    if (resultCategories.isSuccess && resultCategories.content != null) {
+      final categories = List<Category>.from(resultCategories.content!);
+
+      categories.add(
+        Category(
+          id: 0,
+          name: 'Tất cả danh mục',
+          avatar: AppImages.icon_all_categories,
+          is_active: 1,
+        ),
+      );
+
+      emit(
+        state.copyWith(
+          categories: categories,
+          categoriesLoading: false,
+          categoriesError: null,
+        ),
+      );
+    }
+    if (resultPosts.success && resultPosts.data != null) {
+      emit(
+        state.copyWith(
+          posts: resultPosts.data!.content,
+          postsPagination: resultPosts.data!.pagination,
+          postsLoading: false,
+          postsError: null,
+        ),
+      );
     }
   }
 
@@ -70,22 +160,15 @@ class TabHomeCubit extends Cubit<TabHomeState> {
     );
   }
 
+  void changeTab(String tabName) {}
 
-  void changeTab(String tabName) {
-  }
-
-
-  void requestLocationPermission() {
-  }
+  void requestLocationPermission() {}
 
   void onSearchTap() {
     // Navigator.pushNamed(context, AppRouterPaths.)
   }
 
-  void onCategoryTap(Category category) {
-  }
+  void onCategoryTap(Category category) {}
 
-
-  void onFavoriteTap(int index) {
-  }
+  void onFavoriteTap(int index) {}
 }

@@ -8,7 +8,8 @@ import 'package:meko_project/domains/rest_client/rest_client_token.dart';
 import 'package:meko_project/models/body/auth/auth_token.dart';
 
 class RestClient {
-  static const String encodedContentType = 'application/x-www-form-urlencoded;charset=UTF-8';
+  static const String encodedContentType =
+      'application/x-www-form-urlencoded;charset=UTF-8';
   static const String jsonContentType = 'application/json';
   static const Duration defaultTimeout = Duration(seconds: 20);
 
@@ -17,7 +18,8 @@ class RestClient {
   bool isRefreshing = false;
   final List<Function(String)> refreshWaiters = [];
 
-  RestClient(String baseUrl, {
+  RestClient(
+    String baseUrl, {
     Duration timeout = defaultTimeout,
     String contentType = encodedContentType,
     Map<String, dynamic>? headers,
@@ -56,9 +58,9 @@ class RestClient {
     if (kDebugMode) {
       (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
           (HttpClient client) {
-        client.badCertificateCallback = (cert, host, port) => true;
-        return client;
-      };
+            client.badCertificateCallback = (cert, host, port) => true;
+            return client;
+          };
     }
   }
 
@@ -75,7 +77,8 @@ class RestClient {
 
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     if (kDebugMode) {
-      debugPrint('${response.statusCode} ${response.requestOptions.uri}');
+      debugPrint('${response.statusCode} ${response.requestOptions.uri} ');
+      debugPrint(response.data.toString());
     }
     handler.next(response);
   }
@@ -146,13 +149,13 @@ class RestClient {
       );
 
       final newAccessToken = response.data['accessToken'] as String?;
-      final newRefreshToken = response.data['refreshToken'] as String? ?? refreshToken;
+      final newRefreshToken =
+          response.data['refreshToken'] as String? ?? refreshToken;
 
       if (newAccessToken != null) {
-        tokenStore.save(AuthTokens(
-          token: newAccessToken,
-          refreshToken: newRefreshToken,
-        ));
+        tokenStore.save(
+          AuthTokens(token: newAccessToken, refreshToken: newRefreshToken),
+        );
 
         for (final waiter in refreshWaiters) {
           waiter(newAccessToken);

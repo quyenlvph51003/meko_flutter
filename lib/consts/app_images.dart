@@ -5,6 +5,9 @@ class AppImages {
   static const String img_template_1 = 'assets/images/img_template_1.png';
   static const String img_magic_brush = 'assets/images/img_magic_brush.png';
   static const String img_sticker_bgr = 'assets/images/img_sticker_bgr.png';
-  static const String img_merry_christmas = 'assets/images/img_merry_christmas.png';
+  static const String img_merry_christmas =
+      'assets/images/img_merry_christmas.png';
   static const String image_filter = 'assets/images/image_filter.jpg';
+  static const String icon_all_categories =
+      'assets/images/icon_all_categories.png';
 }

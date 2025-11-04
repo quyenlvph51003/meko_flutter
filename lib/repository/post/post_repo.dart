@@ -1,3 +1,4 @@
+import 'package:meko_project/common/enum_common.dart';
 import 'package:meko_project/domains/api_path/api_path.dart';
 import 'package:meko_project/domains/rest_client/rest_client.dart';
 import 'package:meko_project/domains/rest_client/rest_client_extension.dart';
@@ -12,17 +13,19 @@ class PostRepo {
   Future<ResponseCommon<PaginatedResult<ListingItem>>> getPosts({
     int page = 0,
     int size = 10,
+    PostSearchRequest? postSearchRequest,
   }) async {
     try {
       final response = await restClient.post(
         ApiPath.searchPost,
         queryParameters: {'page': page, 'size': size},
+        data: postSearchRequest?.toJson() ?? {},
       );
       return ResponseCommon<PaginatedResult<ListingItem>>.fromJson(
         response.data,
-            (obj) => PaginatedResult<ListingItem>.fromJson(
+        (obj) => PaginatedResult<ListingItem>.fromJson(
           (obj as Map<String, dynamic>),
-              (m) => ListingItem.fromJson(m),
+          (m) => ListingItem.fromJson(m),
         ),
       );
     } catch (e) {
@@ -42,7 +45,7 @@ class PostRepo {
       final response = await restClient.get('${ApiPath.postDetail}/$id');
       return ResponseCommon<ListingItem>.fromJson(
         response.data,
-            (obj) => ListingItem.fromJson(obj as Map<String, dynamic>),
+        (obj) => ListingItem.fromJson(obj as Map<String, dynamic>),
       );
     } catch (e) {
       return ResponseCommon<ListingItem>(
@@ -58,10 +61,40 @@ class PostRepo {
 
   Future<ListingItem> getPostDetailItem(int id) async {
     final res = await getPostDetail(id: id);
-    if (res.data != null) { return res.data as ListingItem; }
-    return ListingItem.fromJson(res.toJson()['data'] as Map<String, dynamic>? ?? <String, dynamic>{});
+    if (res.data != null) {
+      return res.data as ListingItem;
+    }
+    return ListingItem.fromJson(
+      res.toJson()['data'] as Map<String, dynamic>? ?? <String, dynamic>{},
+    );
   }
+}
 
+class PostSearchRequest {
+  final PostStatus? status;
+  final int? userId;
+  final String? wardCode;
+  final String? provinceCode;
+  final String? searchText;
+  final List<int>? categoryIds;
 
+  PostSearchRequest({
+    this.status,
+    this.userId,
+    this.wardCode,
+    this.provinceCode,
+    this.searchText,
+    this.categoryIds,
+  });
 
+  Map<String, dynamic> toJson() {
+    return {
+      'status': postStatusMapStr[status] ?? 'PENDING',
+      'userId': userId,
+      'wardCode': wardCode,
+      'provinceCode': provinceCode,
+      'searchText': searchText,
+      'categoryIds': categoryIds,
+    };
+  }
 }
