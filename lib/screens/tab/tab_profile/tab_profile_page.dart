@@ -7,6 +7,7 @@ import 'package:meko_project/repository/auth/auth_repo.dart';
 import 'package:meko_project/routers/app_router_paths.dart';
 import 'package:meko_project/screens/tab/tab_profile/tab_profile_vm/tab_profile_cubit.dart';
 import 'package:meko_project/screens/tab/tab_profile/tab_profile_vm/tab_profile_state.dart';
+import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import 'package:meko_project/widget/app_button/app_button.dart';
 
 class TabProfilePage extends StatefulWidget {
@@ -18,8 +19,7 @@ class TabProfilePage extends StatefulWidget {
   }
 }
 
-class TabProfilePageState extends State<TabProfilePage>
-    with TickerProviderStateMixin {
+class TabProfilePageState extends State<TabProfilePage> with TickerProviderStateMixin {
   late TabProfileCubit vm;
 
   @override
@@ -55,9 +55,7 @@ class TabProfilePageState extends State<TabProfilePage>
                         padding: const EdgeInsets.only(bottom: 16, top: 24),
                         child: Column(
                           children: [
-                            SizedBox(
-                              height: AppDimens.getHeight(context) * 0.05,
-                            ),
+                            SizedBox(height: AppDimens.getHeight(context) * 0.05),
                             Stack(
                               alignment: Alignment.center,
                               children: [
@@ -66,18 +64,11 @@ class TabProfilePageState extends State<TabProfilePage>
                                   backgroundColor: AppColor.cMain,
                                   child: const Text(
                                     'V',
-                                    style: TextStyle(
-                                      fontSize: 42,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700,
-                                    ),
+                                    style: TextStyle(fontSize: 42, color: Colors.white, fontWeight: FontWeight.w700),
                                   ),
                                 ),
                                 Positioned(
-                                  right:
-                                      MediaQuery.of(context).size.width / 2 -
-                                      44 -
-                                      6,
+                                  right: MediaQuery.of(context).size.width / 2 - 44 - 6,
                                   bottom: 6,
                                   child: Container(
                                     width: 24,
@@ -85,137 +76,102 @@ class TabProfilePageState extends State<TabProfilePage>
                                     decoration: BoxDecoration(
                                       color: Colors.black87,
                                       borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                        color: Colors.white,
-                                        width: 2,
-                                      ),
+                                      border: Border.all(color: Colors.white, width: 2),
                                     ),
-                                    child: const Icon(
-                                      Icons.edit,
-                                      color: Colors.white,
-                                      size: 14,
-                                    ),
+                                    child: const Icon(Icons.edit, color: Colors.white, size: 14),
                                   ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 12),
-                            Text(
-                              state.name,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
+                            Text(state.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
                             const SizedBox(height: 6),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
-                                  'Người theo dõi ${state.followers}',
-                                  style: const TextStyle(color: Colors.grey),
-                                ),
-                                const Text(
-                                  '  •  ',
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                                Text(
-                                  'Đang theo dõi ${state.following}',
-                                  style: const TextStyle(color: Colors.grey),
-                                ),
+                                Text('Email: quyenlvph12332@gmail.com', style: const TextStyle(color: Colors.grey)),
+                                // const Text(
+                                //   '  •  ',
+                                //   style: TextStyle(color: Colors.grey),
+                                // ),
+                                // Text(
+                                //   'Đang theo dõi ${state.following}',
+                                //   style: const TextStyle(color: Colors.grey),
+                                // ),
                               ],
                             ),
-                            const SizedBox(height: 16),
+                            // const SizedBox(height: 16),
                             // card số dư
                             Container(
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
+                              margin: const EdgeInsets.symmetric(horizontal: 16),
                               padding: const EdgeInsets.all(16),
                               decoration: cardDecoration(),
                               child: Column(
                                 children: [
-                                  Row(
-                                    children: [
-                                      const Expanded(
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              'TK Định danh:',
-                                              style: TextStyle(
-                                                color: Colors.black54,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            SizedBox(width: 6),
-                                            Icon(
-                                              Icons.info_outline,
-                                              size: 16,
-                                              color: Colors.black38,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            state.retrying
-                                                ? 'Đang thử...'
-                                                : 'Lỗi kết nối',
-                                            style: const TextStyle(
-                                              color: Colors.black54,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          InkWell(
-                                            onTap: () {
-                                              return;
-                                            },
-                                            child: Text(
-                                              'Thử lại',
-                                              style: TextStyle(
-                                                color: Colors.blue[700],
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
+                                  // Row(
+                                  //   children: [
+                                  //     const Expanded(
+                                  //       child: Row(
+                                  //         children: [
+                                  //           Text(
+                                  //             'TK Định danh:',
+                                  //             style: TextStyle(
+                                  //               color: Colors.black54,
+                                  //               fontWeight: FontWeight.w600,
+                                  //             ),
+                                  //           ),
+                                  //           SizedBox(width: 6),
+                                  //           Icon(
+                                  //             Icons.info_outline,
+                                  //             size: 16,
+                                  //             color: Colors.black38,
+                                  //           ),
+                                  //         ],
+                                  //       ),
+                                  //     ),
+                                  //     Row(
+                                  //       children: [
+                                  //         Text(
+                                  //           state.retrying
+                                  //               ? 'Đang thử...'
+                                  //               : 'Lỗi kết nối',
+                                  //           style: const TextStyle(
+                                  //             color: Colors.black54,
+                                  //           ),
+                                  //         ),
+                                  //         const SizedBox(width: 8),
+                                  //         InkWell(
+                                  //           onTap: () {
+                                  //             return;
+                                  //           },
+                                  //           child: Text(
+                                  //             'Thử lại',
+                                  //             style: TextStyle(
+                                  //               color: Colors.blue[700],
+                                  //               fontWeight: FontWeight.w600,
+                                  //             ),
+                                  //           ),
+                                  //         ),
+                                  //       ],
+                                  //     ),
+                                  //   ],
+                                  // ),
                                   const SizedBox(height: 16),
                                   Row(
                                     children: [
                                       const Text(
-                                        'Đồng Tốt',
-                                        style: TextStyle(
-                                          color: Colors.black54,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                        'Số dư ví',
+                                        style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600),
                                       ),
                                       const Spacer(),
-                                      Text(
-                                        '${state.coins}',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
+                                      Text('${state.coins}', style: const TextStyle(fontWeight: FontWeight.w700)),
                                       const SizedBox(width: 6),
                                       Container(
                                         width: 24,
                                         height: 24,
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Color(0xFFFFF3CD),
-                                        ),
+                                        decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFFFFF3CD)),
                                         child: const Center(
-                                          child: Text(
-                                            'ĐT',
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
+                                          child: Text('ĐT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700)),
                                         ),
                                       ),
                                     ],
@@ -229,17 +185,15 @@ class TabProfilePageState extends State<TabProfilePage>
                                         backgroundColor: AppColor.cMain,
                                         foregroundColor: Colors.black87,
                                         elevation: 0,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
-                                        textStyle: const TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                        ),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                        textStyle: const TextStyle(fontWeight: FontWeight.w700),
                                       ),
-                                      onPressed: () {
-                                        return;
+                                      onPressed: () async {
+                                        final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                                        if (isCheckShowAuth) {
+                                          Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                                          return;
+                                        }
                                       },
                                       child: const Text('Nạp ngay'),
                                     ),
@@ -253,29 +207,54 @@ class TabProfilePageState extends State<TabProfilePage>
                       gapSection(),
                       sectionTitle('Tiện ích'),
                       Container(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
-                        ),
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                         decoration: cardDecoration(),
                         child: Column(
                           children: [
                             itemTile(
+                              onTap: () async {
+                                final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                                if (isCheckShowAuth) {
+                                  Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                                  return;
+                                }
+                              },
                               icon: Icons.favorite_border,
                               title: 'Tin đăng đã lưu',
                             ),
                             dividerInset(),
                             itemTile(
+                              onTap: () async {
+                                final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                                if (isCheckShowAuth) {
+                                  Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                                  return;
+                                }
+                              },
                               icon: Icons.bookmark_border,
                               title: 'Tìm kiếm đã lưu',
                             ),
                             dividerInset(),
                             itemTile(
+                              onTap: () async {
+                                final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                                if (isCheckShowAuth) {
+                                  Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                                  return;
+                                }
+                              },
                               icon: Icons.access_time,
                               title: 'Lịch sử xem tin',
                             ),
                             dividerInset(),
                             itemTile(
+                              onTap: () async {
+                                final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                                if (isCheckShowAuth) {
+                                  Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                                  return;
+                                }
+                              },
                               icon: Icons.star_border,
                               title: 'Đánh giá từ tôi',
                             ),
@@ -284,20 +263,14 @@ class TabProfilePageState extends State<TabProfilePage>
                       ),
                       gapSection(),
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: AppButton(
                           onTap: () {
                             vm.logoutAccount(context);
                           },
                           child: Container(
                             height: 52,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFEBEE),
-                              borderRadius: BorderRadius.circular(14),
-                            ),
+                            decoration: BoxDecoration(color: const Color(0xFFFFEBEE), borderRadius: BorderRadius.circular(14)),
                             child: const Row(
                               children: [
                                 SizedBox(width: 16),
@@ -305,10 +278,7 @@ class TabProfilePageState extends State<TabProfilePage>
                                 SizedBox(width: 12),
                                 Text(
                                   'Đăng xuất',
-                                  style: TextStyle(
-                                    color: Color(0xFFE53935),
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                                  style: TextStyle(color: Color(0xFFE53935), fontWeight: FontWeight.w700),
                                 ),
                               ],
                             ),
@@ -328,30 +298,18 @@ class TabProfilePageState extends State<TabProfilePage>
   }
 
   Widget gapSection() {
-    return const ColoredBox(
-      color: Color(0xFFF7F7F7),
-      child: SizedBox(height: 8),
-    );
+    return const ColoredBox(color: Color(0xFFF7F7F7), child: SizedBox(height: 8));
   }
 
   Widget dividerInset() {
-    return const Padding(
-      padding: EdgeInsets.only(left: 56),
-      child: Divider(height: 1),
-    );
+    return const Padding(padding: EdgeInsets.only(left: 56), child: Divider(height: 1));
   }
 
   BoxDecoration cardDecoration() {
     return BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(16),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(.06),
-          blurRadius: 10,
-          offset: const Offset(0, 4),
-        ),
-      ],
+      boxShadow: [BoxShadow(color: Colors.black.withOpacity(.06), blurRadius: 10, offset: const Offset(0, 4))],
     );
   }
 
@@ -362,26 +320,20 @@ class TabProfilePageState extends State<TabProfilePage>
         alignment: Alignment.centerLeft,
         child: Text(
           title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF6D6D6D),
-          ),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF6D6D6D)),
         ),
       ),
     );
   }
 
-  Widget itemTile({required IconData icon, required String title}) {
+  Widget itemTile({required IconData icon, required String title, required Function()? onTap}) {
     return ListTile(
       leading: Icon(icon, color: Colors.black87),
       title: Text(title, style: const TextStyle(fontSize: 15)),
       trailing: const Icon(Icons.chevron_right, color: Colors.grey),
       dense: true,
       minLeadingWidth: 32,
-      onTap: () {
-        return;
-      },
+      onTap: onTap,
     );
   }
 }

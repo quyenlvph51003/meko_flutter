@@ -7,12 +7,12 @@ import 'package:curl_logger_dio_interceptor/curl_logger_dio_interceptor.dart';
 import 'package:meko_project/consts/app_consts.dart';
 import 'package:meko_project/domains/rest_client/rest_client_token.dart';
 import 'package:meko_project/global_data/data_local/shared_pref.dart';
+import 'package:meko_project/global_data/data_local/sql_maneger.dart';
 import 'package:meko_project/models/body/auth/auth_token.dart';
 import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 
 class RestClient {
-  static const String encodedContentType =
-      'application/x-www-form-urlencoded;charset=UTF-8';
+  static const String encodedContentType = 'application/x-www-form-urlencoded;charset=UTF-8';
   static const String jsonContentType = 'application/json';
   static const Duration defaultTimeout = Duration(seconds: 20);
 
@@ -21,12 +21,7 @@ class RestClient {
   bool isRefreshing = false;
   final List<Function(String)> refreshWaiters = [];
 
-  RestClient(
-    String baseUrl, {
-    Duration timeout = defaultTimeout,
-    String contentType = encodedContentType,
-    Map<String, dynamic>? headers,
-  }) {
+  RestClient(String baseUrl, {Duration timeout = defaultTimeout, String contentType = encodedContentType, Map<String, dynamic>? headers}) {
     final options = BaseOptions(
       baseUrl: baseUrl,
       connectTimeout: timeout.inMilliseconds,
@@ -44,13 +39,7 @@ class RestClient {
   }
 
   void setupInterceptors() {
-    dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: onRequest,
-        onResponse: onResponse,
-        onError: onError,
-      ),
-    );
+    dio.interceptors.add(InterceptorsWrapper(onRequest: onRequest, onResponse: onResponse, onError: onError));
 
     if (kDebugMode) {
       dio.interceptors.add(CurlLoggerDioInterceptor(printOnSuccess: true));
@@ -59,18 +48,14 @@ class RestClient {
 
   void setupHttpAdapter() {
     if (kDebugMode) {
-      (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
-          (HttpClient client) {
-            client.badCertificateCallback = (cert, host, port) => true;
-            return client;
-          };
+      (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (HttpClient client) {
+        client.badCertificateCallback = (cert, host, port) => true;
+        return client;
+      };
     }
   }
 
-  void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) async {
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     final authTokens = await SqliteHelper.getAuthTokens();
     String? accessToken = authTokens?.token;
     if (kDebugMode) {
@@ -97,17 +82,14 @@ class RestClient {
       logError(error);
     }
     final authTokens = await SqliteHelper.getAuthTokens();
-    final bool checkExpiredAccessToken =
-        DateTime.tryParse(
-          authTokens?.tokenExpired ?? '',
-        )?.isBefore(DateTime.now()) ??
-        false;
+    final bool checkExpiredAccessToken = DateTime.tryParse(authTokens?.tokenExpired ?? '')?.isBefore(DateTime.now()) ?? false;
     if (error.response?.statusCode == 401 && checkExpiredAccessToken) {
       try {
-        final newAccessToken = await refreshAccessToken();
-        if (newAccessToken != null) {
+        final AuthTokens authTokens = await refreshAccessToken();
+        if (authTokens != null) {
+          SQLiteManager.instance().put(AppConsts.keyAuthTokens, authTokens.toJson());
           final requestOptions = error.requestOptions;
-          requestOptions.headers['Authorization'] = '$newAccessToken';
+          requestOptions.headers['Authorization'] = '${authTokens.token}';
           final clonedResponse = await dio.fetch(requestOptions);
           return handler.resolve(clonedResponse);
         } else {
@@ -145,7 +127,7 @@ class RestClient {
     }
   }
 
-  Future<String?> refreshAccessToken() async {
+  Future<dynamic> refreshAccessToken() async {
     if (isRefreshing) {
       final completer = Completer<String?>();
       refreshWaiters.add((token) => completer.complete(token));
@@ -158,27 +140,21 @@ class RestClient {
       final refreshToken = authTokens?.refreshToken;
       if (refreshToken == null) return null;
 
-      final response = await dio.post(
-        'auth/refresh-token',
-        data: {'refreshToken': refreshToken},
-      );
+      final response = await dio.post('auth/refresh-token', data: {'refreshToken': refreshToken});
 
       final newAccessToken = response.data['accessToken'] as String?;
-      final newRefreshToken =
-          response.data['refreshToken'] as String? ?? refreshToken;
+      final newRefreshToken = response.data['refreshToken'] as String? ?? refreshToken;
       SharedPref.instance.setString(AppConsts.keyToken, newAccessToken ?? '');
       SharedPref.instance.setString(AppConsts.keyRefreshToken, newRefreshToken);
       if (newAccessToken != null) {
-        tokenStore.save(
-          AuthTokens(token: newAccessToken, refreshToken: newRefreshToken),
-        );
+        tokenStore.save(AuthTokens(token: newAccessToken, refreshToken: newRefreshToken));
 
         for (final waiter in refreshWaiters) {
           waiter(newAccessToken);
         }
         refreshWaiters.clear();
       }
-      return newAccessToken;
+      return response.data;
     } catch (e) {
       print(e);
       return null;

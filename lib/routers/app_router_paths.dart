@@ -6,4 +6,5 @@ class AppRouterPaths {
   static const String requestOtpPage = '/requestOtpPage';
   static const String forgotPassPage = '/forgotPassPage';
   static const String postDetailPage = '/PostDetailPage';
+  static const String signUpPage = '/signUpPage';
 }

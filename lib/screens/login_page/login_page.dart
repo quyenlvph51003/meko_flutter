@@ -17,12 +17,7 @@ import 'login_vm/login_cubit.dart';
 import 'login_vm/login_state.dart';
 
 class LoginPage extends StatelessWidget {
-  const LoginPage({
-    Key? key,
-    this.showBack = true,
-    required void Function() onSuccess,
-    required void Function() onTapRegister,
-  }) : super(key: key);
+  const LoginPage({Key? key, this.showBack = true, required void Function() onSuccess, required void Function() onTapRegister}) : super(key: key);
   final bool showBack;
 
   @override
@@ -35,12 +30,7 @@ class LoginPage extends StatelessWidget {
 }
 
 class LoginPageView extends StatefulWidget {
-  const LoginPageView({
-    super.key,
-    required this.showBack,
-    this.onSuccess,
-    this.onTapRegister,
-  });
+  const LoginPageView({super.key, required this.showBack, this.onSuccess, this.onTapRegister});
 
   final bool showBack;
   final VoidCallback? onSuccess;
@@ -64,25 +54,14 @@ class _LoginPageViewState extends State<LoginPageView> {
     return BlocListener<LoginCubit, LoginState>(
       listener: (context, state) {
         if (state.errorMessage != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage!),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 3),
-            ),
-          );
-        } else if (state.isSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Đăng nhập thành công!'),
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 2),
-            ),
-          );
-          Navigator.of(
+          ScaffoldMessenger.of(
             context,
-            rootNavigator: true,
-          ).pushNamedAndRemoveUntil(AppRouterPaths.homePage, (route) => false);
+          ).showSnackBar(SnackBar(content: Text(state.errorMessage!), backgroundColor: Colors.red, duration: const Duration(seconds: 3)));
+        } else if (state.isSuccess) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Đăng nhập thành công!'), backgroundColor: Colors.green, duration: Duration(seconds: 2)));
+          Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(AppRouterPaths.homePage, (route) => false);
           // widget.onSuccess?.call();
           // Navigator.of(context).maybePop(true);
         }
@@ -106,11 +85,7 @@ class _LoginPageViewState extends State<LoginPageView> {
                         onTap: () {
                           return Navigator.of(context).pop(false);
                         },
-                        child: Container(
-                          width: 24,
-                          height: 24,
-                          child: Icon(Icons.arrow_back, size: 24),
-                        ),
+                        child: Container(width: 24, height: 24, child: Icon(Icons.arrow_back, size: 24)),
                       ),
                       Spacer(),
                     ],
@@ -127,45 +102,26 @@ class _LoginPageViewState extends State<LoginPageView> {
                           padding: EdgeInsets.symmetric(horizontal: 16),
                           child: Column(
                             children: [
-                              Image.asset(
-                                AppImages.img_splash,
-                                height: 120,
-                                fit: BoxFit.fitHeight,
-                              ),
+                              Image.asset(AppImages.img_splash, height: 120, fit: BoxFit.fitHeight),
                               const SizedBox(height: 16),
                               const Text(
                                 'Đăng nhập',
-                                style: TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.black87,
-                                ),
+                                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700, color: Colors.black87),
                               ),
                               const SizedBox(height: 8),
                               Text(
                                 'Chào mừng bạn quay trở lại Meko!',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.grey[600],
-                                ),
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                               ),
                               const SizedBox(height: 32),
                               Row(
                                 children: [
                                   Text(
                                     'Email',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColor.cGray,
-                                    ),
+                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColor.cGray),
                                   ),
                                   const SizedBox(width: 2),
-                                  Text(
-                                    '*',
-                                    style: TextStyle(color: AppColor.cError),
-                                  ),
+                                  Text('*', style: TextStyle(color: AppColor.cError)),
                                 ],
                               ),
                               const SizedBox(height: 8),
@@ -174,10 +130,7 @@ class _LoginPageViewState extends State<LoginPageView> {
                                 hintText: 'Nhập email của bạn',
                                 keyboardType: TextInputType.emailAddress,
                                 textInputAction: TextInputAction.next,
-                                prefixIcon: const Icon(
-                                  Icons.email_outlined,
-                                  size: 20,
-                                ),
+                                prefixIcon: const Icon(Icons.email_outlined, size: 20),
                                 validator: AppValidators.email,
                                 focusedBorderColor: AppColor.color8,
                               ),
@@ -186,17 +139,10 @@ class _LoginPageViewState extends State<LoginPageView> {
                                 children: [
                                   Text(
                                     'Mật khẩu',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColor.cGray,
-                                    ),
+                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColor.cGray),
                                   ),
                                   const SizedBox(width: 2),
-                                  Text(
-                                    '*',
-                                    style: TextStyle(color: AppColor.cError),
-                                  ),
+                                  Text('*', style: TextStyle(color: AppColor.cError)),
                                 ],
                               ),
                               SizedBox(height: 8),
@@ -205,10 +151,7 @@ class _LoginPageViewState extends State<LoginPageView> {
                                 hintText: 'Nhập mật khẩu',
                                 obscureText: true,
                                 textInputAction: TextInputAction.done,
-                                prefixIcon: const Icon(
-                                  Icons.lock_outline,
-                                  size: 20,
-                                ),
+                                prefixIcon: const Icon(Icons.lock_outline, size: 20),
                                 validator: AppValidators.password,
                                 focusedBorderColor: AppColor.color8,
                                 onSubmitted: (_) {
@@ -221,18 +164,11 @@ class _LoginPageViewState extends State<LoginPageView> {
                                 alignment: Alignment.centerRight,
                                 child: AppButton(
                                   onTap: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      AppRouterPaths.requestOtpPage,
-                                    );
+                                    Navigator.pushNamed(context, AppRouterPaths.requestOtpPage);
                                   },
                                   child: const Text(
                                     'Quên mật khẩu?',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF4CAF50),
-                                    ),
+                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF4CAF50)),
                                   ),
                                 ),
                               ),
@@ -254,7 +190,7 @@ class _LoginPageViewState extends State<LoginPageView> {
                               AppButtonCommon(
                                 text: 'Đăng ký tài khoản',
                                 onPressed: () async {
-                                  DefaultTabController.of(context).animateTo(1);
+                                  Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(AppRouterPaths.signUpPage, (route) => true);
                                 },
                                 type: AppButtonType.outlined,
                                 size: AppButtonSize.large,

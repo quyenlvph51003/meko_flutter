@@ -4,12 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meko_project/consts/app_colcor.dart';
 import 'package:meko_project/consts/app_dimens.dart';
 import 'package:meko_project/global_data/data_local/hive_db.dart';
+import 'package:meko_project/routers/app_router_paths.dart';
 import 'package:meko_project/screens/login_page/login_page.dart';
 import 'package:meko_project/screens/sign_up_page/sign_up_page.dart';
 import 'package:meko_project/screens/tab/tab_%20manage_posting/tab_posting_page.dart';
 import 'package:meko_project/screens/tab/tab_chat/tab_chat_page.dart';
 import 'package:meko_project/screens/tab/tab_home/tab_home_page.dart';
 import 'package:meko_project/screens/tab/tab_profile/tab_profile_page.dart';
+import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import 'package:meko_project/utils/login_global/login_global.dart';
 import 'home_vm/home_cubit.dart';
 
@@ -32,29 +34,28 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final pages = const [
-      TabHomePage(),
-      PostManagerPage(),
-      TabChatPage(),
-      TabProfilePage(),
-    ];
+    final pages = const [TabHomePage(), PostManagerPage(), TabChatPage(), TabProfilePage()];
 
     return BlocListener<HomeCubit, HomeState>(
-      listenWhen: (p, c) => c.shouldShowPostSheet,
+      // listenWhen: (p, c) => c.shouldShowPostSheet,
       listener: (context, state) {
         if (state.shouldShowPostSheet) {
           showPostSheet(context);
           return;
+        }
+        if (state.isLoggedIn) {
+          print('chấdnsad');
+        } else {
+          if (state.isCheckShowAuth ?? false) {
+            Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+          }
         }
       },
       child: Scaffold(
         body: Stack(
           children: [
             BlocBuilder<HomeCubit, HomeState>(
-              buildWhen: (p, c) =>
-                  p.currentIndex != c.currentIndex ||
-                  p.isLoggedIn != c.isLoggedIn ||
-                  p.uiRev != c.uiRev,
+              buildWhen: (p, c) => p.currentIndex != c.currentIndex || p.isLoggedIn != c.isLoggedIn || p.uiRev != c.uiRev,
               builder: (context, state) {
                 return IndexedStack(index: state.currentIndex, children: pages);
               },
@@ -67,23 +68,14 @@ class _HomePageState extends State<HomePage> {
                 height: 65 + bottomPadding,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 4,
-                      offset: const Offset(0, -1),
-                    ),
-                  ],
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 4, offset: const Offset(0, -1))],
                 ),
                 child: Column(
                   children: [
                     SizedBox(
                       height: 65,
                       child: BlocBuilder<HomeCubit, HomeState>(
-                        buildWhen: (p, c) =>
-                            p.currentIndex != c.currentIndex ||
-                            p.isLoggedIn != c.isLoggedIn ||
-                            p.uiRev != c.uiRev,
+                        buildWhen: (p, c) => p.currentIndex != c.currentIndex || p.isLoggedIn != c.isLoggedIn || p.uiRev != c.uiRev,
                         builder: (context, state) {
                           return BottomNavigationBar(
                             currentIndex: state.currentIndex,
@@ -95,26 +87,10 @@ class _HomePageState extends State<HomePage> {
                             unselectedItemColor: Colors.grey,
                             showUnselectedLabels: true,
                             items: const [
-                              BottomNavigationBarItem(
-                                icon: Icon(Icons.home_outlined),
-                                activeIcon: Icon(Icons.home_rounded),
-                                label: 'Trang chủ',
-                              ),
-                              BottomNavigationBarItem(
-                                icon: Icon(Icons.label_outline),
-                                activeIcon: Icon(Icons.label),
-                                label: 'Quản lý tin',
-                              ),
-                              BottomNavigationBarItem(
-                                icon: Icon(Icons.chat_bubble_outline),
-                                activeIcon: Icon(Icons.chat_bubble),
-                                label: 'Chat',
-                              ),
-                              BottomNavigationBarItem(
-                                icon: Icon(Icons.person_outline),
-                                activeIcon: Icon(Icons.person),
-                                label: 'Tài khoản',
-                              ),
+                              BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home_rounded), label: 'Trang chủ'),
+                              BottomNavigationBarItem(icon: Icon(Icons.label_outline), activeIcon: Icon(Icons.label), label: 'Quản lý tin'),
+                              BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), activeIcon: Icon(Icons.chat_bubble), label: 'Chat'),
+                              BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'Tài khoản'),
                             ],
                           );
                         },
@@ -129,10 +105,15 @@ class _HomePageState extends State<HomePage> {
               left: AppDimens.getWidth(context) / 2 - 28,
               bottom: 35 + bottomPadding,
               child: GestureDetector(
-                onTap: () {
+                onTap: () async {
                   HapticFeedback.mediumImpact();
-                  vm.openPostSheet();
-                  return;
+                  final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                  if (isCheckShowAuth) {
+                    Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                    return;
+                  } else {
+                    vm.openPostSheet();
+                  }
                 },
                 child: Container(
                   width: 56,
@@ -140,19 +121,9 @@ class _HomePageState extends State<HomePage> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: AppColor.cMain,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColor.color8.withOpacity(0.4),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+                    boxShadow: [BoxShadow(color: AppColor.color8.withOpacity(0.4), blurRadius: 12, offset: const Offset(0, 4))],
                   ),
-                  child: const Icon(
-                    Icons.add_rounded,
-                    color: Colors.white,
-                    size: 32,
-                  ),
+                  child: const Icon(Icons.add_rounded, color: Colors.white, size: 32),
                 ),
               ),
             ),
@@ -180,6 +151,7 @@ class _HomePageState extends State<HomePage> {
               context,
               loginPage: LoginPage(
                 onSuccess: () {
+                  print('duongqinaguye');
                   Navigator.pop(context, true);
                   return;
                 },
@@ -211,11 +183,7 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              isActive ? activeIcon : icon,
-              size: 24,
-              color: isActive ? AppColor.cMain : Colors.grey,
-            ),
+            Icon(isActive ? activeIcon : icon, size: 24, color: isActive ? AppColor.cMain : Colors.grey),
             const SizedBox(height: 4),
             Text(
               label,
@@ -238,31 +206,19 @@ class _HomePageState extends State<HomePage> {
       isScrollControlled: true,
       showDragHandle: true,
       backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) {
         return Padding(
-          padding: EdgeInsets.only(
-            left: 16,
-            right: 16,
-            bottom: 16 + MediaQuery.of(ctx).viewInsets.bottom,
-            top: 4,
-          ),
+          padding: EdgeInsets.only(left: 16, right: 16, bottom: 16 + MediaQuery.of(ctx).viewInsets.bottom, top: 4),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'Đăng tin',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
-              ),
+              const Text('Đăng tin', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
               const SizedBox(height: 16),
               TextField(
                 decoration: InputDecoration(
                   labelText: 'Tiêu đề',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
               const SizedBox(height: 12),
@@ -270,9 +226,7 @@ class _HomePageState extends State<HomePage> {
                 maxLines: 3,
                 decoration: InputDecoration(
                   labelText: 'Mô tả',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
               const SizedBox(height: 16),
@@ -289,9 +243,7 @@ class _HomePageState extends State<HomePage> {
                     backgroundColor: const Color(0xFFFFCF00),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
               ),

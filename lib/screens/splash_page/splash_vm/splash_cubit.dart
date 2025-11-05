@@ -13,12 +13,10 @@ class SplashCubit extends Cubit<SplashState> {
   void init(BuildContext context) async {
     updateAnimation();
     Future.delayed(const Duration(milliseconds: 1500), () async {
-      bool? checkFirstUseApp = await SharedPref.instance.getBool(
-        AppConsts.keyIntro,
-      );
+      bool? checkFirstUseApp = await SharedPref.instance.getBool(AppConsts.keyIntro);
       bool checkLogin = await isCheckLogin();
       if (checkFirstUseApp == true) {
-        if (checkLogin) {
+        if (!checkLogin) {
           await SqliteHelper.deleteAuthTokens();
           await SqliteHelper.deleteUserSql();
         }
@@ -30,10 +28,9 @@ class SplashCubit extends Cubit<SplashState> {
             pageBuilder: (context, animation, secondaryAnimation) {
               return IntroPage();
             },
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-                  return FadeTransition(opacity: animation, child: child);
-                },
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
             transitionDuration: const Duration(milliseconds: 150),
           ),
         );
@@ -43,18 +40,15 @@ class SplashCubit extends Cubit<SplashState> {
 
   Future<bool> isCheckLogin() async {
     final authTokens = await SqliteHelper.getAuthTokens();
-    if (authTokens != null) {
-      final refreshTokenExpired = DateTime.tryParse(
-        authTokens.refreshTokenExpired!,
-      );
-      if (refreshTokenExpired != null) {
-        if (refreshTokenExpired.isBefore(DateTime.now())) {
-          return false;
-        }
-      }
-      return true;
-    }
-    return false;
+
+    if (authTokens == null) return false; // chưa có token => chưa đăng nhập
+
+    final refreshTokenExpired = DateTime.tryParse(authTokens.refreshTokenExpired ?? '');
+    if (refreshTokenExpired == null) return false; // dữ liệu lỗi => coi như hết hạn
+
+    // So sánh thời gian hết hạn với thời gian hiện tại
+    final isValid = refreshTokenExpired.isAfter(DateTime.now());
+    return isValid;
   }
 
   void updateAnimation() {

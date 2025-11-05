@@ -51,22 +51,14 @@ class SignUpPageViewState extends State<SignUpPageView> {
       },
       listener: (context, state) {
         if (state.isSuccess == false) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message!),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 2),
-            ),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message!), backgroundColor: Colors.red, duration: const Duration(seconds: 2)));
           return;
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Đăng ký thành công!'),
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 2),
-            ),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Đăng ký thành công!'), backgroundColor: Colors.green, duration: Duration(seconds: 2)));
           widget.onSuccess.call();
           return;
         }
@@ -88,11 +80,7 @@ class SignUpPageViewState extends State<SignUpPageView> {
                       onTap: () {
                         widget.onBackToLogin.call();
                       },
-                      child: SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: Icon(Icons.arrow_back, size: 24, color: Colors.black87),
-                      ),
+                      child: SizedBox(width: 24, height: 24, child: Icon(Icons.arrow_back, size: 24, color: Colors.black87)),
                     ),
                     const Spacer(),
                   ],
@@ -110,20 +98,12 @@ class SignUpPageViewState extends State<SignUpPageView> {
                             const SizedBox(height: 16),
                             const Text(
                               'Đăng ký',
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.black87,
-                              ),
+                              style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700, color: Colors.black87),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               'Tạo tài khoản Meko để bắt đầu trải nghiệm',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.grey[600],
-                              ),
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.grey[600]),
                             ),
                             const SizedBox(height: 32),
 
@@ -131,11 +111,7 @@ class SignUpPageViewState extends State<SignUpPageView> {
                               children: [
                                 Text(
                                   'Họ và tên',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColor.cGray,
-                                  ),
+                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColor.cGray),
                                 ),
                                 const SizedBox(width: 2),
                                 Text('*', style: TextStyle(color: AppColor.cError)),
@@ -148,9 +124,7 @@ class SignUpPageViewState extends State<SignUpPageView> {
                               textInputAction: TextInputAction.next,
                               prefixIcon: const Icon(Icons.person_outline, size: 20),
                               validator: (v) {
-                                return (v == null || v.trim().isEmpty)
-                                    ? 'Vui lòng nhập họ tên'
-                                    : null;
+                                return (v == null || v.trim().isEmpty) ? 'Vui lòng nhập họ tên' : null;
                               },
                               focusedBorderColor: AppColor.color8,
                             ),
@@ -160,11 +134,7 @@ class SignUpPageViewState extends State<SignUpPageView> {
                               children: [
                                 Text(
                                   'Email',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColor.cGray,
-                                  ),
+                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColor.cGray),
                                 ),
                                 const SizedBox(width: 2),
                                 Text('*', style: TextStyle(color: AppColor.cError)),
@@ -186,11 +156,7 @@ class SignUpPageViewState extends State<SignUpPageView> {
                               children: [
                                 Text(
                                   'Mật khẩu',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColor.cGray,
-                                  ),
+                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColor.cGray),
                                 ),
                                 const SizedBox(width: 2),
                                 Text('*', style: TextStyle(color: AppColor.cError)),
@@ -223,10 +189,7 @@ class SignUpPageViewState extends State<SignUpPageView> {
                                     ),
                                     const SizedBox(width: 8),
                                     const Expanded(
-                                      child: Text(
-                                        'Tôi đồng ý với Điều khoản sử dụng và Chính sách bảo mật',
-                                        style: TextStyle(fontSize: 13),
-                                      ),
+                                      child: Text('Tôi đồng ý với Điều khoản sử dụng và Chính sách bảo mật', style: TextStyle(fontSize: 13)),
                                     ),
                                   ],
                                 );

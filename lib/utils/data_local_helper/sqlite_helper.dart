@@ -1,7 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:meko_project/consts/app_consts.dart';
 import 'package:meko_project/global_data/data_local/sql_maneger.dart';
 import 'package:meko_project/models/body/auth/auth_token.dart';
 import 'package:meko_project/models/body/user/user_model.dart';
+import 'package:meko_project/routers/app_router_paths.dart';
 
 class SqliteHelper {
   //users
@@ -31,5 +33,14 @@ class SqliteHelper {
       return AuthTokens.fromJson(authTokensJson);
     }
     return null;
+  }
+
+  //check hiẻn thị login nếu chưa đăng nhập và muốn sử dụng chức nằng cần đăng nhập
+  static Future<bool> isCheckShowAuth(BuildContext context) async {
+    final user = await SqliteHelper.getUserSql();
+    if (user == null) {
+      return true;
+    }
+    return false;
   }
 }

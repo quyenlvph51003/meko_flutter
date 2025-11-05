@@ -5,16 +5,13 @@ import 'package:meko_project/domains/rest_client/rest_client_extension.dart';
 import 'package:meko_project/models/body/post/listing_item_model.dart';
 import 'package:meko_project/models/paginated_result_common.dart';
 import 'package:meko_project/models/response_common.dart';
+import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 
 class PostRepo {
   final RestClient restClient;
   PostRepo({required this.restClient});
 
-  Future<ResponseCommon<PaginatedResult<ListingItem>>> getPosts({
-    int page = 0,
-    int size = 10,
-    PostSearchRequest? postSearchRequest,
-  }) async {
+  Future<ResponseCommon<PaginatedResult<ListingItem>>> getPosts({int page = 0, int size = 10, PostSearchRequest? postSearchRequest}) async {
     try {
       final response = await restClient.post(
         ApiPath.searchPost,
@@ -23,10 +20,7 @@ class PostRepo {
       );
       return ResponseCommon<PaginatedResult<ListingItem>>.fromJson(
         response.data,
-        (obj) => PaginatedResult<ListingItem>.fromJson(
-          (obj as Map<String, dynamic>),
-          (m) => ListingItem.fromJson(m),
-        ),
+        (obj) => PaginatedResult<ListingItem>.fromJson((obj as Map<String, dynamic>), (m) => ListingItem.fromJson(m)),
       );
     } catch (e) {
       return ResponseCommon<PaginatedResult<ListingItem>>(
@@ -42,20 +36,15 @@ class PostRepo {
 
   Future<ResponseCommon<ListingItem>> getPostDetail({required int id}) async {
     try {
-      final response = await restClient.get('${ApiPath.postDetail}/$id');
-      return ResponseCommon<ListingItem>.fromJson(
-        response.data,
-        (obj) => ListingItem.fromJson(obj as Map<String, dynamic>),
-      );
+      final user = await SqliteHelper.getUserSql();
+      String query = '';
+      if (user != null) {
+        query = '?userId=${user.id}';
+      }
+      final response = await restClient.get('${ApiPath.postDetail}/$id$query');
+      return ResponseCommon<ListingItem>.fromJson(response.data, (obj) => ListingItem.fromJson(obj as Map<String, dynamic>));
     } catch (e) {
-      return ResponseCommon<ListingItem>(
-        datetime: '',
-        errorCode: 500,
-        message: e.toString(),
-        data: null,
-        content: const [],
-        success: false,
-      );
+      return ResponseCommon<ListingItem>(datetime: '', errorCode: 500, message: e.toString(), data: null, content: const [], success: false);
     }
   }
 
@@ -64,9 +53,7 @@ class PostRepo {
     if (res.data != null) {
       return res.data as ListingItem;
     }
-    return ListingItem.fromJson(
-      res.toJson()['data'] as Map<String, dynamic>? ?? <String, dynamic>{},
-    );
+    return ListingItem.fromJson(res.toJson()['data'] as Map<String, dynamic>? ?? <String, dynamic>{});
   }
 }
 
@@ -78,14 +65,7 @@ class PostSearchRequest {
   final String? searchText;
   final List<int>? categoryIds;
 
-  PostSearchRequest({
-    this.status,
-    this.userId,
-    this.wardCode,
-    this.provinceCode,
-    this.searchText,
-    this.categoryIds,
-  });
+  PostSearchRequest({this.status, this.userId, this.wardCode, this.provinceCode, this.searchText, this.categoryIds});
 
   Map<String, dynamic> toJson() {
     return {
