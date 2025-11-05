@@ -9,5 +9,5 @@ class AppImages {
       'assets/images/img_merry_christmas.png';
   static const String image_filter = 'assets/images/image_filter.jpg';
   static const String icon_all_categories =
-      'assets/images/icon_all_categories.png';
+      'assets/icons/icon_all_categories.png';
 }

@@ -543,10 +543,14 @@ class _TabHomeViewState extends State<_TabHomeView> {
                               return const Center(child: AppLoader(size: 20));
                             },
                           )
-                        : Image.asset(
-                            AppImages.icon_all_categories,
-                            width: 20,
-                            height: 20,
+                        : Padding(
+                            padding: const EdgeInsets.all(14),
+                            child: Image.asset(
+                              AppImages.icon_all_categories,
+                              width: 15,
+                              height: 15,
+                              fit: BoxFit.contain,
+                            ),
                           ),
                   ],
                 ),
