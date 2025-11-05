@@ -25,10 +25,11 @@ class TabProfileCubit extends Cubit<TabProfileState> {
           getIt<HomeCubit>().isCheckLogin();
           getIt<HomeCubit>().refreshHome();
           Future.delayed(const Duration(milliseconds: 200), () {
-            Navigator.of(
-              context,
-              rootNavigator: true,
-            ).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => false);
+            Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
+              AppRouterPaths.login,
+              (route) => false,
+              arguments: {'showBack': false},
+            );
           });
         },
       );

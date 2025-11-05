@@ -21,10 +21,14 @@ class AppConsts {
   static const String keyToken = 'key_token';
   static const String keyRefreshToken = 'key_refresh_token';
   static const String keyDeviceId = 'key_device_id';
+  static const String keyAuthTokens = 'key_auth_tokens';
   static const String phone = 'key_phone';
 
   static const String typeQrCode = 'QR_CODE';
   static const String typePDFCode = 'PDF_417';
+
+  // key Hive
+  static const String userSql = 'users';
 
   /// key font
   static const String fontKeyBlack = 'Black';

@@ -22,17 +22,32 @@ class AppRouter {
     return MaterialPageRoute<dynamic>(
       settings: settings,
       builder: (BuildContext context) {
-        return router(context: context, routeName: settings.name!, data: settings.arguments);
+        return router(
+          context: context,
+          routeName: settings.name!,
+          data: settings.arguments,
+        );
       },
     );
   }
 
-  Widget router({required BuildContext context, required String routeName, Object? data}) {
+  Widget router({
+    required BuildContext context,
+    required String routeName,
+    Object? data,
+  }) {
+    final Map<String, dynamic>? map = (data is Map<String, dynamic>)
+        ? data
+        : null;
     switch (routeName) {
       case AppRouterPaths.splash:
         return SplashPage();
       case AppRouterPaths.login:
-        return LoginPage(onSuccess: () {}, onTapRegister: () {});
+        return LoginPage(
+          onSuccess: () {},
+          onTapRegister: () {},
+          showBack: map?['showBack'] ?? true,
+        );
       case AppRouterPaths.homePage:
         return HomePage();
       case AppRouterPaths.requestOtpPage:
@@ -40,9 +55,9 @@ class AppRouter {
       case AppRouterPaths.forgotPassPage:
         return ForgotPassPage();
       case AppRouterPaths.postDetailPage:
-        final map = data as Map<String, dynamic>;
-        final ListingItem item = map['item'] as ListingItem;
-        final Future<ListingItem> Function(int) loader = map['loader'] as Future<ListingItem> Function(int);
+        final ListingItem item = map?['item'] as ListingItem;
+        final Future<ListingItem> Function(int) loader =
+            map?['loader'] as Future<ListingItem> Function(int);
         return PostDetailPage(item: item, loadDetail: loader);
       default:
         return SizedBox();

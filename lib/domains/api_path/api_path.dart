@@ -1,4 +1,5 @@
 class ApiPath {
+  //auth
   static const String authRegister = 'auth/register';
   static const String authLogin = 'auth/login';
   static const String authRefresh = 'auth/refresh-token';
@@ -7,4 +8,7 @@ class ApiPath {
   static const String categoryList = 'category/list';
   static const String searchPost = 'post/search-post';
   static const String postDetail = 'post/detail/';
+
+  //user
+  static const String getProfile = 'user/profile';
 }

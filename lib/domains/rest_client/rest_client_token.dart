@@ -2,7 +2,7 @@ import 'package:meko_project/models/body/auth/auth_token.dart';
 
 class TokenStore {
   String? accessToken, refreshToken;
-  DateTime? accessExp, refreshExp;
+  String? accessExp, refreshExp;
 
   void save(AuthTokens t) {
     accessToken = t.token;
@@ -16,4 +16,3 @@ class TokenStore {
     accessExp = refreshExp = null;
   }
 }
-

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meko_project/consts/app_colcor.dart';
 import 'package:meko_project/consts/app_dimens.dart';
+import 'package:meko_project/global_data/data_local/hive_db.dart';
 import 'package:meko_project/screens/login_page/login_page.dart';
 import 'package:meko_project/screens/sign_up_page/sign_up_page.dart';
 import 'package:meko_project/screens/tab/tab_%20manage_posting/tab_posting_page.dart';

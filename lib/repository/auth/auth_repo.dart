@@ -4,8 +4,10 @@ import 'package:meko_project/domains/api_path/api_path.dart';
 import 'package:meko_project/domains/rest_client/rest_client.dart';
 import 'package:meko_project/domains/rest_client/rest_client_extension.dart';
 import 'package:meko_project/global_data/data_local/shared_pref.dart';
+import 'package:meko_project/global_data/data_local/sql_maneger.dart';
 import 'package:meko_project/models/body/auth/auth_token.dart';
 import 'package:meko_project/models/response_common.dart';
+import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 
 class AuthRepository {
   final RestClient restClient;
@@ -25,9 +27,15 @@ class AuthRepository {
     return ResponseCommon<void>.fromJson(res.data, (_) => null);
   }
 
-  Future<Response?> login({required String email, required String password}) async {
+  Future<Response?> login({
+    required String email,
+    required String password,
+  }) async {
     try {
-      return await restClient.post(ApiPath.authLogin, data: {'email': email, 'password': password});
+      return await restClient.post(
+        ApiPath.authLogin,
+        data: {'email': email, 'password': password},
+      );
     } catch (e) {
       print(e);
       return null;
@@ -36,7 +44,10 @@ class AuthRepository {
 
   Future<Response?> requestOtp({required String email}) async {
     try {
-      return await restClient.post(ApiPath.authRequestOtp, data: {'email': email});
+      return await restClient.post(
+        ApiPath.authRequestOtp,
+        data: {'email': email},
+      );
     } catch (e) {
       print(e);
       return null;
@@ -54,24 +65,35 @@ class AuthRepository {
     return ResponseCommon<void>.fromJson(res.data, (_) => null);
   }
 
-  Future<bool> loginAndSaveToken({required String email, required String password}) async {
+  Future<bool> loginAndSaveToken({
+    required String email,
+    required String password,
+  }) async {
     try {
       final response = await login(email: email, password: password);
+      print(response?.data);
       if (response != null && response.statusCode == 200) {
-        final authTokens = AuthTokens.fromJson(response.data);
-        restClient.tokenStore.save(authTokens);
+        final authTokens = AuthTokens.fromJson(response.data['data']);
+        //lưu token local
+        SQLiteManager.instance().put(
+          AppConsts.keyAuthTokens,
+          authTokens.toJson(),
+        );
         return true;
       }
       return false;
     } catch (e) {
-      print(e);
+      print(e.toString());
       return false;
     }
   }
 
   Future<Response?> refreshToken(String refreshToken) async {
     try {
-      return await restClient.post(ApiPath.authRefresh, data: {'refreshToken': refreshToken});
+      return await restClient.post(
+        ApiPath.authRefresh,
+        data: {'refreshToken': refreshToken},
+      );
     } catch (e) {
       print(e);
       return null;
@@ -80,6 +102,8 @@ class AuthRepository {
 
   Future<void> logout() async {
     await sharedPref.setBool(AppConsts.keyLoginSuccess, false);
+    await SqliteHelper.deleteUserSql();
+    await SqliteHelper.deleteAuthTokens();
     await restClient.tokenStore.clear();
   }
 

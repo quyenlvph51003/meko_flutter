@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meko_project/consts/app_images.dart';
 import 'package:meko_project/screens/splash_page/splash_vm/splash_cubit.dart';
 import 'package:meko_project/screens/splash_page/splash_vm/splash_state.dart';
+import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 
 class SplashPage extends StatelessWidget {
   const SplashPage({Key? key}) : super(key: key);

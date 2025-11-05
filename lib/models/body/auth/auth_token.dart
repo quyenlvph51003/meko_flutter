@@ -1,31 +1,33 @@
 class AuthTokens {
+  String? token;
+  String? refreshToken;
+  String? tokenExpired;
+  String? refreshTokenExpired;
+  int? role;
+
   AuthTokens({
     this.token,
     this.refreshToken,
     this.tokenExpired,
     this.refreshTokenExpired,
+    this.role,
   });
 
-  factory AuthTokens.fromJson(Map<String, dynamic> json) => AuthTokens(
-    token: json['token'] as String?,
-    refreshToken: json['refreshToken'] as String?,
-    tokenExpired: json['tokenExpired'] != null
-        ? DateTime.parse(json['tokenExpired'] as String)
-        : null,
-    refreshTokenExpired: json['refreshTokenExpired'] != null
-        ? DateTime.parse(json['refreshTokenExpired'] as String)
-        : null,
-  );
+  AuthTokens.fromJson(Map<String, dynamic> json) {
+    token = json['token'];
+    refreshToken = json['refreshToken'];
+    tokenExpired = json['tokenExpired'];
+    refreshTokenExpired = json['refreshTokenExpired'];
+    role = json['role'];
+  }
 
-  String? token;
-  String? refreshToken;
-  DateTime? tokenExpired;
-  DateTime? refreshTokenExpired;
-
-  Map<String, dynamic> toJson() => {
-    'token': token,
-    'refreshToken': refreshToken,
-    'tokenExpired': tokenExpired?.toIso8601String(),
-    'refreshTokenExpired': refreshTokenExpired?.toIso8601String(),
-  };
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['token'] = this.token;
+    data['refreshToken'] = this.refreshToken;
+    data['tokenExpired'] = this.tokenExpired;
+    data['refreshTokenExpired'] = this.refreshTokenExpired;
+    data['role'] = this.role;
+    return data;
+  }
 }

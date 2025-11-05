@@ -1,10 +1,14 @@
 import 'package:get_it/get_it.dart';
 import 'package:meko_project/domains/api_path/app_config.dart';
 import 'package:meko_project/domains/rest_client/rest_client.dart';
+import 'package:meko_project/global_data/data_local/hive_db.dart';
 import 'package:meko_project/global_data/data_local/shared_pref.dart';
+import 'package:meko_project/global_data/data_local/sql_maneger.dart';
 import 'package:meko_project/repository/auth/auth_repo.dart';
 import 'package:meko_project/repository/category/category_repo.dart';
 import 'package:meko_project/repository/post/post_repo.dart';
+import 'package:meko_project/repository/user/user_repo.dart';
+import 'package:sqflite/sqflite.dart';
 
 final getIt = GetIt.instance;
 
@@ -14,11 +18,22 @@ class ServiceLocator {
       return RestClient(AppConfig.instance.baseUrl);
     });
     getIt.registerLazySingleton<AuthRepository>(() {
-      return AuthRepository(restClient: getIt<RestClient>(), sharedPref: SharedPref.instance);
+      return AuthRepository(
+        restClient: getIt<RestClient>(),
+        sharedPref: SharedPref.instance,
+      );
     });
     getIt.registerSingleton<CategoryRepository>(
       CategoryRepository(restClient: getIt<RestClient>()),
     );
-    getIt.registerSingleton<PostRepo>(PostRepo(restClient: getIt<RestClient>()));
+    getIt.registerSingleton<PostRepo>(
+      PostRepo(restClient: getIt<RestClient>()),
+    );
+    getIt.registerSingleton<UserRepo>(
+      UserRepo(
+        restClient: getIt<RestClient>(),
+        sqLiteManager: SQLiteManager.instance(),
+      ),
+    );
   }
 }

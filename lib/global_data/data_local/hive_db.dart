@@ -16,7 +16,7 @@ class HiveData {
   String keyCart = 'tableDataCart';
   String keyAddress = 'key_address';
 
-  void initHive() async {
+  Future<void> initHive() async {
     final appDocumentDirectory = await getApplicationDocumentsDirectory();
     Hive.init(appDocumentDirectory.path);
     // Hive.registerAdapter();
@@ -45,6 +45,46 @@ class HiveData {
     } catch (e) {
       MyLogger.e(e);
       return [];
+    }
+  }
+
+  Future<void> put<T>(String boxName, String key, T value) async {
+    try {
+      final box = await Hive.openBox(boxName);
+      await box.put(key, value);
+    } catch (e) {
+      MyLogger.e(e);
+    }
+  }
+
+  /// Đọc dữ liệu
+  Future<T?> get<T>(String boxName, String key) async {
+    try {
+      final box = await Hive.openBox(boxName);
+      return box.get(key);
+    } catch (e) {
+      MyLogger.e(e);
+      return null;
+    }
+  }
+
+  /// Xóa 1 key
+  Future<void> remove(String boxName, String key) async {
+    try {
+      final box = await Hive.openBox(boxName);
+      await box.delete(key);
+    } catch (e) {
+      MyLogger.e(e);
+    }
+  }
+
+  /// Xóa toàn bộ box
+  Future<void> clearBox(String boxName) async {
+    try {
+      final box = await Hive.openBox(boxName);
+      await box.clear();
+    } catch (e) {
+      MyLogger.e(e);
     }
   }
 }

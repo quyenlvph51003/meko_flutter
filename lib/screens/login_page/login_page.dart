@@ -7,6 +7,7 @@ import 'package:meko_project/domains/dependency_injection/service_locator.dart';
 import 'package:meko_project/repository/auth/auth_repo.dart';
 import 'package:meko_project/routers/app_router.dart';
 import 'package:meko_project/routers/app_router_paths.dart';
+import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import 'package:meko_project/widget/app_button/app_button.dart';
 import 'package:meko_project/widget/app_button/app_button_common.dart';
 import 'package:meko_project/widget/app_text_field/app_text_field.dart';
@@ -14,8 +15,6 @@ import 'package:meko_project/widget/app_validators/app_validators.dart';
 
 import 'login_vm/login_cubit.dart';
 import 'login_vm/login_state.dart';
-
-
 
 class LoginPage extends StatelessWidget {
   const LoginPage({
@@ -36,7 +35,12 @@ class LoginPage extends StatelessWidget {
 }
 
 class LoginPageView extends StatefulWidget {
-  const LoginPageView({super.key, required this.showBack, this.onSuccess, this.onTapRegister});
+  const LoginPageView({
+    super.key,
+    required this.showBack,
+    this.onSuccess,
+    this.onTapRegister,
+  });
 
   final bool showBack;
   final VoidCallback? onSuccess;
@@ -75,12 +79,16 @@ class _LoginPageViewState extends State<LoginPageView> {
               duration: Duration(seconds: 2),
             ),
           );
-          widget.onSuccess?.call();
-          Navigator.of(context).maybePop(true);
+          Navigator.of(
+            context,
+            rootNavigator: true,
+          ).pushNamedAndRemoveUntil(AppRouterPaths.homePage, (route) => false);
+          // widget.onSuccess?.call();
+          // Navigator.of(context).maybePop(true);
         }
       },
       child: Scaffold(
-        backgroundColor:  AppColor.white,
+        backgroundColor: AppColor.white,
         body: GestureDetector(
           onTap: () {
             FocusScope.of(context).unfocus();
@@ -89,17 +97,24 @@ class _LoginPageViewState extends State<LoginPageView> {
             child: Column(
               children: [
                 SizedBox(height: 50),
-                Row(
-                  children: [
-                    SizedBox(width: 16),
-                    GestureDetector(
-                      onTap: () {
-                        return Navigator.of(context).pop(false);
-                      },
-                      child: Container(width: 24, height: 24, child: Icon(Icons.arrow_back, size: 24,)),
-                    ),
-                    Spacer(),
-                  ],
+                Visibility(
+                  visible: widget.showBack,
+                  child: Row(
+                    children: [
+                      SizedBox(width: 16),
+                      GestureDetector(
+                        onTap: () {
+                          return Navigator.of(context).pop(false);
+                        },
+                        child: Container(
+                          width: 24,
+                          height: 24,
+                          child: Icon(Icons.arrow_back, size: 24),
+                        ),
+                      ),
+                      Spacer(),
+                    ],
+                  ),
                 ),
                 Container(
                   color: Colors.transparent,
@@ -112,7 +127,11 @@ class _LoginPageViewState extends State<LoginPageView> {
                           padding: EdgeInsets.symmetric(horizontal: 16),
                           child: Column(
                             children: [
-                              Image.asset(AppImages.img_splash, height: 120, fit: BoxFit.fitHeight),
+                              Image.asset(
+                                AppImages.img_splash,
+                                height: 120,
+                                fit: BoxFit.fitHeight,
+                              ),
                               const SizedBox(height: 16),
                               const Text(
                                 'Đăng nhập',
@@ -143,7 +162,10 @@ class _LoginPageViewState extends State<LoginPageView> {
                                     ),
                                   ),
                                   const SizedBox(width: 2),
-                                  Text('*', style: TextStyle(color: AppColor.cError)),
+                                  Text(
+                                    '*',
+                                    style: TextStyle(color: AppColor.cError),
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 8),
@@ -152,7 +174,10 @@ class _LoginPageViewState extends State<LoginPageView> {
                                 hintText: 'Nhập email của bạn',
                                 keyboardType: TextInputType.emailAddress,
                                 textInputAction: TextInputAction.next,
-                                prefixIcon: const Icon(Icons.email_outlined, size: 20),
+                                prefixIcon: const Icon(
+                                  Icons.email_outlined,
+                                  size: 20,
+                                ),
                                 validator: AppValidators.email,
                                 focusedBorderColor: AppColor.color8,
                               ),
@@ -168,7 +193,10 @@ class _LoginPageViewState extends State<LoginPageView> {
                                     ),
                                   ),
                                   const SizedBox(width: 2),
-                                  Text('*', style: TextStyle(color: AppColor.cError)),
+                                  Text(
+                                    '*',
+                                    style: TextStyle(color: AppColor.cError),
+                                  ),
                                 ],
                               ),
                               SizedBox(height: 8),
@@ -177,7 +205,10 @@ class _LoginPageViewState extends State<LoginPageView> {
                                 hintText: 'Nhập mật khẩu',
                                 obscureText: true,
                                 textInputAction: TextInputAction.done,
-                                prefixIcon: const Icon(Icons.lock_outline, size: 20),
+                                prefixIcon: const Icon(
+                                  Icons.lock_outline,
+                                  size: 20,
+                                ),
                                 validator: AppValidators.password,
                                 focusedBorderColor: AppColor.color8,
                                 onSubmitted: (_) {
@@ -190,7 +221,10 @@ class _LoginPageViewState extends State<LoginPageView> {
                                 alignment: Alignment.centerRight,
                                 child: AppButton(
                                   onTap: () {
-                                    Navigator.pushNamed(context, AppRouterPaths.requestOtpPage);
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRouterPaths.requestOtpPage,
+                                    );
                                   },
                                   child: const Text(
                                     'Quên mật khẩu?',

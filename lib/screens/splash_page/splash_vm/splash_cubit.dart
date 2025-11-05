@@ -5,6 +5,7 @@ import 'package:meko_project/global_data/data_local/shared_pref.dart';
 import 'package:meko_project/routers/app_router_paths.dart';
 import 'package:meko_project/screens/intro_page/intro_page.dart';
 import 'package:meko_project/screens/splash_page/splash_vm/splash_state.dart';
+import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 
 class SplashCubit extends Cubit<SplashState> {
   SplashCubit() : super(SplashState(showContent: false));
@@ -12,11 +13,17 @@ class SplashCubit extends Cubit<SplashState> {
   void init(BuildContext context) async {
     updateAnimation();
     Future.delayed(const Duration(milliseconds: 1500), () async {
-      bool? check = await SharedPref.instance.getBool(AppConsts.keyIntro);
-
-      if(check == true){
+      bool? checkFirstUseApp = await SharedPref.instance.getBool(
+        AppConsts.keyIntro,
+      );
+      bool checkLogin = await isCheckLogin();
+      if (checkFirstUseApp == true) {
+        if (checkLogin) {
+          await SqliteHelper.deleteAuthTokens();
+          await SqliteHelper.deleteUserSql();
+        }
         Navigator.pushReplacementNamed(context, AppRouterPaths.homePage);
-      }else{
+      } else {
         Navigator.pushReplacement(
           context,
           PageRouteBuilder(
@@ -25,13 +32,29 @@ class SplashCubit extends Cubit<SplashState> {
             },
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
+                  return FadeTransition(opacity: animation, child: child);
+                },
             transitionDuration: const Duration(milliseconds: 150),
           ),
         );
       }
     });
+  }
+
+  Future<bool> isCheckLogin() async {
+    final authTokens = await SqliteHelper.getAuthTokens();
+    if (authTokens != null) {
+      final refreshTokenExpired = DateTime.tryParse(
+        authTokens.refreshTokenExpired!,
+      );
+      if (refreshTokenExpired != null) {
+        if (refreshTokenExpired.isBefore(DateTime.now())) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
   }
 
   void updateAnimation() {

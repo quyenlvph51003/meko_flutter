@@ -3,16 +3,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meko_project/consts/app_consts.dart';
 import 'package:meko_project/global_data/data_local/shared_pref.dart';
 import 'package:meko_project/repository/auth/auth_repo.dart';
+import 'package:meko_project/domains/dependency_injection/service_locator.dart';
+import 'package:meko_project/repository/user/user_repo.dart';
+
 import 'login_state.dart';
 
 class LoginCubit extends Cubit<LoginState> {
   final AuthRepository authRepository;
 
   LoginCubit({required this.authRepository})
-      : super(LoginState(
-    usernameCtrl: TextEditingController(),
-    passwordCtrl: TextEditingController(),
-  ));
+    : super(
+        LoginState(
+          usernameCtrl: TextEditingController(),
+          passwordCtrl: TextEditingController(),
+        ),
+      );
 
   Future<void> login() async {
     final email = state.usernameCtrl.text.trim();
@@ -32,18 +37,24 @@ class LoginCubit extends Cubit<LoginState> {
       if (success) {
         emit(state.copyWith(isLoading: false, isSuccess: true));
         SharedPref.instance.setBool(AppConsts.keyLoginSuccess, true);
+        final userRepo = getIt<UserRepo>();
+        final user = await userRepo.getUserProfile();
       } else {
-        emit(state.copyWith(
-          isLoading: false,
-          errorMessage: 'Email hoặc mật khẩu không đúng',
-        ));
+        emit(
+          state.copyWith(
+            isLoading: false,
+            errorMessage: 'Lỗi hệ thống, vui lòng liên hệ quản trị viên',
+          ),
+        );
       }
     } catch (e) {
       print(e);
-      emit(state.copyWith(
-        isLoading: false,
-        errorMessage: 'Đã có lỗi xảy ra. Vui lòng thử lại',
-      ));
+      emit(
+        state.copyWith(
+          isLoading: false,
+          errorMessage: 'Đã có lỗi xảy ra. Vui lòng thử lại',
+        ),
+      );
     }
   }
 

@@ -4,8 +4,11 @@ import 'package:dio/dio.dart';
 import 'package:dio/adapter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:curl_logger_dio_interceptor/curl_logger_dio_interceptor.dart';
+import 'package:meko_project/consts/app_consts.dart';
 import 'package:meko_project/domains/rest_client/rest_client_token.dart';
+import 'package:meko_project/global_data/data_local/shared_pref.dart';
 import 'package:meko_project/models/body/auth/auth_token.dart';
+import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 
 class RestClient {
   static const String encodedContentType =
@@ -64,13 +67,19 @@ class RestClient {
     }
   }
 
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final accessToken = tokenStore.accessToken;
+  void onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
+    final authTokens = await SqliteHelper.getAuthTokens();
+    String? accessToken = authTokens?.token;
     if (kDebugMode) {
       debugPrint('${options.method} ${options.uri}');
     }
     if (accessToken != null && accessToken.isNotEmpty) {
-      options.headers['Authorization'] = 'Bearer $accessToken';
+      options.headers['Authorization'] = '$accessToken';
+    } else {
+      tokenStore.clear();
     }
     handler.next(options);
   }
@@ -87,13 +96,18 @@ class RestClient {
     if (kDebugMode) {
       logError(error);
     }
-
-    if (error.response?.statusCode == 401) {
+    final authTokens = await SqliteHelper.getAuthTokens();
+    final bool checkExpiredAccessToken =
+        DateTime.tryParse(
+          authTokens?.tokenExpired ?? '',
+        )?.isBefore(DateTime.now()) ??
+        false;
+    if (error.response?.statusCode == 401 && checkExpiredAccessToken) {
       try {
         final newAccessToken = await refreshAccessToken();
         if (newAccessToken != null) {
           final requestOptions = error.requestOptions;
-          requestOptions.headers['Authorization'] = 'Bearer $newAccessToken';
+          requestOptions.headers['Authorization'] = '$newAccessToken';
           final clonedResponse = await dio.fetch(requestOptions);
           return handler.resolve(clonedResponse);
         } else {
@@ -139,8 +153,9 @@ class RestClient {
     }
 
     isRefreshing = true;
+    final authTokens = await SqliteHelper.getAuthTokens();
     try {
-      final refreshToken = tokenStore.refreshToken;
+      final refreshToken = authTokens?.refreshToken;
       if (refreshToken == null) return null;
 
       final response = await dio.post(
@@ -151,7 +166,8 @@ class RestClient {
       final newAccessToken = response.data['accessToken'] as String?;
       final newRefreshToken =
           response.data['refreshToken'] as String? ?? refreshToken;
-
+      SharedPref.instance.setString(AppConsts.keyToken, newAccessToken ?? '');
+      SharedPref.instance.setString(AppConsts.keyRefreshToken, newRefreshToken);
       if (newAccessToken != null) {
         tokenStore.save(
           AuthTokens(token: newAccessToken, refreshToken: newRefreshToken),

@@ -2,15 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meko_project/consts/app_colcor.dart';
+import 'package:meko_project/consts/app_consts.dart';
 import 'package:meko_project/consts/app_dimens.dart';
 import 'package:meko_project/consts/app_images.dart';
 import 'package:meko_project/consts/app_paths.dart';
 import 'package:meko_project/domains/dependency_injection/service_locator.dart';
+import 'package:meko_project/global_data/data_local/hive_db.dart';
+import 'package:meko_project/global_data/data_local/sql_maneger.dart';
 import 'package:meko_project/models/body/post/listing_item_model.dart';
+import 'package:meko_project/models/body/user/user_model.dart';
 import 'package:meko_project/repository/category/category_repo.dart';
 import 'package:meko_project/repository/post/post_repo.dart';
 import 'package:meko_project/screens/tab/tab_home/tab_home_vm/tab_home_cubit.dart';
 import 'package:meko_project/screens/tab/tab_home/tab_home_vm/tab_home_state.dart';
+import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import 'package:meko_project/widget/app_button/app_button.dart';
 import 'package:meko_project/widget/app_loading/app_loader.dart';
 import 'package:refresh_loadmore/refresh_loadmore.dart';
@@ -353,12 +358,17 @@ class _TabHomeViewState extends State<_TabHomeView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Bạn muốn mua gì?',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+              InkWell(
+                onTap: () async {
+                  final userProfile = await SqliteHelper.getUserSql();
+                },
+                child: Text(
+                  'Bạn muốn mua gì?',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
               SizedBox(height: 4),
