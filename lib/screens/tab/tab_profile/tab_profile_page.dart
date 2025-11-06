@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meko_project/consts/app_colcor.dart';
 import 'package:meko_project/consts/app_dimens.dart';
+import 'package:meko_project/consts/app_images.dart';
 import 'package:meko_project/domains/dependency_injection/service_locator.dart';
 import 'package:meko_project/repository/auth/auth_repo.dart';
 import 'package:meko_project/routers/app_router_paths.dart';
@@ -26,6 +27,7 @@ class TabProfilePageState extends State<TabProfilePage> with TickerProviderState
   void initState() {
     super.initState();
     vm = TabProfileCubit(authRepository: getIt<AuthRepository>());
+    vm.getUserProfile();
   }
 
   @override
@@ -61,11 +63,9 @@ class TabProfilePageState extends State<TabProfilePage> with TickerProviderState
                               children: [
                                 CircleAvatar(
                                   radius: 44,
-                                  backgroundColor: AppColor.cMain,
-                                  child: const Text(
-                                    'V',
-                                    style: TextStyle(fontSize: 42, color: Colors.white, fontWeight: FontWeight.w700),
-                                  ),
+                                  child: state.user.avatar != null
+                                      ? Image.network(state.user.avatar!, fit: BoxFit.cover)
+                                      : Image.asset(AppImages.img_avt_default, fit: BoxFit.cover),
                                 ),
                                 Positioned(
                                   right: MediaQuery.of(context).size.width / 2 - 44 - 6,
@@ -84,12 +84,12 @@ class TabProfilePageState extends State<TabProfilePage> with TickerProviderState
                               ],
                             ),
                             const SizedBox(height: 12),
-                            Text(state.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                            Text(state.user.username ?? 'Chưa có tên', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
                             const SizedBox(height: 6),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('Email: quyenlvph12332@gmail.com', style: const TextStyle(color: Colors.grey)),
+                                Text('Email: ${state.user.email ?? 'Chưa có email'}', style: const TextStyle(color: Colors.grey)),
                                 // const Text(
                                 //   '  •  ',
                                 //   style: TextStyle(color: Colors.grey),

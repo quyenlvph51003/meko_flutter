@@ -7,12 +7,19 @@ import 'package:meko_project/repository/auth/auth_repo.dart';
 import 'package:meko_project/routers/app_router_paths.dart';
 import 'package:meko_project/screens/tab/homes_page/home_vm/home_cubit.dart';
 import 'package:meko_project/screens/tab/tab_profile/tab_profile_vm/tab_profile_state.dart';
+import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import 'package:meko_project/widget/app_dialog/app_dialog.dart';
 
 class TabProfileCubit extends Cubit<TabProfileState> {
-  TabProfileCubit({required this.authRepository})
-    : super(TabProfileState.initial());
+  TabProfileCubit({required this.authRepository}) : super(TabProfileState.initial());
   final AuthRepository authRepository;
+
+  Future<void> getUserProfile() async {
+    final userProfile = await SqliteHelper.getUserSql();
+    if (userProfile != null) {
+      emit(state.copyWith(user: userProfile));
+    }
+  }
 
   Future<void> logoutAccount(BuildContext context) async {
     try {
@@ -25,11 +32,10 @@ class TabProfileCubit extends Cubit<TabProfileState> {
           getIt<HomeCubit>().isCheckLogin();
           getIt<HomeCubit>().refreshHome();
           Future.delayed(const Duration(milliseconds: 200), () {
-            Navigator.of(context, rootNavigator: true).pushNamedAndRemoveUntil(
-              AppRouterPaths.login,
-              (route) => false,
-              arguments: {'showBack': false},
-            );
+            Navigator.of(
+              context,
+              rootNavigator: true,
+            ).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => false, arguments: {'showBack': false});
           });
         },
       );

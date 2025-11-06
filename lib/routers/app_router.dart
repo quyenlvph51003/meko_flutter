@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meko_project/models/body/post/listing_item_model.dart';
+import 'package:meko_project/screens/categories_page/categories_page.dart';
 import 'package:meko_project/screens/forgot_pass_page/forgot_pass_page.dart';
 import 'package:meko_project/screens/forgot_pass_page/request_otp_page.dart';
 import 'package:meko_project/screens/login_page/login_page.dart';
@@ -54,6 +55,8 @@ class AppRouter {
             Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
           },
         );
+      case AppRouterPaths.categoryPage:
+        return CategoriesPage(caytegoryId: map?['caytegoryId'], categoryName: map?['categoryName']);
       default:
         return SizedBox();
     }

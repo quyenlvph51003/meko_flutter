@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:meko_project/common/enum_common.dart';
 import 'package:meko_project/domains/api_path/api_path.dart';
 import 'package:meko_project/domains/rest_client/rest_client.dart';
@@ -74,7 +76,7 @@ class PostSearchRequest {
       'wardCode': wardCode,
       'provinceCode': provinceCode,
       'searchText': searchText,
-      'categoryIds': categoryIds,
+      'categoryIds': (categoryIds?.length == 1) ? [categoryIds?[0], categoryIds?[0]] : categoryIds,
     };
   }
 }

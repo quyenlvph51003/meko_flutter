@@ -12,4 +12,8 @@ class AppImages {
   //icon
   static const String icon_all_categories = 'assets/icons/icon_all_categories.png';
   static const String icon_no_comments = 'assets/icons/icon_no_comments.png';
+  static const String icon_location = 'assets/icons/icon_location.png';
+  static const String icon_pinned = 'assets/icons/icon_pinned.png';
+  static const String icon_no_data_listing = 'assets/icons/icon_no_data_listing.png';
+  static const String icon_no_data_listing2 = 'assets/icons/icon_no_data_listing_2.png';
 }

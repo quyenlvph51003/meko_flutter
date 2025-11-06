@@ -13,8 +13,7 @@ class TabHomeCubit extends Cubit<TabHomeState> {
   final CategoryRepository categoryRepository;
   final PostRepo postRepository;
 
-  TabHomeCubit({required this.categoryRepository, required this.postRepository})
-    : super(TabHomeState.initial());
+  TabHomeCubit({required this.categoryRepository, required this.postRepository}) : super(TabHomeState.initial());
 
   Future<void> initCubit() async {
     await fetchCategories();
@@ -27,30 +26,11 @@ class TabHomeCubit extends Cubit<TabHomeState> {
     if (result.isSuccess && result.content != null) {
       final categories = List<Category>.from(result.content!);
 
-      categories.add(
-        Category(
-          id: 0,
-          name: 'Tất cả danh mục',
-          avatar: AppImages.icon_all_categories,
-          is_active: 1,
-        ),
-      );
+      categories.add(Category(id: 0, name: 'Tất cả danh mục', avatar: AppImages.icon_all_categories, is_active: 1));
 
-      emit(
-        state.copyWith(
-          categories: categories,
-          categoriesLoading: false,
-          categoriesError: null,
-        ),
-      );
+      emit(state.copyWith(categories: categories, categoriesLoading: false, categoriesError: null));
     } else {
-      emit(
-        state.copyWith(
-          categoriesLoading: false,
-          categoriesError: result.message,
-          categories: [],
-        ),
-      );
+      emit(state.copyWith(categoriesLoading: false, categoriesError: result.message, categories: []));
     }
   }
 
@@ -79,72 +59,27 @@ class TabHomeCubit extends Cubit<TabHomeState> {
           ),
         );
       } else {
-        emit(
-          state.copyWith(
-            posts: result.data!.content,
-            postsPagination: result.data!.pagination,
-            postsLoading: false,
-            postsError: null,
-          ),
-        );
+        emit(state.copyWith(posts: result.data!.content, postsPagination: result.data!.pagination, postsLoading: false, postsError: null));
       }
     } else {
-      emit(
-        state.copyWith(
-          postsLoading: false,
-          postsError: result.message,
-          posts: [],
-        ),
-      );
+      emit(state.copyWith(postsLoading: false, postsError: result.message, posts: []));
     }
   }
 
   Future<void> onRefresh() async {
-    emit(
-      state.copyWith(
-        categoriesLoading: true,
-        categoriesError: null,
-        postsLoading: true,
-        postsError: null,
-        noMore: false,
-      ),
-    );
+    emit(state.copyWith(categoriesLoading: true, categoriesError: null, postsLoading: true, postsError: null, page: 0, noMore: false));
 
     final resultCategories = await categoryRepository.getAllCategory();
-    final resultPosts = await postRepository.getPosts(
-      page: 0,
-      size: 10,
-      postSearchRequest: PostSearchRequest(status: PostStatus.APPROVED),
-    );
+    final resultPosts = await postRepository.getPosts(page: 0, size: 10, postSearchRequest: PostSearchRequest(status: PostStatus.APPROVED));
     if (resultCategories.isSuccess && resultCategories.content != null) {
       final categories = List<Category>.from(resultCategories.content!);
 
-      categories.add(
-        Category(
-          id: 0,
-          name: 'Tất cả danh mục',
-          avatar: AppImages.icon_all_categories,
-          is_active: 1,
-        ),
-      );
+      categories.add(Category(id: 0, name: 'Tất cả danh mục', avatar: AppImages.icon_all_categories, is_active: 1));
 
-      emit(
-        state.copyWith(
-          categories: categories,
-          categoriesLoading: false,
-          categoriesError: null,
-        ),
-      );
+      emit(state.copyWith(categories: categories, categoriesLoading: false, categoriesError: null));
     }
     if (resultPosts.success && resultPosts.data != null) {
-      emit(
-        state.copyWith(
-          posts: resultPosts.data!.content,
-          postsPagination: resultPosts.data!.pagination,
-          postsLoading: false,
-          postsError: null,
-        ),
-      );
+      emit(state.copyWith(posts: resultPosts.data!.content, postsPagination: resultPosts.data!.pagination, postsLoading: false, postsError: null));
     }
   }
 
@@ -153,10 +88,7 @@ class TabHomeCubit extends Cubit<TabHomeState> {
     Navigator.pushNamed(
       context,
       AppRouterPaths.postDetailPage,
-      arguments: {
-        'item': item,
-        'loader': (int id) => postRepository.getPostDetailItem(id),
-      },
+      arguments: {'item': item, 'loader': (int id) => postRepository.getPostDetailItem(id)},
     );
   }
 

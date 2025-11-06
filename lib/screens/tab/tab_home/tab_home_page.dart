@@ -16,9 +16,11 @@ import 'package:meko_project/repository/post/post_repo.dart';
 import 'package:meko_project/routers/app_router_paths.dart';
 import 'package:meko_project/screens/tab/tab_home/tab_home_vm/tab_home_cubit.dart';
 import 'package:meko_project/screens/tab/tab_home/tab_home_vm/tab_home_state.dart';
+import 'package:meko_project/utils/converts/forrmat_uttils.dart';
 import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import 'package:meko_project/widget/app_button/app_button.dart';
 import 'package:meko_project/widget/app_loading/app_loader.dart';
+import 'package:meko_project/widget/product/product_card.dart';
 import 'package:refresh_loadmore/refresh_loadmore.dart';
 
 class TabHomePage extends StatelessWidget {
@@ -79,6 +81,7 @@ class _TabHomeViewState extends State<_TabHomeView> {
             vm.onRefresh();
           },
           onLoadmore: () async {
+            print('loadmor');
             if (vm.state.noMore == true) return;
             final page = vm.state.page ?? 0;
             vm.fetchPosts(page: page + 1, isLoadMore: true);
@@ -91,6 +94,7 @@ class _TabHomeViewState extends State<_TabHomeView> {
                   Column(
                     children: [
                       Container(
+                        height: 170,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         decoration: const BoxDecoration(
                           borderRadius: BorderRadius.only(bottomRight: Radius.circular(24), bottomLeft: Radius.circular(24)),
@@ -212,100 +216,17 @@ class _TabHomeViewState extends State<_TabHomeView> {
             itemCount: state.posts.length,
             itemBuilder: (context, index) {
               final item = state.posts[index];
-              return buildProductCard(context, item, index);
+              return ProductCart(
+                item: item,
+                index: index,
+                onTap: () {
+                  vm.onProductTap(context, index);
+                },
+              );
             },
           ),
         );
       },
-    );
-  }
-
-  Widget buildProductCard(BuildContext context, ListingItem item, int index) {
-    return GestureDetector(
-      onTap: () {
-        vm.onProductTap(context, index);
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: AppDimens.getHeight(context) * 0.17,
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    child: Image.network(
-                      item.images.isNotEmpty ? item.images.first : AppPaths.img_splash,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) {
-                        return Container(color: Colors.grey[300], child: const Icon(Icons.image, size: 32));
-                      },
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: GestureDetector(
-                    onTap: () {
-                      vm.onFavoriteTap(index);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(color: Colors.white.withOpacity(0.9), shape: BoxShape.circle),
-                      child: const Icon(Icons.favorite_border, size: 16, color: Colors.grey),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF111111)),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  item.status, // ví dụ "APPROVED"
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${item.price} đ',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFFE53935)),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(Icons.location_on_outlined, size: 12, color: Colors.grey[600]),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        item.address,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -451,8 +372,7 @@ class _TabHomeViewState extends State<_TabHomeView> {
           Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
           return;
         }
-        // vm.onCategoryTap(category);
-        print('dasdsdfsdfsd');
+        Navigator.of(context).pushNamed(AppRouterPaths.categoryPage, arguments: {'caytegoryId': categoryId, 'categoryName': category.name});
       },
       child: Container(
         child: Column(
@@ -582,127 +502,4 @@ class _TabHomeViewState extends State<_TabHomeView> {
       },
     );
   }
-
-  // Widget buildProductCard(BuildContext context, int index) {
-  //   return GestureDetector(
-  //     onTap: () {
-  //       // vm.onProductTap(index);
-  //       print('Click item post');
-  //     },
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         Container(
-  //           height: AppDimens.getHeight(context)*0.17,
-  //           decoration: BoxDecoration(
-  //             borderRadius: BorderRadius.all(Radius.circular(8)),
-  //           ),
-  //           child: Stack(
-  //             children: [
-  //               Positioned.fill(
-  //                 child: Image.asset(
-  //                   AppPaths.img_splash,
-  //                   fit: BoxFit.cover,
-  //                 ),
-  //               ),
-  //               Positioned(
-  //                 top: 8,
-  //                 right: 8,
-  //                 child: GestureDetector(
-  //                   onTap: () {
-  //                     vm.onFavoriteTap(index);
-  //                   },
-  //                   child: Container(
-  //                     padding: const EdgeInsets.all(4),
-  //                     decoration: BoxDecoration(
-  //                       color: Colors.white.withOpacity(0.9),
-  //                       shape: BoxShape.circle,
-  //                     ),
-  //                     child: const Icon(
-  //                       Icons.favorite_border,
-  //                       size: 16,
-  //                       color: Colors.grey,
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //         Padding(
-  //           padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
-  //           child: Column(
-  //             crossAxisAlignment: CrossAxisAlignment.start,
-  //             children: [
-  //               // Tiêu đề (tối đa 2 dòng)
-  //               Text(
-  //                 'CẦN PASS LẠI BÀN LÀM VIỆC LỚN',
-  //                 maxLines: 2,
-  //                 overflow: TextOverflow.ellipsis,
-  //                 style: const TextStyle(
-  //                   fontSize: 13,
-  //                   fontWeight: FontWeight.w600,
-  //                   color: Color(0xFF111111),
-  //                 ),
-  //               ),
-  //
-  //               const SizedBox(height: 2),
-  //
-  //               // Trạng thái / mô tả ngắn (nhỏ, màu xám)
-  //               Text(
-  //                 'Mới',
-  //                 maxLines: 1,
-  //                 overflow: TextOverflow.ellipsis,
-  //                 style: TextStyle(
-  //                   fontSize: 11,
-  //                   color: Colors.grey[600],
-  //                 ),
-  //               ),
-  //
-  //               const SizedBox(height: 4),
-  //
-  //               // Giá (đỏ, đậm)
-  //               Text(
-  //                 '3.300.000 đ',
-  //                 maxLines: 1,
-  //                 overflow: TextOverflow.ellipsis,
-  //                 style: const TextStyle(
-  //                   fontSize: 15,
-  //                   fontWeight: FontWeight.w700,
-  //                   color: Color(0xFFE53935), // đỏ giống mẫu
-  //                 ),
-  //               ),
-  //
-  //               const SizedBox(height: 4),
-  //
-  //               // Địa điểm (icon + text xám, 1 dòng)
-  //               Row(
-  //                 children: [
-  //                   Icon(
-  //                     Icons.location_on_outlined,
-  //                     size: 12,
-  //                     color: Colors.grey[600],
-  //                   ),
-  //                   const SizedBox(width: 4),
-  //                   Expanded(
-  //                     child: Text(
-  //                       'Tp Hồ Chí Minh',
-  //                       maxLines: 1,
-  //                       overflow: TextOverflow.ellipsis,
-  //                       style: TextStyle(
-  //                         fontSize: 11,
-  //                         color: Colors.grey[600],
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ],
-  //           ),
-  //         )
-  //
-  //       ],
-  //     ),
-  //   );
-  // }
 }
