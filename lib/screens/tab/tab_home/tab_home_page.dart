@@ -209,7 +209,7 @@ class _TabHomeViewState extends State<_TabHomeView> {
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              childAspectRatio: 0.63,
+              childAspectRatio: 0.7,
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
             ),
@@ -254,58 +254,67 @@ class _TabHomeViewState extends State<_TabHomeView> {
   Widget buildSearchBar() {
     return GestureDetector(
       onTap: () {
-        vm.onSearchTap();
+        vm.onSearchProductTap(context);
       },
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.only(top: 12, bottom: 12, left: 4, right: 12),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SizedBox(width: 8),
-              AppButton(
-                onTap: () {
-                  showCategorySheet(context);
-                },
-                child: Text(
-                  'Danh mục',
-                  style: TextStyle(color: AppColor.cBlack, fontSize: 13, fontWeight: FontWeight.w400),
-                ),
+      child: BlocBuilder<TabHomeCubit, TabHomeState>(
+        builder: (context, state) {
+          return Container(
+            margin: EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 12, bottom: 12, left: 4, right: 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(width: 8),
+                  SizedBox(
+                    width: 65,
+                    child: AppButton(
+                      onTap: () {
+                        showCategorySheet(context);
+                      },
+                      child: Text(
+                        state.selectedCategory?.name ?? 'Danh mục',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: AppColor.cBlack, fontSize: 13, fontWeight: FontWeight.w400),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 2),
+                  Container(width: 11, height: 10, child: Image.asset(AppPaths.ic_drop_down)),
+                  SizedBox(width: 10),
+                  Container(width: 0.5, height: 15, color: AppColor.cGray),
+                  SizedBox(width: 25),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () async {
+                        final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                        if (isCheckShowAuth) {
+                          Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                          return;
+                        }
+                        vm.onSearchProductTap(context);
+                      },
+                      child: Text('Tìm kiếm..', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+                    ),
+                  ),
+                  SizedBox(width: 3),
+                  Container(
+                    decoration: BoxDecoration(color: AppColor.cMain, shape: BoxShape.circle),
+                    padding: EdgeInsets.all(4),
+                    child: Icon(Icons.search, color: AppColor.white, size: 18),
+                  ),
+                ],
               ),
-              SizedBox(width: 2),
-              Container(width: 11, height: 10, child: Image.asset(AppPaths.ic_drop_down)),
-              SizedBox(width: 10),
-              Container(width: 0.5, height: 15, color: AppColor.cGray),
-              SizedBox(width: 25),
-              Expanded(
-                child: InkWell(
-                  onTap: () async {
-                    final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
-                    if (isCheckShowAuth) {
-                      Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
-                      return;
-                    }
-                    // vm.onSearchTap();
-                  },
-                  child: Text('Tìm kiếm..', style: TextStyle(fontSize: 14, color: Colors.grey[600])),
-                ),
-              ),
-              SizedBox(width: 3),
-              Container(
-                decoration: BoxDecoration(color: AppColor.cMain, shape: BoxShape.circle),
-                padding: EdgeInsets.all(4),
-                child: Icon(Icons.search, color: AppColor.white, size: 18),
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -484,8 +493,7 @@ class _TabHomeViewState extends State<_TabHomeView> {
                                 style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                               ),
                               onTap: () {
-                                // Giữ nguyên logic hiện tại (chưa dùng onCategoryTap)
-                                // Nếu sau này bạn muốn chọn danh mục để lọc, thêm gọi vm.onCategoryTap(category) ở đây
+                                vm.selectedCategoryCubit(category);
                                 Navigator.of(context).pop();
                               },
                             );

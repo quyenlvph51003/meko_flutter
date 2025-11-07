@@ -6,6 +6,9 @@ import 'package:meko_project/global_data/data_local/shared_pref.dart';
 import 'package:meko_project/global_data/data_local/sql_maneger.dart';
 import 'package:meko_project/repository/auth/auth_repo.dart';
 import 'package:meko_project/repository/category/category_repo.dart';
+import 'package:meko_project/repository/favorite/favorite_repo.dart';
+import 'package:meko_project/repository/location/province_repo.dart';
+import 'package:meko_project/repository/location/ward_repo.dart';
 import 'package:meko_project/repository/post/post_repo.dart';
 import 'package:meko_project/repository/user/user_repo.dart';
 import 'package:sqflite/sqflite.dart';
@@ -18,22 +21,20 @@ class ServiceLocator {
       return RestClient(AppConfig.instance.baseUrl);
     });
     getIt.registerLazySingleton<AuthRepository>(() {
-      return AuthRepository(
-        restClient: getIt<RestClient>(),
-        sharedPref: SharedPref.instance,
-      );
+      return AuthRepository(restClient: getIt<RestClient>(), sharedPref: SharedPref.instance);
     });
-    getIt.registerSingleton<CategoryRepository>(
-      CategoryRepository(restClient: getIt<RestClient>()),
-    );
-    getIt.registerSingleton<PostRepo>(
-      PostRepo(restClient: getIt<RestClient>()),
-    );
-    getIt.registerSingleton<UserRepo>(
-      UserRepo(
-        restClient: getIt<RestClient>(),
-        sqLiteManager: SQLiteManager.instance(),
-      ),
-    );
+    getIt.registerSingleton<CategoryRepository>(CategoryRepository(restClient: getIt<RestClient>()));
+    getIt.registerSingleton<PostRepo>(PostRepo(restClient: getIt<RestClient>()));
+    getIt.registerSingleton<UserRepo>(UserRepo(restClient: getIt<RestClient>(), sqLiteManager: SQLiteManager.instance()));
+
+    getIt.registerLazySingleton<WardRepo>(() {
+      return WardRepo(restClient: getIt<RestClient>());
+    });
+    getIt.registerLazySingleton<ProvinceRepo>(() {
+      return ProvinceRepo(restClient: getIt<RestClient>());
+    });
+    getIt.registerLazySingleton<FavoriteRepo>(() {
+      return FavoriteRepo(restClient: getIt<RestClient>());
+    });
   }
 }

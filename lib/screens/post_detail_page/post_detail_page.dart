@@ -2,7 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meko_project/consts/app_images.dart';
+import 'package:meko_project/domains/dependency_injection/service_locator.dart';
 import 'package:meko_project/models/body/user/user_model.dart';
+import 'package:meko_project/repository/favorite/favorite_repo.dart';
 import 'package:meko_project/utils/converts/forrmat_uttils.dart';
 import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import 'package:meko_project/widget/app_button/app_button.dart';
@@ -64,7 +66,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => PostDetailCubit(item: widget.item, loader: widget.loadDetail)..init(widget.item.id),
+      create: (_) => PostDetailCubit(item: widget.item, loader: widget.loadDetail, favoriteRepo: getIt<FavoriteRepo>())..init(widget.item.id),
       child: Scaffold(
         backgroundColor: Colors.white,
         body: BlocBuilder<PostDetailCubit, PostDetailState>(
@@ -451,30 +453,33 @@ class _PostDetailPageState extends State<PostDetailPage> {
                       //   ),
                       // ),
                       // Divider(height: 1, color: Colors.grey[200]),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('Mô tả chi tiết', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                            const SizedBox(height: 12),
-                            Text(
-                              state.item.description,
-                              maxLines: state.descriptionExpanded ? null : 3,
-                              overflow: state.descriptionExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: 13, color: Colors.grey[700], height: 1.5),
-                            ),
-                            const SizedBox(height: 8),
-                            GestureDetector(
-                              onTap: () {
-                                vm.toggleDescription();
-                              },
-                              child: Text(
-                                state.descriptionExpanded ? 'Thu gọn' : 'Xem thêm',
-                                style: const TextStyle(fontSize: 13, color: Colors.blue, fontWeight: FontWeight.w500),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Mô tả chi tiết', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                              const SizedBox(height: 12),
+                              Text(
+                                state.item.description,
+                                maxLines: state.descriptionExpanded ? null : 3,
+                                overflow: state.descriptionExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+                                style: TextStyle(fontSize: 13, color: Colors.grey[700], height: 1.5),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 8),
+                              GestureDetector(
+                                onTap: () {
+                                  vm.toggleDescription();
+                                },
+                                child: Text(
+                                  state.descriptionExpanded ? 'Thu gọn' : 'Xem thêm',
+                                  style: const TextStyle(fontSize: 13, color: Colors.blue, fontWeight: FontWeight.w500),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       Divider(height: 1, color: Colors.grey[200]),

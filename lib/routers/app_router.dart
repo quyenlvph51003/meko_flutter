@@ -4,6 +4,7 @@ import 'package:meko_project/screens/categories_page/categories_page.dart';
 import 'package:meko_project/screens/forgot_pass_page/forgot_pass_page.dart';
 import 'package:meko_project/screens/forgot_pass_page/request_otp_page.dart';
 import 'package:meko_project/screens/login_page/login_page.dart';
+import 'package:meko_project/screens/search_page/search_page.dart';
 import 'package:meko_project/screens/sign_up_page/sign_up_page.dart';
 import 'package:meko_project/screens/splash_page/splash_page.dart';
 import 'package:meko_project/screens/tab/homes_page/home_page.dart';
@@ -57,6 +58,12 @@ class AppRouter {
         );
       case AppRouterPaths.categoryPage:
         return CategoriesPage(caytegoryId: map?['caytegoryId'], categoryName: map?['categoryName']);
+      case AppRouterPaths.searchPage:
+        final Future<List<dynamic>> Function(String) onSearch = map?['onSearch'] as Future<List<dynamic>> Function(String);
+        final Widget Function(dynamic) itemBuilder = map?['itemBuilder'] as Widget Function(dynamic);
+        final void Function(dynamic) onSelected = map?['onSelected'] as void Function(dynamic);
+        String? hintText = map?['hintText'];
+        return SearchPage(onSearch: onSearch, itemBuilder: itemBuilder, onSelected: onSelected, hintText: hintText);
       default:
         return SizedBox();
     }

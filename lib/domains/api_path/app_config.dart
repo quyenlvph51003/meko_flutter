@@ -5,5 +5,5 @@ class AppConfig {
 
   AppConfig._internal();
 
-  final String baseUrl = 'https://mekobe-production-644c.up.railway.app/api/';
+  final String baseUrl = 'https://mekobe-production.up.railway.app/api/';
 }

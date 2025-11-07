@@ -30,7 +30,7 @@ class RestClient {
       contentType: contentType,
       responseType: ResponseType.json,
       headers: headers ?? {'Accept': 'application/json'},
-      validateStatus: (status) => status != null && status < 500,
+      validateStatus: (status) => status != null && status >= 200 && status < 300,
     );
 
     dio = Dio(options);
@@ -70,22 +70,25 @@ class RestClient {
   }
 
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    if (kDebugMode) {
-      debugPrint('${response.statusCode} ${response.requestOptions.uri} ');
-      debugPrint(response.data.toString());
-    }
+    debugPrint('${response.statusCode} ${response.requestOptions.uri} ');
+    debugPrint(response.data.toString());
     handler.next(response);
   }
 
   Future<void> onError(DioError error, ErrorInterceptorHandler handler) async {
-    if (kDebugMode) {
-      logError(error);
+    logError(error);
+    // Nếu có response trả về từ server
+    if (error.response != null) {
+      debugPrint('📡 STATUS CODE: ${error.response?.statusCode}');
+      debugPrint('📦 RESPONSE DATA: ${error.response?.data}');
+    } else {
+      debugPrint('⚠️ No response received from server.');
     }
-    final authTokens = await SqliteHelper.getAuthTokens();
-    final bool checkExpiredAccessToken = DateTime.tryParse(authTokens?.tokenExpired ?? '')?.isBefore(DateTime.now()) ?? false;
+    final authTokenLocals = await SqliteHelper.getAuthTokens();
+    final bool checkExpiredAccessToken = DateTime.tryParse(authTokenLocals?.tokenExpired ?? '')?.isBefore(DateTime.now()) ?? false;
     if (error.response?.statusCode == 401 && checkExpiredAccessToken) {
       try {
-        final AuthTokens authTokens = await refreshAccessToken();
+        final authTokens = await refreshAccessToken();
         if (authTokens != null) {
           SQLiteManager.instance().put(AppConsts.keyAuthTokens, authTokens.toJson());
           final requestOptions = error.requestOptions;
@@ -136,11 +139,16 @@ class RestClient {
 
     isRefreshing = true;
     final authTokens = await SqliteHelper.getAuthTokens();
+    final user = await SqliteHelper.getUserSql();
     try {
       final refreshToken = authTokens?.refreshToken;
       if (refreshToken == null) return null;
 
-      final response = await dio.post('auth/refresh-token', data: {'refreshToken': refreshToken});
+      final response = await dio.post(
+        'auth/refresh-token',
+        data: {'refreshToken': refreshToken, "email": user?.email},
+        options: Options(contentType: 'application/json'),
+      );
 
       final newAccessToken = response.data['accessToken'] as String?;
       final newRefreshToken = response.data['refreshToken'] as String? ?? refreshToken;

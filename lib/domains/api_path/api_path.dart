@@ -11,4 +11,13 @@ class ApiPath {
 
   //user
   static const String getProfile = 'user/profile';
+
+  //province
+  static const String getAllProvince = 'province/get-all';
+  //ward
+  static const String getWards = 'ward/get-by-province-code';
+
+  //favorite
+  static const String createFavorite = 'favorite/create';
+  static const String deleteFavorite = 'favorite/delete/';
 }

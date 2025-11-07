@@ -11,6 +11,7 @@ class TabHomeState extends Equatable {
   final List<Category> categories;
   final bool categoriesLoading;
   final String? categoriesError;
+  Category? selectedCategory;
 
   // Bài viết
   final List<ListingItem> posts;
@@ -21,7 +22,7 @@ class TabHomeState extends Equatable {
   final bool? noMore;
   final int productCount;
 
-  const TabHomeState({
+  TabHomeState({
     required this.selectedTab,
     required this.isAppBarCollapsed,
     required this.categories,
@@ -34,10 +35,11 @@ class TabHomeState extends Equatable {
     this.page,
     this.noMore,
     required this.productCount,
+    this.selectedCategory,
   });
 
   factory TabHomeState.initial() {
-    return const TabHomeState(
+    return TabHomeState(
       selectedTab: 'Dành cho bạn',
       isAppBarCollapsed: false,
       categories: [],
@@ -65,6 +67,7 @@ class TabHomeState extends Equatable {
     int? page,
     bool? noMore,
     int? productCount,
+    Category? selectedCategory,
   }) {
     return TabHomeState(
       selectedTab: selectedTab ?? this.selectedTab,
@@ -79,6 +82,7 @@ class TabHomeState extends Equatable {
       page: page ?? this.page,
       noMore: noMore ?? this.noMore,
       productCount: productCount ?? this.productCount,
+      selectedCategory: selectedCategory ?? this.selectedCategory,
     );
   }
 
@@ -96,5 +100,6 @@ class TabHomeState extends Equatable {
     page,
     noMore,
     productCount,
+    selectedCategory,
   ];
 }
