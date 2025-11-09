@@ -11,7 +11,10 @@ class CategoriesState extends Equatable {
   ProvinceModel? selectedProvince;
   WardModel? selectedWard;
   String? addressFilter;
-
+  final int page;
+  final bool isLastPage;
+  final bool isFilter; //khi chọn nút tìm thì mới tìm theo condition đó
+  Map<int, bool>? isFavorite;
   CategoriesState({
     required this.listings,
     required this.isLoading,
@@ -23,6 +26,10 @@ class CategoriesState extends Equatable {
     this.selectedProvince,
     this.selectedWard,
     this.addressFilter,
+    required this.page,
+    required this.isLastPage,
+    required this.isFilter,
+    this.isFavorite,
   });
 
   CategoriesState copyWith({
@@ -36,6 +43,10 @@ class CategoriesState extends Equatable {
     ProvinceModel? selectedProvince,
     WardModel? selectedWard,
     String? addressFilter,
+    int? page,
+    bool? isLastPage,
+    bool? isFilter,
+    Map<int, bool>? isFavorite,
   }) {
     return CategoriesState(
       listings: listings ?? this.listings,
@@ -48,6 +59,10 @@ class CategoriesState extends Equatable {
       selectedProvince: selectedProvince ?? this.selectedProvince,
       selectedWard: selectedWard ?? this.selectedWard,
       addressFilter: addressFilter ?? this.addressFilter,
+      page: page ?? this.page,
+      isLastPage: isLastPage ?? this.isLastPage,
+      isFilter: isFilter ?? this.isFilter,
+      isFavorite: isFavorite ?? this.isFavorite,
     );
   }
 
@@ -62,15 +77,22 @@ class CategoriesState extends Equatable {
     ProvinceModel? selectedProvince, // trực tiếp gán, có thể null
     WardModel? selectedWard, // trực tiếp gán, có thể null
     String? addressFilter, // trực tiếp gán, có thể null
+    int? page,
+    bool? isLastPage,
+    bool? isFilter,
   }) {
     return CategoriesState(
+      page: page ?? this.page,
+      isLastPage: isLastPage ?? this.isLastPage,
       listings: listings ?? this.listings,
       isLoading: isLoading ?? this.isLoading,
       rebuild: rebuild ?? this.rebuild,
       provinces: provinces ?? this.provinces,
       wards: wards ?? this.wards,
       categories: categories ?? this.categories,
-      selectedCategory: selectedCategory ?? this.selectedCategory,
+      isFilter: isFilter ?? this.isFilter,
+      isFavorite: isFavorite ?? this.isFavorite,
+      selectedCategory: selectedCategory,
       selectedProvince: selectedProvince, // nếu muốn reset thì truyền null
       selectedWard: selectedWard, // nếu muốn reset thì truyền null
       addressFilter: addressFilter, // nếu muốn reset thì truyền null
@@ -89,5 +111,9 @@ class CategoriesState extends Equatable {
     selectedProvince,
     selectedWard,
     addressFilter,
+    page,
+    isLastPage,
+    isFilter,
+    isFavorite,
   ];
 }

@@ -88,9 +88,16 @@ class RestClient {
     final bool checkExpiredAccessToken = DateTime.tryParse(authTokenLocals?.tokenExpired ?? '')?.isBefore(DateTime.now()) ?? false;
     if (error.response?.statusCode == 401 && checkExpiredAccessToken) {
       try {
-        final authTokens = await refreshAccessToken();
+        final resultToken = await refreshAccessToken();
+        final AuthTokens authTokens = AuthTokens.fromJson(resultToken);
         if (authTokens != null) {
-          SQLiteManager.instance().put(AppConsts.keyAuthTokens, authTokens.toJson());
+          final AuthTokens authTokensLocal = AuthTokens(
+            token: authTokens.token,
+            refreshToken: authTokens.refreshToken,
+            tokenExpired: authTokens.tokenExpired,
+            refreshTokenExpired: authTokenLocals?.refreshTokenExpired,
+          );
+          await SQLiteManager.instance().put(AppConsts.keyAuthTokens, authTokensLocal.toJson());
           final requestOptions = error.requestOptions;
           requestOptions.headers['Authorization'] = '${authTokens.token}';
           final clonedResponse = await dio.fetch(requestOptions);
@@ -162,7 +169,7 @@ class RestClient {
         }
         refreshWaiters.clear();
       }
-      return response.data;
+      return response.data['data'];
     } catch (e) {
       print(e);
       return null;

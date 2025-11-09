@@ -7,6 +7,7 @@ import 'package:meko_project/repository/category/category_repo.dart';
 import 'package:meko_project/repository/post/post_repo.dart';
 import 'package:meko_project/routers/app_router.dart';
 import 'package:meko_project/routers/app_router_paths.dart';
+import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import 'package:meko_project/widget/product/product_card_search.dart';
 import 'tab_home_state.dart';
 
@@ -73,6 +74,8 @@ class TabHomeCubit extends Cubit<TabHomeState> {
   }
 
   Future<void> fetchPosts({int page = 0, bool? isLoadMore = false}) async {
+    final user = await SqliteHelper.getUserSql();
+    print(user?.id);
     if (isLoadMore ?? false) {
       emit(state.copyWith(page: page));
     } else {
@@ -81,7 +84,7 @@ class TabHomeCubit extends Cubit<TabHomeState> {
     final result = await postRepository.getPosts(
       page: page,
       size: 10,
-      postSearchRequest: PostSearchRequest(status: PostStatus.APPROVED),
+      postSearchRequest: PostSearchRequest(status: PostStatus.APPROVED, userId: user?.id),
     );
 
     if (result.success && result.data != null) {
@@ -106,9 +109,13 @@ class TabHomeCubit extends Cubit<TabHomeState> {
 
   Future<void> onRefresh() async {
     emit(state.copyWith(categoriesLoading: true, categoriesError: null, postsLoading: true, postsError: null, page: 0, noMore: false));
-
     final resultCategories = await categoryRepository.getAllCategory();
-    final resultPosts = await postRepository.getPosts(page: 0, size: 10, postSearchRequest: PostSearchRequest(status: PostStatus.APPROVED));
+    final user = await SqliteHelper.getUserSql();
+    final resultPosts = await postRepository.getPosts(
+      page: 0,
+      size: 10,
+      postSearchRequest: PostSearchRequest(status: PostStatus.APPROVED, userId: user?.id),
+    );
     if (resultCategories.isSuccess && resultCategories.content != null) {
       final categories = List<Category>.from(resultCategories.content!);
 

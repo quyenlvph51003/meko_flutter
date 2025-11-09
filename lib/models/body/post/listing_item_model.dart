@@ -1,8 +1,9 @@
 class ListingItem {
   final int id;
-  final int userId;
+  final int userPostId;
   final String userNamePoster;
   final String? avatarPoster;
+  final String? emailPoster;
   final String title;
   final String description;
   final String price;
@@ -17,13 +18,16 @@ class ListingItem {
   final String provinceCode;
   final List<String> images;
   final List<String> categories;
-
+  final bool? isFavorite;
+  final int? favoriteId;
+  final int? postId; //phục vụ cho call api favorite
   const ListingItem({
     required this.id,
-    required this.userId,
+    required this.userPostId,
     required this.userNamePoster,
     required this.avatarPoster,
     required this.title,
+    required this.emailPoster,
     required this.description,
     required this.price,
     required this.address,
@@ -37,6 +41,9 @@ class ListingItem {
     required this.provinceCode,
     required this.images,
     required this.categories,
+    this.isFavorite,
+    this.favoriteId,
+    this.postId,
   });
 
   factory ListingItem.fromJson(Map<String, dynamic> json) {
@@ -45,10 +52,11 @@ class ListingItem {
 
     return ListingItem(
       id: json['id'] ?? 0,
-      userId: json['userId'] ?? 0,
+      userPostId: json['userPostId'] ?? 0,
       userNamePoster: json['userNamePoster']?.toString() ?? '',
       avatarPoster: json['avatarPoster']?.toString(),
       title: json['title']?.toString() ?? '',
+      emailPoster: json['emailPoster']?.toString(),
       description: json['description']?.toString() ?? '',
       price: json['price']?.toString() ?? '0',
       address: json['address']?.toString() ?? '',
@@ -62,6 +70,9 @@ class ListingItem {
       provinceCode: json['provinceCode']?.toString() ?? '',
       images: toStrList(json['images']),
       categories: toStrList(json['categories']),
+      isFavorite: json['isFavorite'] ?? false,
+      favoriteId: json['favoriteId'] ?? 0,
+      postId: json['postId'] ?? 0,
     );
   }
 
@@ -69,10 +80,11 @@ class ListingItem {
     String? fmt(DateTime? d) => d?.toUtc().toIso8601String();
     return {
       'id': id,
-      'userId': userId,
+      'userPostId': userPostId,
       'userNamePoster': userNamePoster,
       'avatarPoster': avatarPoster,
       'title': title,
+      'emailPoster': emailPoster,
       'description': description,
       'price': price,
       'address': address,
@@ -86,6 +98,9 @@ class ListingItem {
       'provinceCode': provinceCode,
       'images': images,
       'categories': categories,
+      'isFavorite': isFavorite,
+      'favoriteId': favoriteId,
+      'postId': postId,
     };
   }
 }

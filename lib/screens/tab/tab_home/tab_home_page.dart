@@ -66,123 +66,126 @@ class _TabHomeViewState extends State<_TabHomeView> {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     const overlap = 20.0;
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.only(bottomRight: Radius.circular(24), bottomLeft: Radius.circular(24)),
-          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)]),
-        ),
-        child: RefreshLoadmore(
-          isLastPage: vm.state.noMore ?? false,
-          noMoreWidget: const Center(child: Text('Không có bài viết')),
-          loadingWidget: const AppLoader(),
-          onRefresh: () async {
-            vm.onRefresh();
-          },
-          onLoadmore: () async {
-            print('loadmor');
-            if (vm.state.noMore == true) return;
-            final page = vm.state.page ?? 0;
-            vm.fetchPosts(page: page + 1, isLoadMore: true);
-          },
-          child: Container(
-            color: Colors.white,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Column(
-                    children: [
-                      Container(
-                        height: 170,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.only(bottomRight: Radius.circular(24), bottomLeft: Radius.circular(24)),
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)],
+      body: Stack(
+        children: [
+          Container(
+            width: double.infinity,
+            height: 100,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)]),
+            ),
+          ),
+          RefreshLoadmore(
+            isLastPage: vm.state.noMore ?? false,
+            noMoreWidget: const Center(child: Text('Không có bài viết')),
+            loadingWidget: const AppLoader(),
+            onRefresh: () async {
+              vm.onRefresh();
+            },
+            onLoadmore: () async {
+              print('loadmor');
+              if (vm.state.noMore == true) return;
+              final page = vm.state.page ?? 0;
+              vm.fetchPosts(page: page + 1, isLoadMore: true);
+            },
+            child: Container(
+              color: Colors.white,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Column(
+                      children: [
+                        Container(
+                          height: 170,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.only(bottomRight: Radius.circular(24), bottomLeft: Radius.circular(24)),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)],
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              SafeArea(
+                                top: true,
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.menu, color: Colors.white, size: 28),
+                                    const Spacer(),
+                                    GestureDetector(
+                                      onTap: () async {
+                                        final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                                        if (isCheckShowAuth) {
+                                          Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                                          return;
+                                        }
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.all(8),
+                                        child: Icon(Icons.favorite_border, color: Colors.white, size: 26),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    GestureDetector(
+                                      onTap: () async {
+                                        final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                                        if (isCheckShowAuth) {
+                                          Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                                          return;
+                                        }
+                                        print('sdfsdfsd');
+                                      },
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(8),
+                                        child: Icon(Icons.notifications_outlined, color: Colors.white, size: 26),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 24),
+                              buildHeaderSection(),
+                              const SizedBox(height: 24),
+                            ],
                           ),
                         ),
-                        child: Column(
-                          children: [
-                            SafeArea(
-                              top: true,
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.menu, color: Colors.white, size: 28),
-                                  const Spacer(),
-                                  GestureDetector(
-                                    onTap: () async {
-                                      final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
-                                      if (isCheckShowAuth) {
-                                        Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
-                                        return;
-                                      }
-                                    },
-                                    child: Padding(
-                                      padding: EdgeInsets.all(8),
-                                      child: Icon(Icons.favorite_border, color: Colors.white, size: 26),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  GestureDetector(
-                                    onTap: () async {
-                                      final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
-                                      if (isCheckShowAuth) {
-                                        Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
-                                        return;
-                                      }
-                                      print('sdfsdfsd');
-                                    },
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(8),
-                                      child: Icon(Icons.notifications_outlined, color: Colors.white, size: 26),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: 24),
-                            buildHeaderSection(),
-                            const SizedBox(height: 24),
-                          ],
+                        Transform.translate(
+                          offset: const Offset(0, -overlap),
+                          child: GestureDetector(
+                            onTap: () {
+                              print('sdfsdfsd');
+                            },
+                            child: buildSearchBar(),
+                          ),
                         ),
-                      ),
-                      Transform.translate(
-                        offset: const Offset(0, -overlap),
-                        child: GestureDetector(
-                          onTap: () {
-                            print('sdfsdfsd');
-                          },
-                          child: buildSearchBar(),
+                        const SizedBox(height: overlap),
+                      ],
+                    ),
+                    buildCategoryGrid(),
+                    SizedBox(height: 16),
+                    Container(width: AppDimens.getWidth(context), height: 10, color: AppColor.cGray70),
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        SizedBox(width: 16),
+                        Text(
+                          'Danh sách bài viết',
+                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColor.cBlack),
                         ),
-                      ),
-                      const SizedBox(height: overlap),
-                    ],
-                  ),
-                  buildCategoryGrid(),
-                  SizedBox(height: 16),
-                  Container(width: AppDimens.getWidth(context), height: 10, color: AppColor.cGray70),
-                  SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      SizedBox(width: 16),
-                      Text(
-                        'Danh sách bài viết',
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColor.cBlack),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  buildListItemPost(),
-                  SizedBox(height: bottomPadding + 80),
-                ],
+                      ],
+                    ),
+                    SizedBox(height: 16),
+                    buildListItemPost(),
+                    SizedBox(height: bottomPadding + 80),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

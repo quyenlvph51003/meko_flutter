@@ -66,8 +66,9 @@ class PostSearchRequest {
   final String? provinceCode;
   final String? searchText;
   final List<int>? categoryIds;
+  final int? userPosterId;
 
-  PostSearchRequest({this.status, this.userId, this.wardCode, this.provinceCode, this.searchText, this.categoryIds});
+  PostSearchRequest({this.status, this.userId, this.wardCode, this.provinceCode, this.searchText, this.categoryIds, this.userPosterId});
 
   Map<String, dynamic> toJson() {
     return {
@@ -77,6 +78,7 @@ class PostSearchRequest {
       'provinceCode': provinceCode,
       'searchText': searchText,
       'categoryIds': (categoryIds?.length == 1) ? [categoryIds?[0], categoryIds?[0]] : categoryIds,
+      'userPosterId': userPosterId,
     };
   }
 }

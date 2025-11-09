@@ -218,6 +218,7 @@ class TabProfilePageState extends State<TabProfilePage> with TickerProviderState
                                   Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
                                   return;
                                 }
+                                Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.favoritePage, (route) => true);
                               },
                               icon: Icons.favorite_border,
                               title: 'Tin đăng đã lưu',

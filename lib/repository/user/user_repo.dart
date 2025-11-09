@@ -16,11 +16,8 @@ class UserRepo {
   Future<dynamic> getUserProfile() async {
     final response = await restClient.get(ApiPath.getProfile);
     if (response.statusCode == 200 && response.data != null) {
-      final result = ResponseCommon<dynamic>.fromJson(
-        response.data,
-        (obj) => UserModel.fromJson(obj as Map<String, dynamic>),
-      );
-      sqLiteManager.put(AppConsts.userSql, result.data!.toJson());
+      final result = ResponseCommon<dynamic>.fromJson(response.data, (obj) => UserModel.fromJson(obj as Map<String, dynamic>));
+      await sqLiteManager.put(AppConsts.userSql, result.data!.toJson());
       return result;
     }
     return null;

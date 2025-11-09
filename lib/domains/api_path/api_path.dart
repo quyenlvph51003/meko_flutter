@@ -20,4 +20,5 @@ class ApiPath {
   //favorite
   static const String createFavorite = 'favorite/create';
   static const String deleteFavorite = 'favorite/delete/';
+  static const String searchFavorite = 'favorite/search';
 }

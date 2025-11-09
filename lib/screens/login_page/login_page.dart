@@ -154,8 +154,8 @@ class _LoginPageViewState extends State<LoginPageView> {
                                 prefixIcon: const Icon(Icons.lock_outline, size: 20),
                                 validator: AppValidators.password,
                                 focusedBorderColor: AppColor.color8,
-                                onSubmitted: (_) {
-                                  vm.login();
+                                onSubmitted: (_) async {
+                                  await vm.login();
                                 },
                               ),
 

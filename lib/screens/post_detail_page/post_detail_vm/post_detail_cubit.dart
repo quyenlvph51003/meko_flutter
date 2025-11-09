@@ -12,8 +12,8 @@ class PostDetailCubit extends Cubit<PostDetailState> {
     : super(PostDetailState(item: item, currentImageIndex: 0, isLiked: false, descriptionExpanded: false));
 
   Future<void> init(int id) async {
-    final full = await loader(id);
-    emit(state.copyWith(item: full, currentImageIndex: 0));
+    final itemPost = await loader(id);
+    emit(state.copyWith(item: itemPost, currentImageIndex: 0, isLiked: itemPost.isFavorite));
   }
 
   void changeImageIndex(int index) {
@@ -21,11 +21,11 @@ class PostDetailCubit extends Cubit<PostDetailState> {
   }
 
   void toggleLike() {
-    // if (!state.isLiked) {
-    //   fetchCreateFavorite();
-    // } else {
-    //   // fetchDeleteFavorite();
-    // }
+    if (!state.isLiked) {
+      fetchCreateFavorite();
+    } else {
+      fetchDeleteFavorite();
+    }
     emit(state.copyWith(isLiked: !state.isLiked));
   }
 
@@ -38,7 +38,14 @@ class PostDetailCubit extends Cubit<PostDetailState> {
     if (user == null) {
       return;
     }
-    final isLiked = await favoriteRepo.createFavorite(postId: state.item.id, userId: user.id!);
-    emit(state.copyWith(isLiked: isLiked));
+    await favoriteRepo.createFavorite(postId: state.item.id, userId: user.id!);
+  }
+
+  Future<void> fetchDeleteFavorite() async {
+    final user = await SqliteHelper.getUserSql();
+    if (user == null) {
+      return;
+    }
+    await favoriteRepo.deleteFavorite(postId: state.item.id, userId: user.id!);
   }
 }

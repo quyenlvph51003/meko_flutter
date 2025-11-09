@@ -9,4 +9,5 @@ class AppRouterPaths {
   static const String signUpPage = '/signUpPage';
   static const String categoryPage = '/categoryPage';
   static const String searchPage = '/searchPage';
+  static const String favoritePage = '/favoritePage';
 }

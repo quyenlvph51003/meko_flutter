@@ -17,6 +17,7 @@ import 'package:meko_project/widget/app_button/app_button_common.dart';
 import 'package:meko_project/widget/app_loading/app_loader.dart';
 import 'package:meko_project/widget/product/product_card.dart';
 import 'package:meko_project/widget/widget_helper.dart';
+import 'package:refresh_loadmore/refresh_loadmore.dart';
 
 class CategoriesPage extends StatefulWidget {
   const CategoriesPage({Key? key, required this.caytegoryId, required this.categoryName}) : super(key: key);
@@ -46,180 +47,206 @@ class _CategoriesPageState extends State<CategoriesPage> {
           final vm = context.read<CategoriesCubit>();
           return Scaffold(
             backgroundColor: Colors.white,
-            body: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 50),
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.only(bottomRight: Radius.circular(24), bottomLeft: Radius.circular(24)),
-                      gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)]),
-                    ),
-                    child: SafeArea(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 5),
-                          WidgetHelper.backArrow(context),
-                          const SizedBox(height: 24),
-                          Text(
-                            widget.categoryName,
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
-                          ),
-                          const SizedBox(height: 4),
-                          const Text('Mua thì hời, bán thì lời', style: TextStyle(fontSize: 14, color: Colors.white)),
-                          const SizedBox(height: 16),
-                        ],
-                      ),
-                    ),
+            body: Stack(
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: 100,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)]),
                   ),
-                  Transform.translate(
-                    offset: const Offset(0, -50),
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
-                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: Colors.white,
-                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), offset: const Offset(1, 2), blurRadius: 4)],
-                      ),
+                ),
+                RefreshLoadmore(
+                  isLastPage: state.isLastPage,
+                  onRefresh: () => vm.onRefresh(categoryId: widget.caytegoryId),
+                  onLoadmore: () => vm.onLoadmore(categoryId: widget.caytegoryId),
+                  child: Container(
+                    color: Colors.white,
+                    child: SingleChildScrollView(
                       child: Column(
                         children: [
-                          Row(
-                            children: [
-                              Row(
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            padding: const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 50),
+                            decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.only(bottomRight: Radius.circular(24), bottomLeft: Radius.circular(24)),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [Color(0xFF4CAF50), Color(0xFF66BB6A)],
+                              ),
+                            ),
+                            child: SafeArea(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Image.asset(AppImages.icon_location, width: 24, height: 24, color: AppColor.cMain),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(height: 5),
+                                  WidgetHelper.backArrow(context),
+                                  const SizedBox(height: 24),
                                   Text(
-                                    'Khu vực:',
-                                    style: TextStyle(fontSize: 16, color: Colors.grey, fontWeight: FontWeight.bold),
+                                    widget.categoryName,
+                                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
                                   ),
+                                  const SizedBox(height: 4),
+                                  const Text('Mua thì hời, bán thì lời', style: TextStyle(fontSize: 14, color: Colors.white)),
+                                  const SizedBox(height: 16),
                                 ],
                               ),
-                              Expanded(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        _showBottomFilter(context, vm);
-                                      },
-                                      child: Text(
-                                        state.addressFilter ?? 'Tất cả khu vực',
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(fontSize: 16, color: AppColor.cGray, fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    Icon(Icons.arrow_drop_down, color: Colors.grey),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          Visibility(visible: widget.caytegoryId == 0, child: const SizedBox(height: 16)),
-                          // danh mục tất cả (id=0)
-                          Visibility(
-                            visible: widget.caytegoryId == 0,
-                            child: Row(
-                              children: [
-                                SizedBox(width: 4),
-                                Row(
-                                  children: [
-                                    Image.asset(AppImages.icon_category, width: 20, height: 20, color: AppColor.cMain),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      'Danh mục:',
-                                      style: TextStyle(fontSize: 16, color: Colors.grey, fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () async {
-                                          await vm.getCategories();
-                                          _showBottomCategory(context, vm);
-                                        },
-                                        child: Text(
-                                          state.selectedCategory?.name ?? 'Tất cả danh mục',
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(fontSize: 16, color: AppColor.cGray, fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                      Icon(Icons.arrow_drop_down, color: Colors.grey),
-                                    ],
-                                  ),
-                                ),
-                              ],
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    vm.onSearchProductTap(context, widget.caytegoryId);
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                    decoration: BoxDecoration(color: Colors.grey.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
+                          Transform.translate(
+                            offset: const Offset(0, -50),
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                color: Colors.white,
+                                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), offset: const Offset(1, 2), blurRadius: 4)],
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Image.asset(AppImages.icon_location, width: 24, height: 24, color: AppColor.cMain),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            'Khu vực:',
+                                            style: TextStyle(fontSize: 16, color: Colors.grey, fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
+                                      Expanded(
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () {
+                                                _showBottomFilter(context, vm);
+                                              },
+                                              child: Text(
+                                                state.addressFilter ?? 'Tất cả khu vực',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(fontSize: 16, color: AppColor.cGray, fontWeight: FontWeight.bold),
+                                              ),
+                                            ),
+                                            Icon(Icons.arrow_drop_down, color: Colors.grey),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Visibility(visible: widget.caytegoryId == 0, child: const SizedBox(height: 16)),
+                                  // danh mục tất cả (id=0)
+                                  Visibility(
+                                    visible: widget.caytegoryId == 0,
                                     child: Row(
                                       children: [
+                                        SizedBox(width: 4),
+                                        Row(
+                                          children: [
+                                            Image.asset(AppImages.icon_category, width: 20, height: 20, color: AppColor.cMain),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              'Danh mục:',
+                                              style: TextStyle(fontSize: 16, color: Colors.grey, fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
                                         Expanded(
                                           child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.end,
                                             children: [
-                                              Icon(Icons.search, color: Colors.grey),
-                                              const SizedBox(width: 8),
-                                              Text('Tìm danh mục...', style: TextStyle(fontSize: 15, color: Colors.grey)),
+                                              GestureDetector(
+                                                onTap: () async {
+                                                  await vm.getCategories();
+                                                  _showBottomCategory(context, vm);
+                                                },
+                                                child: Text(
+                                                  state.selectedCategory?.name ?? 'Tất cả danh mục',
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: TextStyle(fontSize: 16, color: AppColor.cGray, fontWeight: FontWeight.bold),
+                                                ),
+                                              ),
+                                              Icon(Icons.arrow_drop_down, color: Colors.grey),
                                             ],
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                ),
-                              ),
-                              SizedBox(width: 6),
-                              AppButton(
-                                onTap: () async {
-                                  await vm.fetchFilter(categoryId: widget.caytegoryId);
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                                  decoration: BoxDecoration(color: AppColor.cMain, borderRadius: BorderRadius.circular(8)),
-                                  child: Center(
-                                    child: Text('Tìm', style: TextStyle(fontSize: 16, color: Colors.white)),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            vm.onSearchProductTap(context, widget.caytegoryId);
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey.withValues(alpha: 0.2),
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.start,
+                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                    children: [
+                                                      Icon(Icons.search, color: Colors.grey),
+                                                      const SizedBox(width: 8),
+                                                      Text('Tìm danh mục...', style: TextStyle(fontSize: 15, color: Colors.grey)),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 6),
+                                      AppButton(
+                                        onTap: () async {
+                                          await vm.fetchFilter(categoryId: widget.caytegoryId);
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                                          decoration: BoxDecoration(color: AppColor.cMain, borderRadius: BorderRadius.circular(8)),
+                                          child: Center(
+                                            child: Text('Tìm', style: TextStyle(fontSize: 16, color: Colors.white)),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
+                          Transform.translate(
+                            offset: const Offset(0, -40),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: const Text('Danh sách bài viết', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                              ),
+                            ),
+                          ),
+                          _buildPosts(state, vm),
                         ],
                       ),
                     ),
                   ),
-                  Transform.translate(
-                    offset: const Offset(0, -40),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: const Text('Danh sách bài viết', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                      ),
-                    ),
-                  ),
-                  _buildPosts(state, vm),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         },

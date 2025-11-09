@@ -66,7 +66,9 @@ class _PostDetailPageState extends State<PostDetailPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => PostDetailCubit(item: widget.item, loader: widget.loadDetail, favoriteRepo: getIt<FavoriteRepo>())..init(widget.item.id),
+      create: (_) =>
+          PostDetailCubit(item: widget.item, loader: widget.loadDetail, favoriteRepo: getIt<FavoriteRepo>())
+            ..init((widget.item.id == 0) ? (widget.item.postId ?? 0) : widget.item.id),
       child: Scaffold(
         backgroundColor: Colors.white,
         body: BlocBuilder<PostDetailCubit, PostDetailState>(
@@ -355,7 +357,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                   Row(
                                     children: [
                                       Text(
-                                        'Email: quyenlv@gmail.com',
+                                        'Email: ${item.emailPoster}',
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(fontSize: 12, color: Colors.grey[600]),
