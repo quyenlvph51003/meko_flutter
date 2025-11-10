@@ -20,6 +20,16 @@ class PostRepo {
         queryParameters: {'page': page, 'size': size},
         data: postSearchRequest?.toJson() ?? {},
       );
+      if (response.data == null) {
+        return ResponseCommon<PaginatedResult<ListingItem>>(
+          datetime: '',
+          errorCode: 500,
+          message: 'No data',
+          data: null,
+          content: const [],
+          success: false,
+        );
+      }
       return ResponseCommon<PaginatedResult<ListingItem>>.fromJson(
         response.data,
         (obj) => PaginatedResult<ListingItem>.fromJson((obj as Map<String, dynamic>), (m) => ListingItem.fromJson(m)),

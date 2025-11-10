@@ -4,8 +4,7 @@ class FormatUtils {
   /// 1. Bao nhiêu giờ/phút/ngày trước
   static String timeAgo(String date) {
     final now = DateTime.now();
-    final diff = now.difference(DateTime.parse(date));
-
+    final diff = now.difference(DateTime.parse(date).toLocal());
     if (diff.inSeconds < 60) {
       return '${diff.inSeconds}s trước';
     } else if (diff.inMinutes < 60) {

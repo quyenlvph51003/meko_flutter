@@ -1,10 +1,15 @@
 // post_detail_page.dart
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meko_project/consts/app_images.dart';
 import 'package:meko_project/domains/dependency_injection/service_locator.dart';
+import 'package:meko_project/models/body/review/reply_model.dart';
+import 'package:meko_project/models/body/review/review_model.dart';
 import 'package:meko_project/models/body/user/user_model.dart';
 import 'package:meko_project/repository/favorite/favorite_repo.dart';
+import 'package:meko_project/repository/reviews/review_repo.dart';
 import 'package:meko_project/utils/converts/forrmat_uttils.dart';
 import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import 'package:meko_project/widget/app_button/app_button.dart';
@@ -27,17 +32,23 @@ class PostDetailPage extends StatefulWidget {
 class _PostDetailPageState extends State<PostDetailPage> {
   late PageController imageController;
   UserModel? user;
+  late TextEditingController controller;
+  late FocusNode focusNode;
   @override
   void initState() {
     super.initState();
     imageController = PageController();
     getUser();
+    controller = TextEditingController();
+    focusNode = FocusNode();
   }
 
   @override
   void dispose() {
     imageController.dispose();
     super.dispose();
+    controller.dispose();
+    focusNode.dispose();
   }
 
   Future<void> getUser() async {
@@ -67,7 +78,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) =>
-          PostDetailCubit(item: widget.item, loader: widget.loadDetail, favoriteRepo: getIt<FavoriteRepo>())
+          PostDetailCubit(item: widget.item, loader: widget.loadDetail, favoriteRepo: getIt<FavoriteRepo>(), reviewRepo: getIt<ReviewRepo>())
             ..init((widget.item.id == 0) ? (widget.item.postId ?? 0) : widget.item.id),
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -408,53 +419,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         ),
                       ),
                       Divider(height: 1, color: Colors.grey[200]),
-                      // Container(
-                      //   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      //   child: Row(
-                      //     children: [
-                      //       const Text('Chat nhanh:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-                      //       const SizedBox(width: 12),
-                      //       Expanded(
-                      //         child: Row(
-                      //           children: [
-                      //             Expanded(
-                      //               child: Container(
-                      //                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      //                 decoration: BoxDecoration(
-                      //                   border: Border.all(color: Colors.grey[300]!),
-                      //                   borderRadius: BorderRadius.circular(4),
-                      //                 ),
-                      //                 child: Text(
-                      //                   'Bạn có ship gà không?',
-                      //                   style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-                      //                   maxLines: 1,
-                      //                   overflow: TextOverflow.ellipsis,
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             const SizedBox(width: 8),
-                      //             Expanded(
-                      //               child: Container(
-                      //                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      //                 decoration: BoxDecoration(
-                      //                   border: Border.all(color: Colors.grey[300]!),
-                      //                   borderRadius: BorderRadius.circular(4),
-                      //                 ),
-                      //                 child: Text(
-                      //                   'Gà này còn không?',
-                      //                   style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-                      //                   maxLines: 1,
-                      //                   overflow: TextOverflow.ellipsis,
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //           ],
-                      //         ),
-                      //       ),
-                      //     ],
-                      //   ),
-                      // ),
-                      // Divider(height: 1, color: Colors.grey[200]),
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Container(
@@ -499,48 +463,121 @@ class _PostDetailPageState extends State<PostDetailPage> {
                               ),
                             ),
                             const SizedBox(height: 12),
-                            Container(
-                              width: 85,
-                              height: 85,
-                              decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey[200]),
-                              child: Center(child: Image.asset(AppImages.icon_no_comments, width: 35, height: 35, color: Colors.grey[600])),
-                            ),
-                            SizedBox(height: 8),
-                            const Text(
-                              'Chưa có bình luận nào.\n Hãy để lại bình luận cho người bán.',
-                              style: TextStyle(fontSize: 13, color: Colors.grey),
-                              textAlign: TextAlign.center,
-                            ),
+                            if (state.reviews.isNotEmpty)
+                              Column(
+                                children: [
+                                  ListView.separated(
+                                    physics: NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    padding: EdgeInsets.zero,
+                                    itemCount: math.min(3, state.reviews.length),
+                                    separatorBuilder: (context, index) => const SizedBox(height: 8),
+                                    itemBuilder: (context, index) {
+                                      final review = state.reviews[index];
+                                      return Column(
+                                        children: [
+                                          _buildReview(
+                                            review: review,
+                                            onTapReply: (ReviewModel parent) {
+                                              vm.changeReviewReply(parent);
+                                              _showBottomComment(context, vm: vm, controller: controller, focusNode: focusNode, user: user);
+                                            },
+                                            user: user,
+                                            vm: vm,
+                                            context: context,
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  ),
+                                  Visibility(visible: state.reviews.length > 3, child: const SizedBox(height: 15)),
+                                  Visibility(
+                                    visible: state.reviews.length > 3,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        vm.changeAutoFocus(true);
+                                        vm.changeReviewReply(null);
+                                        _showBottomComment(
+                                          context,
+                                          userAvatar: user?.avatar ?? '',
+                                          vm: vm,
+                                          controller: controller,
+                                          focusNode: focusNode,
+                                          user: user,
+                                        );
+                                      },
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          'Xem thêm ${state.reviews.length - 3} bình luận',
+                                          style: TextStyle(fontSize: 15, color: Colors.black, decoration: TextDecoration.underline),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            if (state.reviews.isEmpty)
+                              Column(
+                                children: [
+                                  Container(
+                                    width: 85,
+                                    height: 85,
+                                    decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey[200]),
+                                    child: Center(child: Image.asset(AppImages.icon_no_comments, width: 35, height: 35, color: Colors.grey[600])),
+                                  ),
+                                  SizedBox(height: 8),
+                                  const Text(
+                                    'Chưa có bình luận nào.\n Hãy để lại bình luận cho người bán.',
+                                    style: TextStyle(fontSize: 13, color: Colors.grey),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
                           ],
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Row(
                           children: [
                             Expanded(
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                decoration: BoxDecoration(
-                                  // border: Border.all(color: Colors.grey[300]!),
-                                  borderRadius: BorderRadius.circular(18),
-                                  color: Colors.grey[200],
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 25,
-                                      height: 25,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: user?.avatar != null
-                                            ? DecorationImage(image: NetworkImage(user!.avatar!), fit: BoxFit.cover)
-                                            : DecorationImage(image: AssetImage(AppImages.img_avt_default), fit: BoxFit.cover),
+                              child: GestureDetector(
+                                onTap: () {
+                                  vm.changeAutoFocus(true);
+                                  vm.changeReviewReply(null);
+                                  _showBottomComment(
+                                    context,
+                                    userAvatar: user?.avatar ?? '',
+                                    vm: vm,
+                                    controller: controller,
+                                    focusNode: focusNode,
+                                    user: user,
+                                  );
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    // border: Border.all(color: Colors.grey[300]!),
+                                    borderRadius: BorderRadius.circular(18),
+                                    color: Colors.grey[200],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 25,
+                                        height: 25,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: user?.avatar != null
+                                              ? DecorationImage(image: NetworkImage(user!.avatar!), fit: BoxFit.cover)
+                                              : DecorationImage(image: AssetImage(AppImages.img_avt_default), fit: BoxFit.cover),
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    const Text('Bình luận...', style: TextStyle(fontSize: 13, color: Colors.grey)),
-                                  ],
+                                      const SizedBox(width: 8),
+                                      const Text('Bình luận...', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -549,33 +586,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           ],
                         ),
                       ),
-                      // Container(
-                      //   padding: const EdgeInsets.all(16),
-                      //   child: Row(
-                      //     children: [
-                      //       Icon(Icons.account_circle_outlined, size: 18, color: Colors.grey[600]),
-                      //       const SizedBox(width: 8),
-                      //       Expanded(
-                      //         child: Text(
-                      //           state.item.phoneNumber.isEmpty ? 'SDT liên hệ: Đang cập nhật' : 'SDT liên hệ: ${state.item.phoneNumber}',
-                      //           style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-                      //           maxLines: 1,
-                      //           overflow: TextOverflow.ellipsis,
-                      //         ),
-                      //       ),
-                      //       const SizedBox(width: 8),
-                      //       GestureDetector(
-                      //         onTap: () {
-                      //           callPhone(context, state.item.phoneNumber);
-                      //         },
-                      //         child: const Text(
-                      //           'Gọi ngay',
-                      //           style: TextStyle(fontSize: 13, color: Colors.blue, fontWeight: FontWeight.w500),
-                      //         ),
-                      //       ),
-                      //     ],
-                      //   ),
-                      // ),
                       const SizedBox(height: 100),
                     ],
                   ),
@@ -636,4 +646,460 @@ class _PostDetailPageState extends State<PostDetailPage> {
       ),
     );
   }
+}
+
+Widget _buildReply({ReplyModel? reply, UserModel? user, required BuildContext context, required PostDetailCubit vm, bool? isDetail}) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.grey[200],
+          image: DecorationImage(
+            image: reply?.replyUserAvatar != null ? NetworkImage(reply!.replyUserAvatar!) : AssetImage(AppImages.img_avt_default),
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
+      SizedBox(width: 8),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(4)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        reply?.replyUser ?? '',
+                        style: TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w400),
+                        textAlign: TextAlign.center,
+                      ),
+                      Visibility(
+                        visible: user?.id == reply?.replyUserId,
+                        child: GestureDetector(
+                          onTap: () {
+                            if (isDetail == true) {
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (ctx) {
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        ListTile(
+                                          leading: const Icon(Icons.edit, color: Colors.red),
+                                          title: const Text('Chỉnh sửa', style: TextStyle(color: Colors.black)),
+                                          onTap: () {
+                                            Navigator.pop(ctx);
+                                            vm.changeEdit(true);
+                                            vm.changeReplyEdit(reply);
+                                          },
+                                        ),
+                                        ListTile(
+                                          leading: const Icon(Icons.delete, color: Colors.red),
+                                          title: const Text('Xóa bình luận', style: TextStyle(color: Colors.black)),
+                                          onTap: () {
+                                            if (isDetail == true) {
+                                              Navigator.pop(ctx);
+                                              vm.deleteReview(reviewId: reply?.replyId ?? 0);
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+                          },
+                          child: Icon(Icons.more_vert, color: Colors.black.withValues(alpha: 0.5), size: 20),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    reply?.replyComment ?? '',
+                    style: TextStyle(fontSize: 13, color: Colors.black.withOpacity(0.9), fontWeight: FontWeight.w300),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  FormatUtils.timeAgo(
+                    (reply?.replyCreatedAt ?? '').split('.').first.replaceAll(' ', 'T') + 'Z', // thêm Z cho UTC
+                  ),
+                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _buildReview({
+  required ReviewModel review,
+  required Function(ReviewModel parent) onTapReply,
+  bool? isDetail,
+  UserModel? user,
+  required PostDetailCubit vm,
+  required BuildContext context,
+}) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.grey[200],
+          image: DecorationImage(
+            image: review.reviewUserAvatar != null ? NetworkImage(review.reviewUserAvatar!) : AssetImage(AppImages.img_avt_default),
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
+      SizedBox(width: 8),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(4)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          review.reviewUser ?? '',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w400),
+                        ),
+                      ),
+                      Visibility(
+                        visible: user?.id == review.reviewUserId,
+                        child: GestureDetector(
+                          onTap: () {
+                            if (isDetail == true) {
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (ctx) {
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        ListTile(
+                                          leading: const Icon(Icons.edit, color: Colors.red),
+                                          title: const Text('Chỉnh sửa', style: TextStyle(color: Colors.black)),
+                                          onTap: () {
+                                            Navigator.pop(ctx);
+                                            vm.changeEdit(true);
+                                            vm.changeReviewReply(review, isEdit: true);
+                                          },
+                                        ),
+                                        ListTile(
+                                          leading: const Icon(Icons.delete, color: Colors.red),
+                                          title: const Text('Xóa bình luận', style: TextStyle(color: Colors.black)),
+                                          onTap: () {
+                                            if (isDetail == true) {
+                                              Navigator.pop(ctx);
+                                              vm.deleteReview(reviewId: review.reviewId ?? 0);
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+                          },
+                          child: Icon(Icons.more_vert, color: Colors.black.withValues(alpha: 0.5), size: 20),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    review.reviewComment ?? '',
+                    style: TextStyle(fontSize: 13, color: Colors.black.withOpacity(0.9), fontWeight: FontWeight.w300),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    onTapReply(review);
+                  },
+                  child: Text('Trả lời', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                ),
+                Text(
+                  FormatUtils.timeAgo(review.reviewCreatedAt ?? ''),
+                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            if (review.replies?.isNotEmpty ?? false)
+              ListView.builder(
+                physics: NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: isDetail == true ? review.replies?.length ?? 0 : math.min(1, review.replies?.length ?? 0),
+                padding: EdgeInsets.zero,
+                itemBuilder: (context, index) {
+                  final reply = review.replies?[index];
+                  return _buildReply(reply: reply, user: user, context: context, vm: vm, isDetail: isDetail);
+                },
+              ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+void _showBottomComment(
+  BuildContext context, {
+  String? userAvatar,
+  required PostDetailCubit vm,
+  required TextEditingController controller,
+  required FocusNode focusNode,
+  UserModel? user,
+}) {
+  showModalBottomSheet(
+    isDismissible: true,
+    backgroundColor: Colors.white,
+    barrierColor: Colors.black.withOpacity(0.5),
+    isScrollControlled: true,
+    useSafeArea: true,
+    context: context,
+    builder: (ctx) {
+      return BlocProvider.value(
+        value: vm,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+          ),
+          child: Scaffold(
+            resizeToAvoidBottomInset: true,
+            body: BlocBuilder<PostDetailCubit, PostDetailState>(
+              builder: (context, state) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            child: GestureDetector(
+                              onTap: () => Navigator.pop(ctx),
+                              child: Icon(Icons.cancel, size: 25, color: Colors.black),
+                            ),
+                          ),
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text('Bình luận', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Divider(color: Colors.grey.withOpacity(0.5), thickness: 1),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: ListView.separated(
+                          padding: EdgeInsets.zero,
+                          itemCount: state.reviews.length,
+                          separatorBuilder: (context, index) => const SizedBox(height: 8),
+                          itemBuilder: (context, index) {
+                            final review = state.reviews[index];
+                            return Column(
+                              children: [
+                                _buildReview(
+                                  review: review,
+                                  onTapReply: (ReviewModel parent) {
+                                    focusNode.requestFocus();
+                                    vm.changeReviewReply(parent);
+                                  },
+                                  isDetail: true,
+                                  user: user,
+                                  vm: vm,
+                                  context: context,
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: state.reviewReply != null || state.reply != null,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Row(
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  text: (state.reply != null || (state.isEdit ?? false)) ? 'Đang chỉnh sửa ' : 'Đang trả lời ',
+                                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                                  children: [
+                                    TextSpan(
+                                      text: state.reply != null ? state.reply?.replyUser ?? '' : state.reviewReply?.reviewUser ?? '',
+                                      style: TextStyle(fontSize: 12, color: Colors.black, fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              GestureDetector(
+                                onTap: () {
+                                  focusNode.unfocus();
+                                  vm.changeReviewReply(null);
+                                },
+                                child: Text('Hủy bỏ', style: TextStyle(fontSize: 12, color: Colors.grey.withOpacity(0.8))),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {},
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                decoration: BoxDecoration(
+                                  // border: Border.all(color: Colors.grey[300]!),
+                                  borderRadius: BorderRadius.circular(18),
+                                  color: Colors.grey[200],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 25,
+                                      height: 25,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        image: userAvatar != null
+                                            ? DecorationImage(image: NetworkImage(userAvatar), fit: BoxFit.cover)
+                                            : DecorationImage(image: AssetImage(AppImages.img_avt_default), fit: BoxFit.cover),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: TextField(
+                                        controller: controller,
+                                        onChanged: (value) {
+                                          vm.changeComment(value);
+                                        },
+                                        focusNode: focusNode,
+                                        autofocus: true,
+                                        style: const TextStyle(fontSize: 12, height: 1.0),
+                                        strutStyle: const StrutStyle(fontSize: 12, height: 1.0, forceStrutHeight: true),
+                                        minLines: 1,
+                                        maxLines: 1,
+                                        textAlignVertical: TextAlignVertical.center,
+                                        decoration: const InputDecoration(
+                                          isDense: true,
+                                          isCollapsed: true,
+                                          contentPadding: EdgeInsets.symmetric(vertical: 2, horizontal: 6),
+                                          border: InputBorder.none,
+                                          hintText: 'Bình luận...',
+                                          hintStyle: TextStyle(fontSize: 12, color: Colors.grey),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () {
+                              if (controller.text.isNotEmpty) {
+                                vm.changeComment('');
+                                controller.clear();
+                                focusNode.unfocus();
+                                if (state.isEdit ?? false) {
+                                  vm.updateReview(
+                                    reviewId: state.reply != null ? state.reply?.replyId ?? 0 : state.reviewReply?.reviewId ?? 0,
+                                    content: state.commentController.text,
+                                  );
+                                } else {
+                                  vm.createReview(
+                                    postId: state.item.id == 0 ? (state.item.postId ?? 0) : (state.item.id),
+                                    content: state.commentController.text,
+                                  );
+                                }
+                                vm.changeReviewReply(null);
+                                vm.changeReplyEdit(null);
+                                vm.changeEdit(false);
+                              }
+                            },
+                            child: Icon(Icons.send, size: 25, color: state.commentController.text.isEmpty ? Colors.grey : AppColor.cMain),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      );
+    },
+  );
 }

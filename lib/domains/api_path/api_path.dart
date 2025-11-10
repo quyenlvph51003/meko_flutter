@@ -21,4 +21,19 @@ class ApiPath {
   static const String createFavorite = 'favorite/create';
   static const String deleteFavorite = 'favorite/delete/';
   static const String searchFavorite = 'favorite/search';
+
+  //history
+  static const String searchHistory = 'history/search';
+
+  //reviews
+  static const String reviewList = 'review/list';
+  static const String createReview = 'review/create';
+  static const String deleteReview = 'review/delete';
+  static const String updateReview = 'review/update';
+
+  //violation: nội dung vi phạm
+  static const String getViolationList = 'violation/get-all';
+
+  //report
+  static const String createReport = 'report/create';
 }

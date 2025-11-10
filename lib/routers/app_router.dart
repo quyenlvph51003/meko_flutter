@@ -4,6 +4,7 @@ import 'package:meko_project/screens/categories_page/categories_page.dart';
 import 'package:meko_project/screens/favorite_page/favorite_page.dart' show FavoritePage;
 import 'package:meko_project/screens/forgot_pass_page/forgot_pass_page.dart';
 import 'package:meko_project/screens/forgot_pass_page/request_otp_page.dart';
+import 'package:meko_project/screens/history_page/history_page.dart';
 import 'package:meko_project/screens/login_page/login_page.dart';
 import 'package:meko_project/screens/search_page/search_page.dart';
 import 'package:meko_project/screens/sign_up_page/sign_up_page.dart';
@@ -67,6 +68,8 @@ class AppRouter {
         return SearchPage(onSearch: onSearch, itemBuilder: itemBuilder, onSelected: onSelected, hintText: hintText);
       case AppRouterPaths.favoritePage:
         return FavoritePage();
+      case AppRouterPaths.historyPage:
+        return HistoryPage();
       default:
         return SizedBox();
     }

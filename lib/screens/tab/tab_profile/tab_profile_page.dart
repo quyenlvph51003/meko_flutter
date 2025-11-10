@@ -243,6 +243,7 @@ class TabProfilePageState extends State<TabProfilePage> with TickerProviderState
                                   Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
                                   return;
                                 }
+                                Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.historyPage, (route) => true);
                               },
                               icon: Icons.access_time,
                               title: 'Lịch sử xem tin',
