@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:meko_project/consts/app_colcor.dart';
 import 'package:meko_project/consts/app_consts.dart';
 import 'package:meko_project/domains/dependency_injection/service_locator.dart';
 import 'package:meko_project/global_data/data_local/shared_pref.dart';
@@ -18,6 +20,40 @@ class TabProfileCubit extends Cubit<TabProfileState> {
     final userProfile = await SqliteHelper.getUserSql();
     if (userProfile != null) {
       emit(state.copyWith(user: userProfile));
+    }
+  }
+
+  // change page
+  Future<void> changePage(BuildContext context, String passwordOld, String passwordNew) async {
+    final result = await authRepository.changePass(passwordOld: passwordOld, passwordNew: passwordNew);
+    if (result) {
+      Navigator.of(context).pop();
+      Fluttertoast.showToast(
+        msg: 'Thay đổi mật khẩu thành công',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: AppColor.cMain,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
+  }
+
+  // change pin
+  Future<void> changePin(BuildContext context, String pinWalletOld, String pinWalletNew) async {
+    final result = await authRepository.changePinCodeWalltet(pinWalletOld: pinWalletOld, pinWalletNew: pinWalletNew);
+    if (result) {
+      Navigator.of(context).pop();
+      Fluttertoast.showToast(
+        msg: 'Thay đổi mã pin thành công',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: AppColor.cMain,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     }
   }
 

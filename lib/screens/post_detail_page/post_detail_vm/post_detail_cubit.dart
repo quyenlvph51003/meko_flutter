@@ -1,31 +1,45 @@
 // post_detail_cubit.dart
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meko_project/models/body/post/listing_item_model.dart';
 import 'package:meko_project/models/body/review/reply_model.dart';
 import 'package:meko_project/models/body/review/review_model.dart';
+import 'package:meko_project/models/body/violation/violation_model.dart';
 import 'package:meko_project/repository/favorite/favorite_repo.dart';
+import 'package:meko_project/repository/report/report_repo.dart';
 import 'package:meko_project/repository/reviews/review_repo.dart';
+import 'package:meko_project/repository/violation/violation_repo.dart';
 import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import 'post_detail_state.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class PostDetailCubit extends Cubit<PostDetailState> {
   final Future<ListingItem> Function(int) loader;
   final FavoriteRepo favoriteRepo;
   final ReviewRepo reviewRepo;
-  PostDetailCubit({required ListingItem item, required this.loader, required this.favoriteRepo, required this.reviewRepo})
-    : super(
-        PostDetailState(
-          item: item,
-          currentImageIndex: 0,
-          isLiked: false,
-          descriptionExpanded: false,
-          reviews: [],
-          commentController: TextEditingController(),
-          autoFocus: true,
-          isEdit: false,
-        ),
-      );
+  final ViolationRepo violationRepo;
+  final ReportRepo reportRepo;
+  PostDetailCubit({
+    required ListingItem item,
+    required this.loader,
+    required this.favoriteRepo,
+    required this.reviewRepo,
+    required this.violationRepo,
+    required this.reportRepo,
+  }) : super(
+         PostDetailState(
+           item: item,
+           currentImageIndex: 0,
+           isLiked: false,
+           descriptionExpanded: false,
+           reviews: [],
+           commentController: TextEditingController(),
+           autoFocus: true,
+           isEdit: false,
+           violations: [],
+         ),
+       );
   Future<void> init(int id) async {
     final itemPost = await loader(id);
     await fetchListReview(postId: id);
@@ -91,12 +105,45 @@ class PostDetailCubit extends Cubit<PostDetailState> {
     emit(state.copyWith(descriptionExpanded: !state.descriptionExpanded));
   }
 
+  //selected violation
+  void changeViolationSelected(ViolationModel? violation) {
+    emit(state.copyWithNullable(violationSelected: violation));
+  }
+
   Future<void> fetchCreateFavorite() async {
     final user = await SqliteHelper.getUserSql();
     if (user == null) {
       return;
     }
     await favoriteRepo.createFavorite(postId: state.item.id, userId: user.id!);
+  }
+
+  //report
+
+  Future<void> createReportCubit({required String content}) async {
+    final response = await reportRepo.createReport(
+      postId: state.item.id == 0 ? state.item.postId ?? 0 : state.item.id,
+      violationId: state.violationSelected?.id ?? 0,
+      reason: content,
+    );
+    if (response) {
+      Fluttertoast.showToast(
+        msg: "Bài viết đã được báo cáo",
+        toastLength: Toast.LENGTH_SHORT, // hoặc Toast.LENGTH_LONG
+        gravity: ToastGravity.BOTTOM, // vị trí hiển thị
+        backgroundColor: Colors.black87,
+        textColor: Colors.white,
+        fontSize: 16,
+      );
+    }
+  }
+
+  // get list violation
+  Future<void> fetchListViolation() async {
+    final response = await violationRepo.getViolationList();
+    if (response.data != null) {
+      emit(state.copyWith(violations: response.data));
+    }
   }
 
   Future<void> fetchDeleteFavorite() async {

@@ -10,6 +10,9 @@ import 'package:meko_project/screens/search_page/search_page.dart';
 import 'package:meko_project/screens/sign_up_page/sign_up_page.dart';
 import 'package:meko_project/screens/splash_page/splash_page.dart';
 import 'package:meko_project/screens/tab/homes_page/home_page.dart';
+import 'package:meko_project/screens/top_up_wallet/top_up_wallet.dart';
+import 'package:meko_project/screens/update_post_page/update_post_page.dart';
+import 'package:meko_project/screens/web_view_page/web_view_page.dart';
 
 import '../screens/post_detail_page/post_detail_page.dart';
 import 'app_router_paths.dart';
@@ -70,6 +73,12 @@ class AppRouter {
         return FavoritePage();
       case AppRouterPaths.historyPage:
         return HistoryPage();
+      case AppRouterPaths.updatePostPage:
+        return PostUpdateScreen(postId: map?['postId']);
+      case AppRouterPaths.topUpPage:
+        return TopUpScreen();
+      case AppRouterPaths.webviewPage:
+        return WebViewScreen(url: map?['url'], title: map?['title']);
       default:
         return SizedBox();
     }

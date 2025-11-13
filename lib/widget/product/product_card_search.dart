@@ -57,7 +57,7 @@ class ItemProductSearch extends StatelessWidget {
                     Text(
                       description,
                       style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 8),

@@ -5,12 +5,18 @@ class ApiPath {
   static const String authRefresh = 'auth/refresh-token';
   static const String authRequestOtp = 'auth/request-otp';
   static const String authVerifyOtp = 'auth/verify-otp';
+  static const String changePass = 'auth/change-password';
+
   static const String categoryList = 'category/list';
   static const String searchPost = 'post/search-post';
   static const String postDetail = 'post/detail/';
+  static const String postUpdate = 'post/update';
+  static const String postUpdateStatus = 'post/update-status';
 
   //user
   static const String getProfile = 'user/profile';
+  static const String createWallet = 'user/create-pin-wallet';
+  static const String updatePinWallet = 'user/update-pin-wallet';
 
   //province
   static const String getAllProvince = 'province/get-all';
@@ -36,4 +42,7 @@ class ApiPath {
 
   //report
   static const String createReport = 'report/create';
+
+  //payment
+  static const String payment = 'payment/create-payment';
 }

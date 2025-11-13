@@ -22,4 +22,19 @@ class UserRepo {
     }
     return null;
   }
+
+  Future<bool> createPinWallet({required String pin, required int userId}) async {
+    try {
+      final response = await restClient.post(ApiPath.createWallet, data: {'pinWallet': pin, 'userId': userId});
+      if (response.statusCode == 200 && response.data != null) {
+        final result = ResponseCommon<UserModel>.fromJson(response.data, (obj) => UserModel.fromJson(obj as Map<String, dynamic>));
+        await sqLiteManager.put(AppConsts.userSql, result.data!.toJson());
+        return true;
+      }
+      return false;
+    } catch (error) {
+      print(error);
+      return false;
+    }
+  }
 }

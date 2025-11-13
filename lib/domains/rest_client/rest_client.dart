@@ -4,6 +4,9 @@ import 'package:dio/dio.dart';
 import 'package:dio/adapter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:curl_logger_dio_interceptor/curl_logger_dio_interceptor.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meko_project/consts/app_consts.dart';
 import 'package:meko_project/domains/rest_client/rest_client_token.dart';
 import 'package:meko_project/global_data/data_local/shared_pref.dart';
@@ -83,6 +86,19 @@ class RestClient {
       debugPrint('📦 RESPONSE DATA: ${error.response?.data}');
     } else {
       debugPrint('⚠️ No response received from server.');
+    }
+    if (error.response?.statusCode != 401) {
+      final message = error.response?.data['message'] ?? 'Lỗi';
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        Fluttertoast.showToast(
+          msg: message,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16,
+        );
+      });
     }
     final authTokenLocals = await SqliteHelper.getAuthTokens();
     final bool checkExpiredAccessToken = DateTime.tryParse(authTokenLocals?.tokenExpired ?? '')?.isBefore(DateTime.now()) ?? false;

@@ -11,4 +11,7 @@ class AppRouterPaths {
   static const String searchPage = '/searchPage';
   static const String favoritePage = '/favoritePage';
   static const String historyPage = '/historyPage';
+  static const String updatePostPage = '/updatePostPage';
+  static const String topUpPage = '/topUpPage';
+  static const String webviewPage = 'webViewPage';
 }

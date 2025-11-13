@@ -21,6 +21,10 @@ class ListingItem {
   final bool? isFavorite;
   final int? favoriteId;
   final int? postId; //phục vụ cho call api favorite
+  final String? wardName;
+  final String? provinceName;
+  final String? reasonReject;
+  final String? reasonViolation;
   const ListingItem({
     required this.id,
     required this.userPostId,
@@ -44,6 +48,10 @@ class ListingItem {
     this.isFavorite,
     this.favoriteId,
     this.postId,
+    this.wardName,
+    this.provinceName,
+    this.reasonReject,
+    this.reasonViolation,
   });
 
   factory ListingItem.fromJson(Map<String, dynamic> json) {
@@ -73,6 +81,10 @@ class ListingItem {
       isFavorite: json['isFavorite'] ?? false,
       favoriteId: json['favoriteId'] ?? 0,
       postId: json['postId'] ?? 0,
+      wardName: json['wardName']?.toString(),
+      provinceName: json['provinceName']?.toString(),
+      reasonReject: json['reasonReject']?.toString(),
+      reasonViolation: json['reasonViolation']?.toString(),
     );
   }
 
@@ -101,6 +113,10 @@ class ListingItem {
       'isFavorite': isFavorite,
       'favoriteId': favoriteId,
       'postId': postId,
+      'wardName': wardName,
+      'provinceName': provinceName,
+      'reasonReject': reasonReject,
+      'reasonViolation': reasonViolation,
     };
   }
 }

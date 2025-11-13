@@ -194,6 +194,7 @@ class TabProfilePageState extends State<TabProfilePage> with TickerProviderState
                                           Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
                                           return;
                                         }
+                                        Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.topUpPage, (route) => true);
                                       },
                                       child: const Text('Nạp ngay'),
                                     ),
@@ -231,18 +232,6 @@ class TabProfilePageState extends State<TabProfilePage> with TickerProviderState
                                   Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
                                   return;
                                 }
-                              },
-                              icon: Icons.bookmark_border,
-                              title: 'Tìm kiếm đã lưu',
-                            ),
-                            dividerInset(),
-                            itemTile(
-                              onTap: () async {
-                                final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
-                                if (isCheckShowAuth) {
-                                  Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
-                                  return;
-                                }
                                 Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.historyPage, (route) => true);
                               },
                               icon: Icons.access_time,
@@ -259,6 +248,32 @@ class TabProfilePageState extends State<TabProfilePage> with TickerProviderState
                               },
                               icon: Icons.star_border,
                               title: 'Đánh giá từ tôi',
+                            ),
+                            dividerInset(),
+                            itemTile(
+                              onTap: () async {
+                                final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                                if (isCheckShowAuth) {
+                                  Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                                  return;
+                                }
+                                _showChangePasswordDialog(context);
+                              },
+                              icon: Icons.key,
+                              title: 'Đổi mật khẩu',
+                            ),
+                            dividerInset(),
+                            itemTile(
+                              onTap: () async {
+                                final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                                if (isCheckShowAuth) {
+                                  Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                                  return;
+                                }
+                                _showChangePinCodeWalletDialog(context);
+                              },
+                              icon: Icons.password,
+                              title: 'Đổi mã pin',
                             ),
                           ],
                         ),
@@ -296,6 +311,285 @@ class TabProfilePageState extends State<TabProfilePage> with TickerProviderState
           ),
         ),
       ),
+    );
+  }
+
+  void _showChangePasswordDialog(BuildContext context) {
+    final oldCtrl = TextEditingController();
+    final newCtrl = TextEditingController();
+    final confirmCtrl = TextEditingController();
+    String? error;
+    bool isLoading = false;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setState) {
+            return Dialog(
+              insetPadding: const EdgeInsets.symmetric(horizontal: 40),
+              backgroundColor: Colors.transparent, // để dễ custom màu
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Header màu riêng
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: const BoxDecoration(
+                        color: AppColor.cMain, // màu header
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                      ),
+                      child: Center(
+                        child: const Text(
+                          'Đổi mật khẩu',
+                          style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    // Body màu custom
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF0F0F0), // màu body tùy chỉnh
+                        borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextField(
+                            controller: oldCtrl,
+                            obscureText: true,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Mật khẩu hiện tại',
+                              labelStyle: TextStyle(color: AppColor.color1),
+                              focusColor: AppColor.cMain,
+                              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColor.cMain)),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextField(
+                            controller: newCtrl,
+                            obscureText: true,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Mật khẩu mới (min 6 kí tự)',
+                              labelStyle: TextStyle(color: AppColor.color1),
+                              focusColor: AppColor.cMain,
+                              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColor.cMain)),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextField(
+                            controller: confirmCtrl,
+                            obscureText: true,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Nhập lại mật khẩu mới',
+                              labelStyle: TextStyle(color: AppColor.color1),
+                              focusColor: AppColor.cMain,
+                              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColor.cMain)),
+                            ),
+                          ),
+                          if (error != null) ...[const SizedBox(height: 8), Text(error!, style: const TextStyle(color: Colors.red))],
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx),
+                                child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
+                              ),
+                              const SizedBox(width: 8),
+                              ElevatedButton(
+                                onPressed: () {
+                                  final newP = newCtrl.text.trim();
+                                  final confirmP = confirmCtrl.text.trim();
+                                  if (newP.length < 6) {
+                                    setState(() => error = 'Mật khẩu mới phải tối thiểu 6 kí tự');
+                                    return;
+                                  }
+                                  if (newP != confirmP) {
+                                    setState(() => error = 'Xác nhận mật khẩu không khớp');
+                                    return;
+                                  }
+                                  setState(() => isLoading = true);
+                                  context.read<TabProfileCubit>().changePage(ctx, oldCtrl.text, newCtrl.text);
+                                  setState(() => isLoading = false);
+                                },
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStatePropertyAll(AppColor.cMain),
+                                  foregroundColor: WidgetStatePropertyAll(Colors.white),
+                                ),
+                                child: isLoading
+                                    ? SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: Center(
+                                          child: CircularProgressIndicator(backgroundColor: Colors.white, color: AppColor.cMain.withOpacity(0.3)),
+                                        ),
+                                      )
+                                    : const Text('Cập nhật', style: TextStyle(fontSize: 15, color: Colors.white)),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  //đổi mã pin ở ví
+  void _showChangePinCodeWalletDialog(BuildContext context) {
+    final oldCtrl = TextEditingController();
+    final newCtrl = TextEditingController();
+    final confirmCtrl = TextEditingController();
+    String? error;
+    bool isLoading = false;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setState) {
+            return Dialog(
+              insetPadding: const EdgeInsets.symmetric(horizontal: 40),
+              backgroundColor: Colors.transparent, // để dễ custom màu
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Header màu riêng
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: const BoxDecoration(
+                        color: AppColor.cMain, // màu header
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                      ),
+                      child: Center(
+                        child: const Text(
+                          'Đổi mã pin',
+                          style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    // Body màu custom
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF0F0F0), // màu body tùy chỉnh
+                        borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextField(
+                            controller: oldCtrl,
+                            obscureText: true,
+                            maxLength: 6,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Mật pin hiện tại',
+                              labelStyle: TextStyle(color: AppColor.color1),
+                              focusColor: AppColor.cMain,
+                              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColor.cMain)),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextField(
+                            controller: newCtrl,
+                            obscureText: true,
+                            maxLength: 6,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Mã pin mới',
+                              labelStyle: TextStyle(color: AppColor.color1),
+                              focusColor: AppColor.cMain,
+                              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColor.cMain)),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextField(
+                            controller: confirmCtrl,
+                            obscureText: true,
+                            maxLength: 6,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Nhập lại mã pin mới',
+                              labelStyle: TextStyle(color: AppColor.color1),
+                              focusColor: AppColor.cMain,
+                              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppColor.cMain)),
+                            ),
+                          ),
+                          if (error != null) ...[const SizedBox(height: 8), Text(error!, style: const TextStyle(color: Colors.red))],
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx),
+                                child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
+                              ),
+                              const SizedBox(width: 8),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  final newP = newCtrl.text.trim();
+                                  final confirmP = confirmCtrl.text.trim();
+                                  if (newP.length < 6) {
+                                    setState(() => error = 'Mã pin mới phải tối thiểu 6 kí tự');
+                                    return;
+                                  }
+                                  if (newP != confirmP) {
+                                    setState(() => error = 'Xác nhận mã pin không khớp');
+                                    return;
+                                  }
+                                  setState(() => isLoading = true);
+                                  await context.read<TabProfileCubit>().changePin(ctx, oldCtrl.text, newCtrl.text);
+                                  setState(() => isLoading = false);
+                                },
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStatePropertyAll(AppColor.cMain),
+                                  foregroundColor: WidgetStatePropertyAll(Colors.white),
+                                ),
+                                child: isLoading
+                                    ? SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: Center(
+                                          child: CircularProgressIndicator(backgroundColor: Colors.white, color: AppColor.cMain.withOpacity(0.3)),
+                                        ),
+                                      )
+                                    : const Text('Cập nhật', style: TextStyle(fontSize: 15, color: Colors.white)),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 

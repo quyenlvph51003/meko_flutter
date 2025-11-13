@@ -7,6 +7,7 @@ import 'package:meko_project/domains/rest_client/rest_client_extension.dart';
 import 'package:meko_project/models/body/post/listing_item_model.dart';
 import 'package:meko_project/models/paginated_result_common.dart';
 import 'package:meko_project/models/response_common.dart';
+import 'package:meko_project/repository/post/post_update_request.dart';
 import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 
 class PostRepo {
@@ -66,6 +67,27 @@ class PostRepo {
       return res.data as ListingItem;
     }
     return ListingItem.fromJson(res.toJson()['data'] as Map<String, dynamic>? ?? <String, dynamic>{});
+  }
+
+  Future<bool> updatePost(PostUpdateRequest postUpdateRequest) async {
+    try {
+      print(postUpdateRequest.toJson());
+      final response = await restClient.put(ApiPath.postUpdate, data: await postUpdateRequest.buildPostUpdateFormData());
+      return response.statusCode == 200;
+    } catch (e) {
+      print(' Call update post failed ${e.toString()}');
+      return false;
+    }
+  }
+
+  Future<bool> updatePostStatus({required int postId, required PostStatus status}) async {
+    try {
+      final response = await restClient.put('${ApiPath.postUpdateStatus}/$postId', data: {'status': postStatusMapStr[status] ?? 'PENDING'});
+      return response.statusCode == 200;
+    } catch (e) {
+      print(' Call update post status failed ${e.toString()}');
+      return false;
+    }
   }
 }
 

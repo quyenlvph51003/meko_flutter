@@ -5,6 +5,7 @@ import 'package:meko_project/models/body/location/ward_model.dart';
 import 'package:meko_project/models/body/post/listing_item_model.dart';
 import 'package:meko_project/models/body/review/reply_model.dart';
 import 'package:meko_project/models/body/review/review_model.dart';
+import 'package:meko_project/models/body/violation/violation_model.dart';
 
 class PostDetailState extends Equatable {
   final ListingItem item;
@@ -17,6 +18,8 @@ class PostDetailState extends Equatable {
   ReviewModel? reviewReply;
   ReplyModel? reply;
   final bool? isEdit;
+  final List<ViolationModel> violations;
+  ViolationModel? violationSelected;
   PostDetailState({
     required this.item,
     required this.currentImageIndex,
@@ -28,6 +31,8 @@ class PostDetailState extends Equatable {
     this.reviewReply,
     this.reply,
     this.isEdit,
+    required this.violations,
+    this.violationSelected,
   });
 
   PostDetailState copyWith({
@@ -41,6 +46,8 @@ class PostDetailState extends Equatable {
     ReviewModel? reviewReply,
     ReplyModel? reply,
     bool? isEdit,
+    List<ViolationModel>? violations,
+    ViolationModel? violationSelected,
   }) {
     return PostDetailState(
       item: item ?? this.item,
@@ -53,6 +60,8 @@ class PostDetailState extends Equatable {
       reply: reply ?? this.reply,
       autoFocus: autoFocus ?? this.autoFocus,
       isEdit: isEdit ?? this.isEdit,
+      violations: violations ?? this.violations,
+      violationSelected: violationSelected ?? this.violationSelected,
     );
   }
 
@@ -67,6 +76,8 @@ class PostDetailState extends Equatable {
     ReplyModel? reply,
     bool? autoFocus,
     bool? isEdit,
+    List<ViolationModel>? violations,
+    ViolationModel? violationSelected,
   }) {
     return PostDetailState(
       item: item ?? this.item,
@@ -79,6 +90,8 @@ class PostDetailState extends Equatable {
       reviewReply: reviewReply,
       reply: reply,
       isEdit: isEdit ?? this.isEdit,
+      violations: violations ?? this.violations,
+      violationSelected: violationSelected,
     );
   }
 
@@ -95,5 +108,7 @@ class PostDetailState extends Equatable {
     reviewReply,
     reply,
     isEdit,
+    violations,
+    violationSelected,
   ];
 }

@@ -12,7 +12,7 @@ class ViolationRepo {
 
   Future<ResponseCommon<List<ViolationModel>>> getViolationList() async {
     try {
-      final response = await restClient.get(ApiPath.getViolationList);
+      final response = await restClient.get(ApiPath.getViolationList, queryParameters: {'isActive': 1});
       if (response.data == null) {
         return ResponseCommon<List<ViolationModel>>(datetime: '', errorCode: 500, message: 'No data', data: null, content: const [], success: false);
       }

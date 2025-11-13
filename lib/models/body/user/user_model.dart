@@ -57,6 +57,46 @@ class UserModel {
     pinWallet = json['pin_wallet'];
   }
 
+  UserModel copyWith({
+    int? id,
+    String? username,
+    String? email,
+    String? password,
+    int? role,
+    String? createdAt,
+    String? updatedAt,
+    String? tokenExpired,
+    String? refreshToken,
+    String? refreshExpired,
+    String? otpCode,
+    String? otpExpired,
+    String? addressName,
+    String? avatar,
+    int? isActive,
+    double? walletBalance,
+    String? pinWallet,
+  }) {
+    return UserModel(
+      id: id,
+      username: username,
+      email: email,
+      password: password,
+      role: role,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      tokenExpired: tokenExpired,
+      refreshToken: refreshToken,
+      refreshExpired: refreshExpired,
+      otpCode: otpCode,
+      otpExpired: otpExpired,
+      addressName: addressName,
+      avatar: avatar,
+      isActive: isActive,
+      walletBalance: walletBalance,
+      pinWallet: pinWallet,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;

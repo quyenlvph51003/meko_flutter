@@ -31,11 +31,11 @@ class LoginCubit extends Cubit<LoginState> {
         final user = await userRepo.getUserProfile();
         emit(state.copyWith(isLoading: false, isSuccess: true));
       } else {
-        emit(state.copyWith(isLoading: false, errorMessage: 'Lỗi hệ thống, vui lòng liên hệ quản trị viên'));
+        emit(state.copyWith(isLoading: false));
       }
     } catch (e) {
       print(e);
-      emit(state.copyWith(isLoading: false, errorMessage: 'Đã có lỗi xảy ra. Vui lòng thử lại'));
+      emit(state.copyWith(isLoading: false));
     }
   }
 

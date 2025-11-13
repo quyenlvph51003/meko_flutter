@@ -15,27 +15,14 @@ class AuthRepository {
 
   AuthRepository({required this.restClient, required this.sharedPref});
 
-  Future<ResponseCommon<void>> register({
-    required String email,
-    required String password,
-    required String username,
-  }) async {
-    final res = await restClient.post(
-      ApiPath.authRegister,
-      data: {'email': email, 'password': password, 'username': username},
-    );
+  Future<ResponseCommon<void>> register({required String email, required String password, required String username}) async {
+    final res = await restClient.post(ApiPath.authRegister, data: {'email': email, 'password': password, 'username': username});
     return ResponseCommon<void>.fromJson(res.data, (_) => null);
   }
 
-  Future<Response?> login({
-    required String email,
-    required String password,
-  }) async {
+  Future<Response?> login({required String email, required String password}) async {
     try {
-      return await restClient.post(
-        ApiPath.authLogin,
-        data: {'email': email, 'password': password},
-      );
+      return await restClient.post(ApiPath.authLogin, data: {'email': email, 'password': password});
     } catch (e) {
       print(e);
       return null;
@@ -44,41 +31,26 @@ class AuthRepository {
 
   Future<Response?> requestOtp({required String email}) async {
     try {
-      return await restClient.post(
-        ApiPath.authRequestOtp,
-        data: {'email': email},
-      );
+      return await restClient.post(ApiPath.authRequestOtp, data: {'email': email});
     } catch (e) {
       print(e);
       return null;
     }
   }
 
-  Future<ResponseCommon<void>> verifyOtp({
-    required String email,
-    required String otp,
-  }) async {
-    final res = await restClient.post(
-      ApiPath.authVerifyOtp,
-      data: {'email': email, 'otp': otp},
-    );
+  Future<ResponseCommon<void>> verifyOtp({required String email, required String otp}) async {
+    final res = await restClient.post(ApiPath.authVerifyOtp, data: {'email': email, 'otp': otp});
     return ResponseCommon<void>.fromJson(res.data, (_) => null);
   }
 
-  Future<bool> loginAndSaveToken({
-    required String email,
-    required String password,
-  }) async {
+  Future<bool> loginAndSaveToken({required String email, required String password}) async {
     try {
       final response = await login(email: email, password: password);
       print(response?.data);
       if (response != null && response.statusCode == 200) {
         final authTokens = AuthTokens.fromJson(response.data['data']);
         //lưu token local
-        SQLiteManager.instance().put(
-          AppConsts.keyAuthTokens,
-          authTokens.toJson(),
-        );
+        SQLiteManager.instance().put(AppConsts.keyAuthTokens, authTokens.toJson());
         return true;
       }
       return false;
@@ -90,13 +62,41 @@ class AuthRepository {
 
   Future<Response?> refreshToken(String refreshToken) async {
     try {
-      return await restClient.post(
-        ApiPath.authRefresh,
-        data: {'refreshToken': refreshToken},
-      );
+      return await restClient.post(ApiPath.authRefresh, data: {'refreshToken': refreshToken});
     } catch (e) {
       print(e);
       return null;
+    }
+  }
+
+  Future<bool> changePass({required String passwordOld, required String passwordNew}) async {
+    try {
+      final user = await SqliteHelper.getUserSql();
+      if (user == null) {
+        return false;
+      }
+      final response = await restClient.put(ApiPath.changePass, data: {'passwordOld': passwordOld, 'passwordNew': passwordNew, 'email': user.email});
+      return response.statusCode == 200;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  Future<bool> changePinCodeWalltet({required String pinWalletOld, required String pinWalletNew}) async {
+    try {
+      final user = await SqliteHelper.getUserSql();
+      if (user == null) {
+        return false;
+      }
+      final response = await restClient.put(
+        '${ApiPath.updatePinWallet}/${user.id}',
+        data: {'pinWalletNew': pinWalletNew, 'pinWalletOld': pinWalletOld},
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      print(e);
+      return false;
     }
   }
 

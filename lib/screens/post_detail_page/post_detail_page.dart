@@ -8,8 +8,11 @@ import 'package:meko_project/domains/dependency_injection/service_locator.dart';
 import 'package:meko_project/models/body/review/reply_model.dart';
 import 'package:meko_project/models/body/review/review_model.dart';
 import 'package:meko_project/models/body/user/user_model.dart';
+import 'package:meko_project/models/body/violation/violation_model.dart';
 import 'package:meko_project/repository/favorite/favorite_repo.dart';
+import 'package:meko_project/repository/report/report_repo.dart';
 import 'package:meko_project/repository/reviews/review_repo.dart';
+import 'package:meko_project/repository/violation/violation_repo.dart';
 import 'package:meko_project/utils/converts/forrmat_uttils.dart';
 import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import 'package:meko_project/widget/app_button/app_button.dart';
@@ -61,25 +64,45 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   Future<void> callPhone(BuildContext context, String? raw) async {
-    final phone = (raw ?? '').replaceAll(RegExp(r'[^0-9+]'), '');
+    // 1️⃣ Lọc số hợp lệ: giữ 0-9 và dấu +
+    String phone = (raw ?? '').replaceAll(RegExp(r'[^0-9+]'), '');
+
     if (phone.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Không có số điện thoại hợp lệ')));
       return;
     }
-    final uri = Uri(scheme: 'tel', path: phone);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Không thể mở gọi với số $phone')));
+
+    // 2️⃣ Chuyển số nội địa sang quốc tế (tùy chọn)
+    if (phone.startsWith('0')) {
+      phone = '+84' + phone.substring(1); // Ví dụ: 013213123 → +8413213123
+    }
+
+    // 3️⃣ Tạo Uri chuẩn
+    final Uri uri = Uri.parse('tel:$phone');
+
+    // 4️⃣ Thử mở app Gọi
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Thiết bị không hỗ trợ gọi điện với số $phone')));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi khi mở gọi: $e')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) =>
-          PostDetailCubit(item: widget.item, loader: widget.loadDetail, favoriteRepo: getIt<FavoriteRepo>(), reviewRepo: getIt<ReviewRepo>())
-            ..init((widget.item.id == 0) ? (widget.item.postId ?? 0) : widget.item.id),
+      create: (_) => PostDetailCubit(
+        item: widget.item,
+        loader: widget.loadDetail,
+        favoriteRepo: getIt<FavoriteRepo>(),
+        reviewRepo: getIt<ReviewRepo>(),
+        violationRepo: getIt<ViolationRepo>(),
+        reportRepo: getIt<ReportRepo>(),
+      )..init((widget.item.id == 0) ? (widget.item.postId ?? 0) : widget.item.id),
       child: Scaffold(
         backgroundColor: Colors.white,
         body: BlocBuilder<PostDetailCubit, PostDetailState>(
@@ -166,13 +189,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                     ),
                                   ),
                                 ),
-                                // const SizedBox(width: 5),
-                                // Container(
-                                //   width: 40,
-                                //   height: 40,
-                                //   decoration: BoxDecoration(color: Colors.white.withOpacity(0.9), shape: BoxShape.circle),
-                                //   child: const Icon(Icons.share_outlined, size: 20, color: Colors.black),
-                                // ),
                                 const SizedBox(width: 5),
                                 GestureDetector(
                                   onTap: () {
@@ -201,12 +217,21 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                               ),
                                               Divider(color: Colors.grey.withOpacity(0.5), thickness: 1),
                                               ListTile(
+                                                onTap: () {
+                                                  //reset
+                                                  vm.fetchListViolation();
+                                                  vm.changeViolationSelected(null);
+                                                  showViolationBottom(context, vm);
+                                                },
                                                 leading: Icon(Icons.warning_amber_outlined),
                                                 contentPadding: EdgeInsets.zero,
                                                 title: Text('Báo cáo vi phạm', style: TextStyle(color: Colors.black, fontSize: 14)),
                                               ),
                                               Divider(color: Colors.grey.withOpacity(0.5), thickness: 1),
                                               ListTile(
+                                                onTap: () {
+                                                  Navigator.pop(context);
+                                                },
                                                 leading: Icon(Icons.support_agent_sharp),
                                                 contentPadding: EdgeInsets.zero,
                                                 title: Text('Cần trợ giúp?', style: TextStyle(color: Colors.black, fontSize: 14)),
@@ -373,22 +398,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                                       ),
-                                      // const SizedBox(width: 8),
-                                      // Text('2002 Đã bán', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                                     ],
                                   ),
-                                  // const SizedBox(height: 4),
-                                  // Row(
-                                  //   children: [
-                                  //     Container(
-                                  //       width: 6,
-                                  //       height: 6,
-                                  //       decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.green),
-                                  //     ),
-                                  //     const SizedBox(width: 6),
-                                  //     Text('Hoạt động 4 giờ trước', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-                                  //   ],
-                                  // ),
                                 ],
                               ),
                             ),
@@ -403,16 +414,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                   ),
                                   child: Icon(Icons.phone, size: 25, color: AppColor.cMain),
                                 ),
-                                // const SizedBox(width: 8),
-                                // Container(
-                                //   width: 40,
-                                //   height: 40,
-                                //   decoration: BoxDecoration(
-                                //     shape: BoxShape.circle,
-                                //     border: Border.all(color: Colors.grey[300]!),
-                                //   ),
-                                //   child: Icon(Icons.star_border, size: 18, color: Colors.grey[600]),
-                                // ),
                               ],
                             ),
                           ],
@@ -616,7 +617,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           child: AppButton(
                             onTap: () {
                               callPhone(context, state.item.phoneNumber);
-                              print('Da click vao sdt de goi + ${state.item.phoneNumber}');
                             },
                             child: Container(
                               height: 48,
@@ -1098,6 +1098,126 @@ void _showBottomComment(
               },
             ),
           ),
+        ),
+      );
+    },
+  );
+}
+
+void showViolationBottom(BuildContext context, PostDetailCubit vm) {
+  final controller = TextEditingController();
+  showModalBottomSheet(
+    context: context,
+    isDismissible: true, // tap ra ngoài để đóng
+    backgroundColor: Colors.white, // màu background của bottom sheet
+    barrierColor: Colors.black.withOpacity(0.5), // làm mờ màn hình
+    useSafeArea: true,
+    isScrollControlled: true,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+    builder: (context) {
+      return BlocProvider.value(
+        value: vm,
+        child: BlocBuilder<PostDetailCubit, PostDetailState>(
+          builder: (context, state) {
+            return Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: Scaffold(
+                resizeToAvoidBottomInset: true,
+                body: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            child: GestureDetector(
+                              onTap: () => Navigator.pop(context),
+                              child: Icon(Icons.cancel, size: 25, color: Colors.black),
+                            ),
+                          ),
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text('Báo cáo vi phạm', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Divider(color: Colors.grey.withOpacity(0.5), thickness: 1),
+                    if (state.violations.isNotEmpty)
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: state.violations.length,
+                            itemBuilder: (cont, index) {
+                              final item = state.violations[index];
+                              // bản chất 2 obj giống nhau
+                              return RadioListTile<ViolationModel>(
+                                value: item,
+                                groupValue: state.violationSelected,
+                                activeColor: AppColor.cMain,
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    vm.changeViolationSelected(value);
+                                    // Nếu bạn muốn đóng bottom sheet sau khi chọn thì bật dòng này:
+                                    // Navigator.pop(context);
+                                  }
+                                },
+                                title: Text(item.name ?? ''),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    if (state.violationSelected != null)
+                      Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            // Ô nhập mô tả chiếm hết phần còn lại
+                            Expanded(
+                              child: TextField(
+                                controller: controller,
+                                decoration: InputDecoration(
+                                  focusColor: AppColor.cMain,
+                                  border: OutlineInputBorder(),
+                                  hintText: 'Mô tả(Không bắt buộc)',
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                ),
+                                maxLines: 1, // Nếu muốn multiline thì tăng lên
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            // Nút gửi
+                            ElevatedButton(
+                              onPressed: () {
+                                if (state.violationSelected != null) {
+                                  vm.createReportCubit(content: controller.text);
+                                  Navigator.pop(context);
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                              ),
+                              child: Text('Gửi', style: TextStyle(color: Colors.white)),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       );
     },
