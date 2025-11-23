@@ -10,6 +10,7 @@ import 'package:meko_project/repository/favorite/favorite_repo.dart';
 import 'package:meko_project/repository/history/history_repo.dart';
 import 'package:meko_project/repository/location/province_repo.dart';
 import 'package:meko_project/repository/location/ward_repo.dart';
+import 'package:meko_project/repository/package/package_repository.dart';
 import 'package:meko_project/repository/payment/payment_repo.dart';
 import 'package:meko_project/repository/post/post_repo.dart';
 import 'package:meko_project/repository/report/report_repo.dart';
@@ -55,6 +56,9 @@ class ServiceLocator {
     });
     getIt.registerLazySingleton<PaymentRepo>(() {
       return PaymentRepo(restClient: getIt<RestClient>());
+    });
+    getIt.registerLazySingleton<PackageRepository>(() {
+      return PackageRepository(restClient: getIt<RestClient>());
     });
   }
 }

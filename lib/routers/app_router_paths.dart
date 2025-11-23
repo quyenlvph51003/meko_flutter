@@ -12,6 +12,12 @@ class AppRouterPaths {
   static const String favoritePage = '/favoritePage';
   static const String historyPage = '/historyPage';
   static const String updatePostPage = '/updatePostPage';
+  static const String createPostPage = '/createPostPage';
   static const String topUpPage = '/topUpPage';
   static const String webviewPage = 'webViewPage';
+  static const String transactionStatusPage = '/transactionStatusPage';
+  static const String purchasePackagePage = '/purchasePackagePage';
+  static const String packagePages = 'packagePages';
+  static const String createPost = '/createPost';
+  static const String createPurcharsePost = '/createPurcharsePost';
 }

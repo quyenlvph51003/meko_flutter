@@ -8,6 +8,7 @@ import 'package:meko_project/models/body/post/listing_item_model.dart';
 import 'package:meko_project/models/paginated_result_common.dart';
 import 'package:meko_project/models/response_common.dart';
 import 'package:meko_project/repository/post/post_update_request.dart';
+import 'package:meko_project/repository/post/post_create_request.dart';
 import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 
 class PostRepo {
@@ -76,6 +77,16 @@ class PostRepo {
       return response.statusCode == 200;
     } catch (e) {
       print(' Call update post failed ${e.toString()}');
+      return false;
+    }
+  }
+
+  Future<bool> createPost(PostCreateRequest request) async {
+    try {
+      final response = await restClient.post(ApiPath.postCreate, data: await request.buildPostCreateFormData());
+      return response.statusCode == 200;
+    } catch (e) {
+      print(' Call create post failed ${e.toString()}');
       return false;
     }
   }

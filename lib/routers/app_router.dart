@@ -6,6 +6,9 @@ import 'package:meko_project/screens/forgot_pass_page/forgot_pass_page.dart';
 import 'package:meko_project/screens/forgot_pass_page/request_otp_page.dart';
 import 'package:meko_project/screens/history_page/history_page.dart';
 import 'package:meko_project/screens/login_page/login_page.dart';
+import 'package:meko_project/screens/packages_page/packages_page.dart';
+import 'package:meko_project/screens/create_post_page/create_post_page.dart';
+import 'package:meko_project/screens/purcharse_create_post/purcharse_create_post.dart';
 import 'package:meko_project/screens/search_page/search_page.dart';
 import 'package:meko_project/screens/sign_up_page/sign_up_page.dart';
 import 'package:meko_project/screens/splash_page/splash_page.dart';
@@ -13,6 +16,8 @@ import 'package:meko_project/screens/tab/homes_page/home_page.dart';
 import 'package:meko_project/screens/top_up_wallet/top_up_wallet.dart';
 import 'package:meko_project/screens/update_post_page/update_post_page.dart';
 import 'package:meko_project/screens/web_view_page/web_view_page.dart';
+import 'package:meko_project/screens/transaction_status/transaction_status_page.dart';
+import 'package:meko_project/screens/purchase_package/purchase_package_page.dart';
 
 import '../screens/post_detail_page/post_detail_page.dart';
 import 'app_router_paths.dart';
@@ -75,10 +80,24 @@ class AppRouter {
         return HistoryPage();
       case AppRouterPaths.updatePostPage:
         return PostUpdateScreen(postId: map?['postId']);
+      case AppRouterPaths.createPostPage:
+        return PostCreateScreen();
       case AppRouterPaths.topUpPage:
         return TopUpScreen();
       case AppRouterPaths.webviewPage:
-        return WebViewScreen(url: map?['url'], title: map?['title']);
+        return WebViewScreen(url: map?['url'], title: map?['title'], successUrlContains: map?['successUrlContains'], onSuccess: map?['onSuccess']);
+      case AppRouterPaths.transactionStatusPage:
+        final bool success = map?['success'] == true;
+        final String? message = map?['message'] as String?;
+        return TransactionStatusPage(success: success, message: message);
+      case AppRouterPaths.purchasePackagePage:
+        return PurchasePackagePage(packageId: map?['packageId'] as int?, price: map?['price'] as String?, title: map?['title']);
+      case AppRouterPaths.packagePages:
+        return PackagesPage();
+      case AppRouterPaths.createPost:
+        return PostCreateScreen();
+      case AppRouterPaths.createPurcharsePost:
+        return PurcharseCreatePost();
       default:
         return SizedBox();
     }

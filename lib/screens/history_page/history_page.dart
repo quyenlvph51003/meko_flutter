@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meko_project/consts/app_colcor.dart';
 import 'package:meko_project/domains/dependency_injection/service_locator.dart';
 import 'package:meko_project/repository/favorite/favorite_repo.dart';
 import 'package:meko_project/repository/history/history_repo.dart';
@@ -22,7 +23,12 @@ class _HistoryPageState extends State<HistoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tin đăng đã xem', style: TextStyle(color: Colors.black, fontSize: 20)),
+        backgroundColor: AppColor.cMain,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+        ),
+        title: const Text('Tin đăng đã xem', style: TextStyle(color: Colors.white)),
       ),
       body: BlocProvider(
         create: (context) => HistoryCubit(historyRepo: getIt<HistoryRepo>())..initCubit(),

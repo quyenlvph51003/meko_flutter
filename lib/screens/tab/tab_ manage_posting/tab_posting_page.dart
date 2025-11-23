@@ -199,7 +199,7 @@ class HeaderStrip extends StatelessWidget {
                             Text(state.user?.username ?? '', style: TextStyle(fontWeight: FontWeight.w600)),
                             AppButton(
                               onTap: () {
-                                print(' Vua click vao Dang tin ');
+                                Navigator.of(context).pushNamed(AppRouterPaths.createPost);
                               },
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -338,6 +338,8 @@ class TabBarStrip extends StatelessWidget {
                   tabItem(context, 'Đang hiển thị', PostStatus.APPROVED, state.currentTab),
                   SizedBox(width: 8),
                   tabItem(context, 'Đã ẩn', PostStatus.HIDDEN, state.currentTab),
+                  SizedBox(width: 8),
+                  tabItem(context, 'Hết hạn', PostStatus.EXPIRED, state.currentTab),
                   SizedBox(width: 8),
                   tabItem(context, 'Từ chối', PostStatus.REJECTED, state.currentTab),
                   SizedBox(width: 8),

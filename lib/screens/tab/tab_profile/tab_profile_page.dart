@@ -8,6 +8,7 @@ import 'package:meko_project/repository/auth/auth_repo.dart';
 import 'package:meko_project/routers/app_router_paths.dart';
 import 'package:meko_project/screens/tab/tab_profile/tab_profile_vm/tab_profile_cubit.dart';
 import 'package:meko_project/screens/tab/tab_profile/tab_profile_vm/tab_profile_state.dart';
+import 'package:meko_project/utils/converts/forrmat_uttils.dart';
 import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import 'package:meko_project/widget/app_button/app_button.dart';
 
@@ -164,16 +165,16 @@ class TabProfilePageState extends State<TabProfilePage> with TickerProviderState
                                         style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600),
                                       ),
                                       const Spacer(),
-                                      Text('${state.coins}', style: const TextStyle(fontWeight: FontWeight.w700)),
-                                      const SizedBox(width: 6),
-                                      Container(
-                                        width: 24,
-                                        height: 24,
-                                        decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFFFFF3CD)),
-                                        child: const Center(
-                                          child: Text('ĐT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700)),
-                                        ),
-                                      ),
+                                      Text('${FormatUtils.formatCurrency(double.tryParse(state.user.walletBalance??'0') as num)}', style: const TextStyle(fontWeight: FontWeight.w700,color: Colors.red,fontSize: 20)),
+                                      // const SizedBox(width: 6),
+                                      // Container(
+                                      //   width: 24,
+                                      //   height: 24,
+                                      //   decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFFFFF3CD)),
+                                      //   child: const Center(
+                                      //     child: Text('ĐT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700)),
+                                      //   ),
+                                      // ),
                                     ],
                                   ),
                                   const SizedBox(height: 12),
@@ -212,6 +213,19 @@ class TabProfilePageState extends State<TabProfilePage> with TickerProviderState
                         decoration: cardDecoration(),
                         child: Column(
                           children: [
+                            itemTile(
+                              onTap: () async {
+                                final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                                if (isCheckShowAuth) {
+                                  Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                                  return;
+                                }
+                                Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.packagePages, (route) => true);
+                              },
+                              icon: Icons.list,
+                              title: 'Danh sách gói đăng',
+                            ),
+                            dividerInset(),
                             itemTile(
                               onTap: () async {
                                 final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
@@ -302,7 +316,7 @@ class TabProfilePageState extends State<TabProfilePage> with TickerProviderState
                           ),
                         ),
                       ),
-                      const SizedBox(height: 28),
+                      const SizedBox(height: 100),
                     ]),
                   ),
                 ],

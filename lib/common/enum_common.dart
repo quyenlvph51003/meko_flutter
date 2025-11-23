@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-enum PostStatus { PENDING, APPROVED, HIDDEN, VIOLATION, REJECTED }
+enum PostStatus { PENDING, APPROVED, HIDDEN, VIOLATION, REJECTED, EXPIRED }
 
 Map<PostStatus, String> postStatusMapStr = {
   PostStatus.PENDING: 'PENDING',
@@ -10,6 +10,7 @@ Map<PostStatus, String> postStatusMapStr = {
   PostStatus.HIDDEN: 'HIDDEN',
   PostStatus.VIOLATION: 'VIOLATION',
   PostStatus.REJECTED: 'REJECTED',
+  PostStatus.EXPIRED: 'EXPIRED',
 };
 
 Map<PostStatus, Color> postStatusColor = {
@@ -18,6 +19,7 @@ Map<PostStatus, Color> postStatusColor = {
   PostStatus.HIDDEN: Colors.grey, // Từ chối / Ẩn
   PostStatus.VIOLATION: Colors.red, // Vi phạm
   PostStatus.REJECTED: Colors.blueGrey, // Đã ẩn
+  PostStatus.EXPIRED: Colors.blueGrey, // Đã ẩn
 };
 
 Map<PostStatus, String> postStatusMapViStr = {
@@ -26,6 +28,7 @@ Map<PostStatus, String> postStatusMapViStr = {
   PostStatus.HIDDEN: 'Đã Ẩn',
   PostStatus.VIOLATION: 'Vi phạm',
   PostStatus.REJECTED: 'Từ chối',
+  PostStatus.EXPIRED: 'Hết hạn',
 };
 
 Map<String, Color> postStatusStrColor = {
@@ -34,6 +37,7 @@ Map<String, Color> postStatusStrColor = {
   'HIDDEN': Colors.grey, // Từ chối / Ẩn
   'VIOLATION': Colors.red, // Vi phạm
   'REJECTED': Colors.blueGrey, // Đã ẩn
+  'EXPIRED': Colors.blueGrey, // Đã ẩn
 };
 
 Map<String, String> postStatusStrMapViStr = {
@@ -42,4 +46,5 @@ Map<String, String> postStatusStrMapViStr = {
   'HIDDEN': 'Đã Ẩn',
   'VIOLATION': 'Vi phạm',
   'REJECTED': 'Từ chối',
+  'EXPIRED': 'Hết hạn',
 };

@@ -26,6 +26,9 @@ class FormatUtils {
     return DateFormat(pattern).format(date);
   }
 
+  static String formatDateNoMinitues(DateTime date, {String pattern = 'dd/MM/yyyy'}) {
+    return DateFormat(pattern).format(date);
+  }
   /// 3. Format số thành nghìn đồng
   static String formatCurrency(num amount) {
     final formatter = NumberFormat('#,###', 'vi_VN');

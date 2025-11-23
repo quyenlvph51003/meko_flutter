@@ -44,7 +44,6 @@ class _HomePageState extends State<HomePage> {
           return;
         }
         if (state.isLoggedIn) {
-          print('chấdnsad');
         } else {
           if (state.isCheckShowAuth ?? false) {
             Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
@@ -57,7 +56,10 @@ class _HomePageState extends State<HomePage> {
             BlocBuilder<HomeCubit, HomeState>(
               buildWhen: (p, c) => p.currentIndex != c.currentIndex || p.isLoggedIn != c.isLoggedIn || p.uiRev != c.uiRev,
               builder: (context, state) {
-                return IndexedStack(index: state.currentIndex, children: pages);
+                // Return the active page directly so it rebuilds when the tab changes.
+                // This replaces the previous IndexedStack which preserved the state of
+                // all pages. Now tapping a tab will recreate/load its page.
+                return pages[state.currentIndex];
               },
             ),
             Positioned(
@@ -112,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
                     return;
                   } else {
-                    vm.openPostSheet();
+                    Navigator.of(context).pushNamed(AppRouterPaths.createPost);
                   }
                 },
                 child: Container(

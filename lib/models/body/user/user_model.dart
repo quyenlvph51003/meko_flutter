@@ -14,7 +14,7 @@ class UserModel {
   String? addressName;
   String? avatar;
   int? isActive;
-  double? walletBalance;
+  String? walletBalance;
   String? pinWallet;
 
   UserModel({
@@ -73,7 +73,7 @@ class UserModel {
     String? addressName,
     String? avatar,
     int? isActive,
-    double? walletBalance,
+    String? walletBalance,
     String? pinWallet,
   }) {
     return UserModel(

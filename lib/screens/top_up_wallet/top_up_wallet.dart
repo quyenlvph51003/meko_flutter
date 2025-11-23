@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meko_project/consts/app_colcor.dart';
 import 'package:meko_project/domains/dependency_injection/service_locator.dart';
 import 'package:meko_project/models/body/user/user_model.dart';
 import 'package:meko_project/repository/payment/payment_repo.dart';
 import 'package:meko_project/repository/user/user_repo.dart';
 import 'package:meko_project/screens/top_up_wallet/vm/top_up_cubit.dart';
+import 'package:meko_project/widget/app_button/app_button_common.dart';
 
 class TopUpScreen extends StatefulWidget {
   const TopUpScreen({super.key});
@@ -34,7 +36,11 @@ class _TopUpScreenState extends State<TopUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Nạp tiền vào ví')),
+      appBar: AppBar(
+        title: const Text('Nạp tiền vào ví'),
+        backgroundColor: AppColor.cMain,
+        leading: IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back)),
+      ),
       body: BlocProvider(
         create: (_) => TopUpCubit(userRepo: getIt<UserRepo>(), paymentRepo: getIt<PaymentRepo>())..init(),
         child: BlocBuilder<TopUpCubit, TopUpState>(
@@ -103,7 +109,7 @@ class _WalletHeader extends StatelessWidget {
         children: [
           Text('Xin chào, ${user?.username ?? '---'}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
-          Text('Số dư hiện tại: ${(user?.walletBalance ?? 0).toStringAsFixed(0)} VND', style: const TextStyle(fontSize: 16)),
+          Text('Số dư hiện tại: ${(user?.walletBalance ?? '')} VND', style: const TextStyle(fontSize: 16)),
         ],
       ),
     );
@@ -189,13 +195,20 @@ class _BuildTopUp extends StatelessWidget {
               .toList(),
         ),
         const SizedBox(height: 20),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: isSubmitting ? null : onTopUp,
-            child: isSubmitting ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Nạp tiền'),
-          ),
+        AppButtonCommon(
+          text: 'Nạp tiền',
+          isLoading: isSubmitting,
+          onPressed: () async {
+            onTopUp();
+          },
         ),
+        // SizedBox(
+        //   width: double.infinity,
+        //   child: ElevatedButton(
+        //     onPressed: isSubmitting ? null : onTopUp,
+        //     child: isSubmitting ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Nạp tiền'),
+        //   ),
+        // ),
       ],
     );
   }

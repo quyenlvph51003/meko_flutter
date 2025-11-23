@@ -11,6 +11,7 @@ class ApiPath {
   static const String searchPost = 'post/search-post';
   static const String postDetail = 'post/detail/';
   static const String postUpdate = 'post/update';
+  static const String postCreate = 'post/create';
   static const String postUpdateStatus = 'post/update-status';
 
   //user
@@ -45,4 +46,9 @@ class ApiPath {
 
   //payment
   static const String payment = 'payment/create-payment';
+  static const String paymentPurchase = 'payment/create-payment-package'; //user mua gói
+  static const String userPayment = 'payment/get-payments-by-userId'; // user đang sở hữu gói
+
+  //package
+  static const String getPackages = 'payment-package';
 }
