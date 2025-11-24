@@ -62,26 +62,44 @@ class TabProfilePageState extends State<TabProfilePage> with TickerProviderState
                             Stack(
                               alignment: Alignment.center,
                               children: [
-                                CircleAvatar(
-                                  radius: 44,
-                                  child: state.user.avatar != null
-                                      ? Image.network(state.user.avatar!, fit: BoxFit.cover)
-                                      : Image.asset(AppImages.img_avt_default, fit: BoxFit.cover),
-                                ),
-                                Positioned(
-                                  right: MediaQuery.of(context).size.width / 2 - 44 - 6,
-                                  bottom: 6,
+                                InkWell(
+                                  onTap: () async {
+                                    final result = await Navigator.of(context).pushNamed(AppRouterPaths.profileEditPage);
+                                    if (result == true) {
+                                      vm.getUserProfile();
+                                    }
+                                  },
                                   child: Container(
-                                    width: 24,
-                                    height: 24,
+                                    width: 88,
+                                    height: 88,
                                     decoration: BoxDecoration(
-                                      color: Colors.black87,
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(color: Colors.white, width: 2),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.grey.shade300, width: 2),
+                                      image: state.user.avatar != null
+                                          ? DecorationImage(image: NetworkImage(state.user.avatar!), fit: BoxFit.cover)
+                                          : null,
                                     ),
-                                    child: const Icon(Icons.edit, color: Colors.white, size: 14),
                                   ),
                                 ),
+                                // Positioned(
+                                //   // right: MediaQuery.of(context).size.width / 2 - 44 - 6,
+                                //   bottom: 6,
+                                //   child: InkWell(
+                                //     onTap: () {
+                                //       context.read<TabProfileCubit>().pickAndUpdateAvatar(context);
+                                //     },
+                                //     child: Container(
+                                //       width: 50,
+                                //       height: 50,
+                                //       decoration: BoxDecoration(
+                                //         color: Colors.black87,
+                                //         borderRadius: BorderRadius.circular(12),
+                                //         border: Border.all(color: Colors.white, width: 2),
+                                //       ),
+                                //       child: const Icon(Icons.edit, color: Colors.white, size: 14),
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             ),
                             const SizedBox(height: 12),
@@ -165,7 +183,10 @@ class TabProfilePageState extends State<TabProfilePage> with TickerProviderState
                                         style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600),
                                       ),
                                       const Spacer(),
-                                      Text('${FormatUtils.formatCurrency(double.tryParse(state.user.walletBalance??'0') as num)}', style: const TextStyle(fontWeight: FontWeight.w700,color: Colors.red,fontSize: 20)),
+                                      Text(
+                                        '${FormatUtils.formatCurrency(double.tryParse(state.user.walletBalance ?? '0') as num)}',
+                                        style: const TextStyle(fontWeight: FontWeight.w700, color: Colors.red, fontSize: 20),
+                                      ),
                                       // const SizedBox(width: 6),
                                       // Container(
                                       //   width: 24,

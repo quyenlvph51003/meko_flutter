@@ -18,6 +18,8 @@ class ApiPath {
   static const String getProfile = 'user/profile';
   static const String createWallet = 'user/create-pin-wallet';
   static const String updatePinWallet = 'user/update-pin-wallet';
+  static const String updateAvatar = 'user/upload-avatar';
+  static const String updateProfile = 'user/update-user';
 
   //province
   static const String getAllProvince = 'province/get-all';

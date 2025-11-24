@@ -11,6 +11,8 @@ import 'package:meko_project/screens/tab/homes_page/home_vm/home_cubit.dart';
 import 'package:meko_project/screens/tab/tab_profile/tab_profile_vm/tab_profile_state.dart';
 import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import 'package:meko_project/widget/app_dialog/app_dialog.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:meko_project/repository/user/user_repo.dart';
 
 class TabProfileCubit extends Cubit<TabProfileState> {
   TabProfileCubit({required this.authRepository}) : super(TabProfileState.initial());
@@ -77,6 +79,35 @@ class TabProfileCubit extends Cubit<TabProfileState> {
       );
     } catch (e) {
       print(e);
+    }
+  }
+
+  Future<void> pickAndUpdateAvatar(BuildContext context) async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+      if (picked == null) return;
+      final userRepo = getIt<UserRepo>();
+      final updated = await userRepo.updateAvatar(picked.path);
+      if (updated != null) {
+        emit(state.copyWith(user: updated));
+        Fluttertoast.showToast(
+          msg: 'Cập nhật ảnh đại diện thành công',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: AppColor.cMain,
+          textColor: Colors.white,
+        );
+      }
+    } catch (e) {
+      print(e);
+      Fluttertoast.showToast(
+        msg: 'Cập nhật ảnh đại diện thất bại',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
     }
   }
 }

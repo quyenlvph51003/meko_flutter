@@ -20,4 +20,5 @@ class AppRouterPaths {
   static const String packagePages = 'packagePages';
   static const String createPost = '/createPost';
   static const String createPurcharsePost = '/createPurcharsePost';
+  static const String profileEditPage = '/profileEditPage';
 }

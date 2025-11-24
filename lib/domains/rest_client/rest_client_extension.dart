@@ -34,6 +34,18 @@ extension RestClientExtension on RestClient {
     return await dio.post(path, data: formData, onSendProgress: onSendProgress);
   }
 
+  Future<Response> uploadFilePut(
+    String path,
+    String filePath, {
+    String fileKey = 'file',
+    Map<String, dynamic>? data,
+    ProgressCallback? onSendProgress,
+  }) async {
+    final formData = FormData.fromMap({...?data, fileKey: await MultipartFile.fromFile(filePath)});
+
+    return await dio.put(path, data: formData, onSendProgress: onSendProgress);
+  }
+
   Future<Response> downloadFile(String urlPath, String savePath, {ProgressCallback? onReceiveProgress, CancelToken? cancelToken}) async {
     return await dio.download(urlPath, savePath, onReceiveProgress: onReceiveProgress, cancelToken: cancelToken);
   }

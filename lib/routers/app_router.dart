@@ -18,6 +18,7 @@ import 'package:meko_project/screens/update_post_page/update_post_page.dart';
 import 'package:meko_project/screens/web_view_page/web_view_page.dart';
 import 'package:meko_project/screens/transaction_status/transaction_status_page.dart';
 import 'package:meko_project/screens/purchase_package/purchase_package_page.dart';
+import 'package:meko_project/screens/profile_edit/profile_edit_page.dart';
 
 import '../screens/post_detail_page/post_detail_page.dart';
 import 'app_router_paths.dart';
@@ -98,6 +99,8 @@ class AppRouter {
         return PostCreateScreen();
       case AppRouterPaths.createPurcharsePost:
         return PurcharseCreatePost();
+      case AppRouterPaths.profileEditPage:
+        return ProfileEditPage();
       default:
         return SizedBox();
     }
