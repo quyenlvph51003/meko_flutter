@@ -7,6 +7,7 @@ import 'package:meko_project/common/enum_common.dart';
 import 'package:meko_project/models/body/category/category_model.dart';
 import 'package:meko_project/models/body/location/province_model.dart';
 import 'package:meko_project/models/body/location/ward_model.dart';
+import 'package:meko_project/models/body/paymnent/user_payment_model.dart';
 import 'package:meko_project/models/body/post/listing_item_model.dart';
 import 'package:meko_project/repository/category/category_repo.dart';
 import 'package:meko_project/repository/post/post_repo.dart';
@@ -48,6 +49,25 @@ class PostUpdateCubit extends Cubit<PostUpdateState> {
         wardSelected: state.wardSelected,
       ),
     );
+  }
+
+  //set userpayment
+  void setUserPayment(UserPaymentModel userPayment) {
+    emit(state.copyWith(userPayment: userPayment, rebuild: state.rebuild + 1));
+  }
+
+  // gia hạn:
+  Future<void> extensionPost({required int postId, required int paymentId}) async {
+    emit(state.copyWith(isLoadingExtension: true));
+    try {
+      final result = await postRepository.updatePostExtension(postId: postId, paymentId: paymentId);
+      if (result) {
+        emit(state.copyWith(isLoadingExtension: false));
+        Fluttertoast.showToast(msg: 'Gia hạn thành công', backgroundColor: Colors.green);
+      }
+    } catch (e) {
+      emit(state.copyWith(isLoadingExtension: false));
+    }
   }
 
   ///set null subCategories

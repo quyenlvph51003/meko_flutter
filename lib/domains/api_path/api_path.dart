@@ -13,6 +13,7 @@ class ApiPath {
   static const String postUpdate = 'post/update';
   static const String postCreate = 'post/create';
   static const String postUpdateStatus = 'post/update-status';
+  static const String postUpdateExtension = 'post/update-extension-post'; // gia hanj tin dang
 
   //user
   static const String getProfile = 'user/profile';
@@ -39,6 +40,7 @@ class ApiPath {
   static const String createReview = 'review/create';
   static const String deleteReview = 'review/delete';
   static const String updateReview = 'review/update';
+  static const String reviewListByUser = 'review/list-by-tab';
 
   //violation: nội dung vi phạm
   static const String getViolationList = 'violation/get-all';

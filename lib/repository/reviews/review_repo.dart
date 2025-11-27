@@ -1,7 +1,9 @@
 import 'package:meko_project/domains/api_path/api_path.dart';
 import 'package:meko_project/domains/rest_client/rest_client.dart';
 import 'package:meko_project/domains/rest_client/rest_client_extension.dart';
+import 'package:meko_project/models/body/review/my_review_model.dart';
 import 'package:meko_project/models/body/review/review_model.dart';
+import 'package:meko_project/models/paginated_result_common.dart';
 import 'package:meko_project/models/response_common.dart';
 import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 
@@ -83,6 +85,51 @@ class ReviewRepo {
     } catch (error) {
       print(error);
       return false;
+    }
+  }
+
+  Future<ResponseCommon<PaginatedResult<MyReviewModel>>> getReviewListByUser({required int page, int size = 10, int tabIndex = 0}) async {
+    try {
+      final user = await SqliteHelper.getUserSql();
+      if (user == null) {
+        return ResponseCommon<PaginatedResult<MyReviewModel>>(
+          datetime: '',
+          errorCode: 500,
+          message: 'No data',
+          data: null,
+          content: const [],
+          success: false,
+        );
+      }
+      final response = await restClient.get(
+        ApiPath.reviewListByUser,
+        queryParameters: {'page': page, 'size': size, 'tab': tabIndex == 1 ? 'myComments' : 'myPosts', 'userId': user.id},
+      );
+      if (response.data == null) {
+        return ResponseCommon<PaginatedResult<MyReviewModel>>(
+          datetime: '',
+          errorCode: 500,
+          message: 'No data',
+          data: null,
+          content: const [],
+          success: false,
+        );
+      }
+      return ResponseCommon<PaginatedResult<MyReviewModel>>.fromJson(
+        response.data,
+        (obj) => PaginatedResult<MyReviewModel>.fromJson((obj as Map<String, dynamic>), (m) => MyReviewModel.fromJson(m)),
+      );
+    } catch (error) {
+      print('đuonasdasd');
+      print(error);
+      return ResponseCommon<PaginatedResult<MyReviewModel>>(
+        datetime: '',
+        errorCode: 500,
+        message: 'No data',
+        data: null,
+        content: const [],
+        success: false,
+      );
     }
   }
 }

@@ -6,14 +6,18 @@ import 'package:meko_project/common/enum_common.dart';
 import 'package:meko_project/consts/app_colcor.dart';
 import 'package:meko_project/domains/dependency_injection/service_locator.dart';
 import 'package:meko_project/models/body/category/category_model.dart';
+import 'package:meko_project/models/body/paymnent/user_payment_model.dart';
 import 'package:meko_project/repository/category/category_repo.dart';
 import 'package:meko_project/repository/post/post_repo.dart';
 import 'package:meko_project/repository/location/province_repo.dart';
 import 'package:meko_project/repository/location/ward_repo.dart';
 import 'package:meko_project/models/body/location/province_model.dart';
 import 'package:meko_project/models/body/location/ward_model.dart';
+import 'package:meko_project/routers/app_router_paths.dart';
 import 'package:meko_project/screens/update_post_page/post_update_vm/post_update_cubit.dart';
+import 'package:meko_project/utils/converts/forrmat_uttils.dart';
 import 'package:meko_project/widget/app_button/app_button.dart';
+import 'package:meko_project/widget/app_button/app_button_common.dart';
 import 'package:meko_project/widget/app_loading/app_loader.dart';
 
 class PostUpdateScreen extends StatefulWidget {
@@ -648,7 +652,36 @@ class _PostUpdateScreenState extends State<PostUpdateScreen> {
                     ),
                   ),
                   Visibility(visible: state.listing?.status == 'REJECTED', child: const SizedBox(height: 24)),
-
+                  Text(
+                    'Bài viết hết hạn vào ngày: ${FormatUtils.formatDateNoMinitues(state.listing?.expiredAt ?? DateTime.now())}',
+                    style: TextStyle(color: state.listing?.status == 'EXPIRED' ? Colors.red : Colors.grey, fontSize: 16),
+                  ),
+                  if (state.listing?.status == 'EXPIRED') ...[
+                    Visibility(visible: state.userPayment != null, child: const SizedBox(height: 8)),
+                    Visibility(
+                      visible: state.userPayment != null,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text('Gói đăng mới: ${state.userPayment?.packageName}', style: TextStyle(color: AppColor.cMain, fontSize: 16)),
+                          ),
+                          InkWell(
+                            onTap: () async {
+                              final result = await Navigator.of(context).pushNamed(AppRouterPaths.createPurcharsePost);
+                              if (result != null) {
+                                context.read<PostUpdateCubit>().setUserPayment(result as UserPaymentModel);
+                              }
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: Icon(Icons.edit, color: AppColor.cMain),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
                   // Action buttons by status
                   if (state.listing?.status == 'APPROVED')
                     Padding(
@@ -707,23 +740,35 @@ class _PostUpdateScreenState extends State<PostUpdateScreen> {
                         ),
                       ),
                     ),
+                  if (state.listing?.status == 'EXPIRED') ...[
+                    SizedBox(
+                      width: double.infinity,
+                      child: AppButtonCommon(
+                        text: state.userPayment != null ? 'Xác nhận gia hạn' : 'Gia hạn bài viết',
+                        backgroundColor: AppColor.cGray,
+                        onPressed: () async {
+                          if (state.userPayment != null) {
+                            context.read<PostUpdateCubit>().extensionPost(postId: state.listing?.id ?? 0, paymentId: state.userPayment?.id ?? 0);
+                          } else {
+                            final result = await Navigator.of(context).pushNamed(AppRouterPaths.createPurcharsePost);
+                            if (result != null) {
+                              context.read<PostUpdateCubit>().setUserPayment(result as UserPaymentModel);
+                            }
+                          }
+                        },
+                        isLoading: state.isLoadingExtension ?? false,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 10),
                   // 9️⃣ Submit button
                   Visibility(
                     visible: state.listing?.status != 'VIOLATION',
                     child: SizedBox(
                       width: double.infinity,
-                      child: AppButton(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                          decoration: BoxDecoration(color: AppColor.cMain, borderRadius: BorderRadius.circular(15)),
-                          child: Center(
-                            child: (state.isLoadingUpdate ?? false)
-                                ? CircularProgressIndicator(color: Colors.white, backgroundColor: Colors.grey.withValues(alpha: 0.5))
-                                : Text('Cập nhật bài viết', style: TextStyle(color: Colors.white, fontSize: 16)),
-                          ),
-                        ),
-                        onTap: () {
+                      child: AppButtonCommon(
+                        text: 'Cập nhật bài viết',
+                        onPressed: () async {
                           context.read<PostUpdateCubit>().updatePost(
                             title: _titleController.text,
                             description: _descriptionController.text,
@@ -735,6 +780,28 @@ class _PostUpdateScreenState extends State<PostUpdateScreen> {
                             context: context,
                           );
                         },
+                        isLoading: state.isLoadingUpdate ?? false,
+                        // child: Container(
+                        //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                        //   decoration: BoxDecoration(color: AppColor.cMain, borderRadius: BorderRadius.circular(15)),
+                        //   child: Center(
+                        //     child: (state.isLoadingUpdate ?? false)
+                        //         ? CircularProgressIndicator(color: Colors.white, backgroundColor: Colors.grey.withValues(alpha: 0.5))
+                        //         : Text('Cập nhật bài viết', style: TextStyle(color: Colors.white, fontSize: 16)),
+                        //   ),
+                        // ),
+                        // onTap: () {
+                        //   context.read<PostUpdateCubit>().updatePost(
+                        //     title: _titleController.text,
+                        //     description: _descriptionController.text,
+                        //     price: double.parse(_priceController.text),
+                        //     phone: _phoneController.text,
+                        //     address: _addressController.text,
+                        //     images: _images,
+                        //     removedImageUrls: _removedImageUrls,
+                        //     context: context,
+                        //   );
+                        // },
                       ),
                     ),
                   ),

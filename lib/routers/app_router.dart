@@ -6,6 +6,7 @@ import 'package:meko_project/screens/forgot_pass_page/forgot_pass_page.dart';
 import 'package:meko_project/screens/forgot_pass_page/request_otp_page.dart';
 import 'package:meko_project/screens/history_page/history_page.dart';
 import 'package:meko_project/screens/login_page/login_page.dart';
+import 'package:meko_project/screens/my_review_page/my_review_page.dart';
 import 'package:meko_project/screens/packages_page/packages_page.dart';
 import 'package:meko_project/screens/create_post_page/create_post_page.dart';
 import 'package:meko_project/screens/purcharse_create_post/purcharse_create_post.dart';
@@ -101,6 +102,8 @@ class AppRouter {
         return PurcharseCreatePost();
       case AppRouterPaths.profileEditPage:
         return ProfileEditPage();
+      case AppRouterPaths.myReviewPage:
+        return MyReviewPage();
       default:
         return SizedBox();
     }

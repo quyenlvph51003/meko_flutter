@@ -17,6 +17,8 @@ class PostUpdateState extends Equatable {
   final int rebuild;
   String? locationStr;
   final bool? isLoadingUpdate;
+  final bool? isLoadingExtension;
+  final UserPaymentModel? userPayment;
 
   PostUpdateState({
     this.listing,
@@ -33,6 +35,8 @@ class PostUpdateState extends Equatable {
     this.rebuild = 0,
     this.locationStr,
     this.isLoadingUpdate,
+    this.userPayment,
+    this.isLoadingExtension,
   });
 
   PostUpdateState copyWith({
@@ -50,6 +54,8 @@ class PostUpdateState extends Equatable {
     int? rebuild,
     String? locationStr,
     bool? isLoadingUpdate,
+    UserPaymentModel? userPayment,
+    bool? isLoadingExtension,
   }) {
     return PostUpdateState(
       listing: listing ?? this.listing,
@@ -66,6 +72,8 @@ class PostUpdateState extends Equatable {
       rebuild: rebuild ?? this.rebuild,
       locationStr: locationStr ?? this.locationStr,
       isLoadingUpdate: isLoadingUpdate ?? this.isLoadingUpdate,
+      userPayment: userPayment ?? this.userPayment,
+      isLoadingExtension: isLoadingExtension ?? this.isLoadingExtension,
     );
   }
 
@@ -82,6 +90,8 @@ class PostUpdateState extends Equatable {
     WardModel? wardSelectedCached,
     int? rebuild,
     List<Category>? subCategories,
+    UserPaymentModel? userPayment,
+    bool? isLoadingExtension,
   }) {
     return PostUpdateState(
       listing: listing ?? this.listing,
@@ -96,6 +106,8 @@ class PostUpdateState extends Equatable {
       wardSelectedCached: wardSelectedCached,
       rebuild: rebuild ?? this.rebuild,
       subCategories: subCategories ?? [],
+      userPayment: userPayment ?? this.userPayment,
+      isLoadingExtension: isLoadingExtension ?? this.isLoadingExtension,
     );
   }
 
@@ -111,11 +123,12 @@ class PostUpdateState extends Equatable {
     wards,
     provinceSelected,
     wardSelected,
-
     provinceSelectedCached,
     wardSelectedCached,
     rebuild,
     locationStr,
     isLoadingUpdate,
+    userPayment,
+    isLoadingExtension,
   ];
 }

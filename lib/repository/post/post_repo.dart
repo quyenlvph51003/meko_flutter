@@ -100,6 +100,21 @@ class PostRepo {
       return false;
     }
   }
+
+  Future<bool> updatePostExtension({required int postId, required int paymentId}) async {
+    try {
+      final user = await SqliteHelper.getUserSql();
+      if (user == null) return false;
+      final response = await restClient.put(
+        ApiPath.postUpdateExtension,
+        queryParameters: {'postId': postId, 'paymentId': paymentId, 'userId': user.id},
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      print(' Call update post extension failed ${e.toString()}');
+      return false;
+    }
+  }
 }
 
 class PostSearchRequest {
