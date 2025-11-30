@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meko_project/consts/app_images.dart';
 import 'package:meko_project/domains/dependency_injection/service_locator.dart';
 import 'package:meko_project/models/body/review/reply_model.dart';
@@ -13,6 +14,7 @@ import 'package:meko_project/repository/favorite/favorite_repo.dart';
 import 'package:meko_project/repository/report/report_repo.dart';
 import 'package:meko_project/repository/reviews/review_repo.dart';
 import 'package:meko_project/repository/violation/violation_repo.dart';
+import 'package:meko_project/routers/app_router_paths.dart';
 import 'package:meko_project/utils/converts/forrmat_uttils.dart';
 import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import 'package:meko_project/widget/app_button/app_button.dart';
@@ -64,26 +66,17 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   Future<void> callPhone(BuildContext context, String? raw) async {
-    // 1️⃣ Lọc số hợp lệ: giữ 0-9 và dấu +
     String phone = (raw ?? '').replaceAll(RegExp(r'[^0-9+]'), '');
 
-    if (phone.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Không có số điện thoại hợp lệ')));
-      return;
-    }
-
-    // 2️⃣ Chuyển số nội địa sang quốc tế (tùy chọn)
     if (phone.startsWith('0')) {
-      phone = '+84' + phone.substring(1); // Ví dụ: 013213123 → +8413213123
+      phone = '+84${phone.substring(1)}';
     }
 
-    // 3️⃣ Tạo Uri chuẩn
-    final Uri uri = Uri.parse('tel:$phone');
+    final uri = Uri(scheme: 'tel', path: phone);
 
-    // 4️⃣ Thử mở app Gọi
     try {
       if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        await launchUrl(uri, mode: LaunchMode.externalApplication); // ❗ bỏ mode: LaunchMode.externalApplication
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Thiết bị không hỗ trợ gọi điện với số $phone')));
       }
@@ -175,7 +168,12 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                 ),
                                 const Spacer(),
                                 GestureDetector(
-                                  onTap: () {
+                                  onTap: () async {
+                                    final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                                    if (isCheckShowAuth) {
+                                      Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                                      return;
+                                    }
                                     vm.toggleLike();
                                   },
                                   child: Container(
@@ -191,7 +189,12 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                 ),
                                 const SizedBox(width: 5),
                                 GestureDetector(
-                                  onTap: () {
+                                  onTap: () async {
+                                    final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                                    if (isCheckShowAuth) {
+                                      Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                                      return;
+                                    }
                                     showModalBottomSheet(
                                       context: context,
                                       isDismissible: true, // tap ra ngoài để đóng
@@ -320,10 +323,24 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),
                                 ),
                                 const Spacer(),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(4)),
-                                  child: Icon(Icons.favorite_border, size: 16, color: Colors.grey[600]),
+                                InkWell(
+                                  onTap: () async {
+                                    final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                                    if (isCheckShowAuth) {
+                                      Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                                      return;
+                                    }
+                                    vm.toggleLike();
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(4)),
+                                    child: Icon(
+                                      state.isLiked ? Icons.favorite : Icons.favorite_border,
+                                      size: 16,
+                                      color: state.isLiked ? Colors.red : Colors.grey[600],
+                                    ),
+                                  ),
                                 ),
                                 const SizedBox(width: 8),
                                 Text('Lưu', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
@@ -405,14 +422,19 @@ class _PostDetailPageState extends State<PostDetailPage> {
                             ),
                             Row(
                               children: [
-                                Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.grey[300]!),
+                                InkWell(
+                                  onTap: () {
+                                    callPhone(context, item.phoneNumber);
+                                  },
+                                  child: Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.grey[300]!),
+                                    ),
+                                    child: Icon(Icons.phone, size: 25, color: AppColor.cMain),
                                   ),
-                                  child: Icon(Icons.phone, size: 25, color: AppColor.cMain),
                                 ),
                               ],
                             ),
@@ -479,7 +501,12 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                         children: [
                                           _buildReview(
                                             review: review,
-                                            onTapReply: (ReviewModel parent) {
+                                            onTapReply: (ReviewModel parent) async {
+                                              final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                                              if (isCheckShowAuth) {
+                                                Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                                                return;
+                                              }
                                               vm.changeReviewReply(parent);
                                               _showBottomComment(context, vm: vm, controller: controller, focusNode: focusNode, user: user);
                                             },
@@ -495,7 +522,12 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                   Visibility(
                                     visible: state.reviews.length > 3,
                                     child: GestureDetector(
-                                      onTap: () {
+                                      onTap: () async {
+                                        final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                                        if (isCheckShowAuth) {
+                                          Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                                          return;
+                                        }
                                         vm.changeAutoFocus(true);
                                         vm.changeReviewReply(null);
                                         _showBottomComment(
@@ -544,7 +576,12 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           children: [
                             Expanded(
                               child: GestureDetector(
-                                onTap: () {
+                                onTap: () async {
+                                  final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                                  if (isCheckShowAuth) {
+                                    Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                                    return;
+                                  }
                                   vm.changeAutoFocus(true);
                                   vm.changeReviewReply(null);
                                   _showBottomComment(
@@ -603,14 +640,19 @@ class _PostDetailPageState extends State<PostDetailPage> {
                     ),
                     child: Row(
                       children: [
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey[300]!),
-                            borderRadius: BorderRadius.circular(8),
+                        InkWell(
+                          onTap: () {
+                            Fluttertoast.showToast(msg: 'Chức năng này đang được phát triển', backgroundColor: Colors.red);
+                          },
+                          child: Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(Icons.sms, color: Colors.grey[600], size: 20),
                           ),
-                          child: Icon(Icons.sms, color: Colors.grey[600], size: 20),
                         ),
                         const SizedBox(width: 12),
                         Expanded(

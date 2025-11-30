@@ -1,6 +1,6 @@
 class AppImages {
   ///IMG
-  static const String img_splash = 'assets/images/img_splash.png';
+  static const String img_splash = 'assets/icons/ic_meko_logo.jpg';
   static const String img_template = 'assets/images/img_template.png';
   static const String img_template_1 = 'assets/images/img_template_1.png';
   static const String img_magic_brush = 'assets/images/img_magic_brush.png';

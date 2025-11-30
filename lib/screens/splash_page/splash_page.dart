@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meko_project/consts/app_colcor.dart';
 import 'package:meko_project/consts/app_images.dart';
 import 'package:meko_project/screens/splash_page/splash_vm/splash_cubit.dart';
 import 'package:meko_project/screens/splash_page/splash_vm/splash_state.dart';
@@ -10,10 +11,7 @@ class SplashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => SplashCubit(),
-      child: const SplashPageView(),
-    );
+    return BlocProvider(create: (context) => SplashCubit(), child: const SplashPageView());
   }
 }
 
@@ -38,7 +36,7 @@ class _SplashPageViewState extends State<SplashPageView> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F6FF),
+      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -48,11 +46,7 @@ class _SplashPageViewState extends State<SplashPageView> {
                 return AnimatedOpacity(
                   duration: const Duration(milliseconds: 800),
                   opacity: state.showContent ? 1 : 0,
-                  child: Image.asset(
-                    AppImages.img_splash,
-                    height: 125,
-                    fit: BoxFit.fitHeight,
-                  ),
+                  child: Image.asset(AppImages.img_splash, height: 125, fit: BoxFit.fitHeight),
                 );
               },
             ),
@@ -66,10 +60,7 @@ class _SplashPageViewState extends State<SplashPageView> {
                   Container(
                     width: screenWidth,
                     height: 2.5,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE6EBF8),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
+                    decoration: BoxDecoration(color: const Color(0xFFE6EBF8), borderRadius: BorderRadius.circular(5)),
                   ),
                   BlocBuilder<SplashCubit, SplashState>(
                     builder: (context, state) {
@@ -77,10 +68,7 @@ class _SplashPageViewState extends State<SplashPageView> {
                         duration: const Duration(milliseconds: 1800),
                         width: state.showContent ? screenWidth : 0,
                         height: 2.5,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFF2D2E),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
+                        decoration: BoxDecoration(color: AppColor.cMain, borderRadius: BorderRadius.circular(5)),
                       );
                     },
                   ),

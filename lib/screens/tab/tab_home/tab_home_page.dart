@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meko_project/consts/app_colcor.dart';
 import 'package:meko_project/consts/app_consts.dart';
 import 'package:meko_project/consts/app_dimens.dart';
@@ -121,6 +122,7 @@ class _TabHomeViewState extends State<_TabHomeView> {
                                           Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
                                           return;
                                         }
+                                        Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.favoritePage, (route) => true);
                                       },
                                       child: Padding(
                                         padding: EdgeInsets.all(8),
@@ -135,7 +137,7 @@ class _TabHomeViewState extends State<_TabHomeView> {
                                           Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
                                           return;
                                         }
-                                        print('sdfsdfsd');
+                                        Fluttertoast.showToast(msg: 'Chức năng này đang được phát triển', backgroundColor: Colors.red);
                                       },
                                       child: const Padding(
                                         padding: EdgeInsets.all(8),
@@ -256,7 +258,12 @@ class _TabHomeViewState extends State<_TabHomeView> {
 
   Widget buildSearchBar() {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
+        final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+        if (isCheckShowAuth) {
+          Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+          return;
+        }
         vm.onSearchProductTap(context);
       },
       child: BlocBuilder<TabHomeCubit, TabHomeState>(
@@ -353,7 +360,7 @@ class _TabHomeViewState extends State<_TabHomeView> {
           );
         }
         return SizedBox(
-          height: 250,
+          height: 210,
           child: GridView.builder(
             shrinkWrap: true,
             padding: EdgeInsets.zero,
@@ -390,8 +397,8 @@ class _TabHomeViewState extends State<_TabHomeView> {
         child: Column(
           children: [
             SizedBox(
-              width: 70,
-              height: 80,
+              width: 40,
+              height: 50,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Stack(

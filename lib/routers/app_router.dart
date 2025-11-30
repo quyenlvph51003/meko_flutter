@@ -15,6 +15,7 @@ import 'package:meko_project/screens/sign_up_page/sign_up_page.dart';
 import 'package:meko_project/screens/splash_page/splash_page.dart';
 import 'package:meko_project/screens/tab/homes_page/home_page.dart';
 import 'package:meko_project/screens/top_up_wallet/top_up_wallet.dart';
+import 'package:meko_project/screens/transaction_page/transaction_page.dart';
 import 'package:meko_project/screens/update_post_page/update_post_page.dart';
 import 'package:meko_project/screens/web_view_page/web_view_page.dart';
 import 'package:meko_project/screens/transaction_status/transaction_status_page.dart';
@@ -104,6 +105,8 @@ class AppRouter {
         return ProfileEditPage();
       case AppRouterPaths.myReviewPage:
         return MyReviewPage();
+      case AppRouterPaths.walletHistory:
+        return TransactionHistoryScreen();
       default:
         return SizedBox();
     }

@@ -22,4 +22,5 @@ class AppRouterPaths {
   static const String createPurcharsePost = '/createPurcharsePost';
   static const String profileEditPage = '/profileEditPage';
   static const String myReviewPage = 'myReviewPage';
+  static const String walletHistory = 'walletHistoryPage';
 }

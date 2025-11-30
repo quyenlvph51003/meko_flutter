@@ -55,4 +55,7 @@ class ApiPath {
 
   //package
   static const String getPackages = 'payment-package';
+
+  //wallet lịch sử giao dịch
+  static const String getWalletHistory = 'walletlog/get-all';
 }

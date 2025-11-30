@@ -293,10 +293,10 @@ class TabProfilePageState extends State<TabProfilePage> with TickerProviderState
                                   Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
                                   return;
                                 }
-                                // Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.myReviewPage, (route) => true);
+                                Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.walletHistory, (route) => true);
                               },
                               icon: Icons.payment,
-                              title: 'Lịch sử giao dịch',
+                              title: 'Lịch sử nạp tiền',
                             ),
                             dividerInset(),
                             itemTile(
@@ -323,6 +323,21 @@ class TabProfilePageState extends State<TabProfilePage> with TickerProviderState
                               },
                               icon: Icons.password,
                               title: 'Đổi mã pin',
+                            ),
+                            dividerInset(),
+                            itemTile(
+                              onTap: () async {
+                                final navResult = await Navigator.of(context).pushNamed(
+                                  AppRouterPaths.webviewPage,
+                                  arguments: {
+                                    'url': 'https://mekobe-production.up.railway.app/chinh-sach-quyen-rieng-tu',
+                                    'title': 'Chính sách & quyền riêng tư',
+                                    'successUrlContains': 'vnp_ResponseCode=00',
+                                  },
+                                );
+                              },
+                              icon: Icons.private_connectivity,
+                              title: 'Chính sách & quyền riêng tư',
                             ),
                           ],
                         ),

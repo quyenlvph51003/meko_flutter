@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meko_project/common/enum_common.dart';
 import 'package:meko_project/consts/app_colcor.dart';
 import 'package:meko_project/consts/app_dimens.dart';
@@ -63,35 +64,38 @@ class PostManagerView extends StatelessWidget {
           builder: (context, state) {
             return Row(
               children: [
-                Stack(
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        return;
-                      },
-                      icon: const Icon(Icons.notifications_none_rounded, color: Colors.black87),
-                    ),
-                    if (state.notificationCount > 0)
-                      Positioned(
-                        right: 10,
-                        top: 10,
-                        child: Container(
-                          height: 18,
-                          padding: const EdgeInsets.symmetric(horizontal: 5),
-                          decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(9)),
-                          child: Center(
-                            child: Text(
-                              state.notificationCount.toString(),
-                              style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
+                InkWell(
+                  onTap: () {
+                    Fluttertoast.showToast(msg: 'Chức năng này đang được phát triển', backgroundColor: Colors.red);
+                  },
+                  child: Stack(
+                    children: [
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.notifications_none_rounded, color: Colors.black87),
+                      ),
+                      if (state.notificationCount > 0)
+                        Positioned(
+                          right: 10,
+                          top: 10,
+                          child: Container(
+                            height: 18,
+                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                            decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(9)),
+                            child: Center(
+                              child: Text(
+                                state.notificationCount.toString(),
+                                style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
                 IconButton(
                   onPressed: () {
-                    return;
+                    Fluttertoast.showToast(msg: 'Chức năng này đang được phát triển', backgroundColor: Colors.red);
                   },
                   icon: const Icon(Icons.chat_bubble_outline_rounded, color: Colors.black87),
                 ),
@@ -144,7 +148,7 @@ class HeaderStrip extends StatelessWidget {
                     Colors.black87,
                     Colors.grey.shade200,
                     onTap: () {
-                      return;
+                      Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.packagePages, (route) => true);
                     },
                   ),
                   const SizedBox(width: 8),
@@ -153,7 +157,15 @@ class HeaderStrip extends StatelessWidget {
                       return p.voucherCount != c.voucherCount;
                     },
                     builder: (context, state) {
-                      return buildChipWithBadge(context, Icons.card_giftcard, 'Ưu đãi', state.voucherCount);
+                      return buildChipWithBadge(
+                        context,
+                        Icons.card_giftcard,
+                        'Ưu đãi',
+                        state.voucherCount,
+                        onTap: () {
+                          Fluttertoast.showToast(msg: 'Chức năng này đang được phát triển', backgroundColor: Colors.red);
+                        },
+                      );
                     },
                   ),
                   const SizedBox(width: 8),
@@ -164,7 +176,7 @@ class HeaderStrip extends StatelessWidget {
                     Colors.black87,
                     Colors.grey.shade200,
                     onTap: () {
-                      return;
+                      Fluttertoast.showToast(msg: 'Chức năng này đang được phát triển', backgroundColor: Colors.red);
                     },
                   ),
                 ],
@@ -213,46 +225,46 @@ class HeaderStrip extends StatelessWidget {
                           ],
                         ),
                       ),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: AppColor.cMain, width: 1),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.monetization_on, size: 16, color: AppColor.cMain),
-                            SizedBox(width: 4),
-                            Text('DT'),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      BlocBuilder<PostManagerCubit, PostManagerState>(
-                        builder: (context, state) {
-                          return Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.grey.shade300),
-                            ),
-                            child: Row(
-                              children: [
-                                Text(state.dtPoint.toString()),
-                                const SizedBox(width: 6),
-                                InkWell(
-                                  onTap: () {
-                                    context.read<PostManagerCubit>().increaseDT();
-                                  },
-                                  child: const Icon(Icons.add_circle, color: Colors.green, size: 18),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                      // Container(
+                      //   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.white,
+                      //     borderRadius: BorderRadius.circular(16),
+                      //     border: Border.all(color: AppColor.cMain, width: 1),
+                      //   ),
+                      //   child: Row(
+                      //     children: [
+                      //       Icon(Icons.monetization_on, size: 16, color: AppColor.cMain),
+                      //       SizedBox(width: 4),
+                      //       Text('DT'),
+                      //     ],
+                      //   ),
+                      // ),
+                      // const SizedBox(width: 6),
+                      // BlocBuilder<PostManagerCubit, PostManagerState>(
+                      //   builder: (context, state) {
+                      //     return Container(
+                      //       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      //       decoration: BoxDecoration(
+                      //         color: Colors.white,
+                      //         borderRadius: BorderRadius.circular(16),
+                      //         border: Border.all(color: Colors.grey.shade300),
+                      //       ),
+                      //       child: Row(
+                      //         children: [
+                      //           Text(state.dtPoint.toString()),
+                      //           const SizedBox(width: 6),
+                      //           InkWell(
+                      //             onTap: () {
+                      //               context.read<PostManagerCubit>().increaseDT();
+                      //             },
+                      //             child: const Icon(Icons.add_circle, color: Colors.green, size: 18),
+                      //           ),
+                      //         ],
+                      //       ),
+                      //     );
+                      //   },
+                      // ),
                     ],
                   ),
                 );
@@ -281,20 +293,11 @@ class HeaderStrip extends StatelessWidget {
     );
   }
 
-  Widget buildChipWithBadge(BuildContext context, IconData icon, String label, int count) {
+  Widget buildChipWithBadge(BuildContext context, IconData icon, String label, int count, {VoidCallback? onTap}) {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        buildChip(
-          context,
-          icon,
-          label,
-          Colors.black87,
-          Colors.grey.shade200,
-          onTap: () {
-            return;
-          },
-        ),
+        buildChip(context, icon, label, Colors.black87, Colors.grey.shade200, onTap: onTap),
         if (count > 0)
           Positioned(
             right: -6,
