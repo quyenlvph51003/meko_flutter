@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meko_project/models/body/post/listing_item_model.dart';
 import 'package:meko_project/screens/categories_page/categories_page.dart';
+import 'package:meko_project/screens/chat_bot_handle/chat_page/chat_page.dart';
 import 'package:meko_project/screens/favorite_page/favorite_page.dart' show FavoritePage;
 import 'package:meko_project/screens/forgot_pass_page/forgot_pass_page.dart';
 import 'package:meko_project/screens/forgot_pass_page/request_otp_page.dart';
@@ -107,6 +108,8 @@ class AppRouter {
         return MyReviewPage();
       case AppRouterPaths.walletHistory:
         return TransactionHistoryScreen();
+      case AppRouterPaths.chatAiPage:
+        return MekoChatAiPage();
       default:
         return SizedBox();
     }

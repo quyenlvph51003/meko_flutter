@@ -113,7 +113,19 @@ class _TabHomeViewState extends State<_TabHomeView> {
                                 top: true,
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.menu, color: Colors.white, size: 28),
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.chatAiPage, (route) => true);
+                                      },
+                                      child: Container(
+                                        // padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(width: 1, color: Colors.white),
+                                        ),
+                                        child: Image.asset(AppImages.icon_ai, width: 40, height: 40),
+                                      ),
+                                    ),
                                     const Spacer(),
                                     GestureDetector(
                                       onTap: () async {

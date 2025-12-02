@@ -17,4 +17,5 @@ class AppImages {
   static const String icon_no_data_listing = 'assets/icons/icon_no_data_listing.png';
   static const String icon_no_data_listing2 = 'assets/icons/icon_no_data_listing_2.png';
   static const String icon_category = 'assets/icons/icon_category.png';
+  static const String icon_ai = 'assets/icons/icon_chatbox.png';
 }
