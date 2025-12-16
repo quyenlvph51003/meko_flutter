@@ -11,6 +11,7 @@ import 'package:meko_project/screens/tab/tab_%20manage_posting/tab_posting_page.
 import 'package:meko_project/screens/tab/tab_chat/tab_chat_page.dart';
 import 'package:meko_project/screens/tab/tab_home/tab_home_page.dart';
 import 'package:meko_project/screens/tab/tab_profile/tab_profile_page.dart';
+import 'package:meko_project/services/socket_service.dart';
 import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import 'package:meko_project/utils/login_global/login_global.dart';
 import 'home_vm/home_cubit.dart';
@@ -29,6 +30,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     vm = context.read<HomeCubit>();
+    SocketService().connect();
   }
 
   @override

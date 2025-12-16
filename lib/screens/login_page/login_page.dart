@@ -7,6 +7,7 @@ import 'package:meko_project/domains/dependency_injection/service_locator.dart';
 import 'package:meko_project/repository/auth/auth_repo.dart';
 import 'package:meko_project/routers/app_router.dart';
 import 'package:meko_project/routers/app_router_paths.dart';
+import 'package:meko_project/services/socket_service.dart';
 import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import 'package:meko_project/widget/app_button/app_button.dart';
 import 'package:meko_project/widget/app_button/app_button_common.dart';

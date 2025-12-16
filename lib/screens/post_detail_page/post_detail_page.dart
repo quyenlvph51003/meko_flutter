@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meko_project/consts/app_images.dart';
+import 'package:meko_project/consts/app_paths.dart';
 import 'package:meko_project/domains/dependency_injection/service_locator.dart';
 import 'package:meko_project/models/body/review/reply_model.dart';
 import 'package:meko_project/models/body/review/review_model.dart';
@@ -15,6 +16,7 @@ import 'package:meko_project/repository/report/report_repo.dart';
 import 'package:meko_project/repository/reviews/review_repo.dart';
 import 'package:meko_project/repository/violation/violation_repo.dart';
 import 'package:meko_project/routers/app_router_paths.dart';
+import 'package:meko_project/screens/chat_page/chat_page_screen.dart';
 import 'package:meko_project/utils/converts/forrmat_uttils.dart';
 import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import 'package:meko_project/widget/app_button/app_button.dart';
@@ -642,7 +644,18 @@ class _PostDetailPageState extends State<PostDetailPage> {
                       children: [
                         InkWell(
                           onTap: () {
-                            Fluttertoast.showToast(msg: 'Chức năng này đang được phát triển', backgroundColor: Colors.red);
+                            // Fluttertoast.showToast(msg: 'Chức năng này đang được phát triển', backgroundColor: Colors.red);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ChatPageScreen(
+                                  name: item.userNamePoster,
+                                  // conversationId: null,
+                                  avt: item.avatarPoster ?? '',
+                                  partner_id: item.userPostId,
+                                ),
+                              ),
+                            );
                           },
                           child: Container(
                             width: 48,
