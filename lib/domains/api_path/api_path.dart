@@ -58,4 +58,7 @@ class ApiPath {
 
   //wallet lịch sử giao dịch
   static const String getWalletHistory = 'walletlog/get-all';
+
+  //rating
+  static const String ratingRate = 'rating/rate';
 }

@@ -20,6 +20,7 @@ class PostDetailState extends Equatable {
   final bool? isEdit;
   final List<ViolationModel> violations;
   ViolationModel? violationSelected;
+  final int? myRating;
   PostDetailState({
     required this.item,
     required this.currentImageIndex,
@@ -33,6 +34,7 @@ class PostDetailState extends Equatable {
     this.isEdit,
     required this.violations,
     this.violationSelected,
+    this.myRating,
   });
 
   PostDetailState copyWith({
@@ -48,6 +50,7 @@ class PostDetailState extends Equatable {
     bool? isEdit,
     List<ViolationModel>? violations,
     ViolationModel? violationSelected,
+    int? myRating,
   }) {
     return PostDetailState(
       item: item ?? this.item,
@@ -62,6 +65,7 @@ class PostDetailState extends Equatable {
       isEdit: isEdit ?? this.isEdit,
       violations: violations ?? this.violations,
       violationSelected: violationSelected ?? this.violationSelected,
+      myRating: myRating ?? this.myRating,
     );
   }
 
@@ -78,6 +82,7 @@ class PostDetailState extends Equatable {
     bool? isEdit,
     List<ViolationModel>? violations,
     ViolationModel? violationSelected,
+    int? myRating,
   }) {
     return PostDetailState(
       item: item ?? this.item,
@@ -92,6 +97,7 @@ class PostDetailState extends Equatable {
       isEdit: isEdit ?? this.isEdit,
       violations: violations ?? this.violations,
       violationSelected: violationSelected,
+      myRating: myRating ?? this.myRating,
     );
   }
 
@@ -110,5 +116,6 @@ class PostDetailState extends Equatable {
     isEdit,
     violations,
     violationSelected,
+    myRating,
   ];
 }

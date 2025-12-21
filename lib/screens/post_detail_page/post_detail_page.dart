@@ -14,6 +14,7 @@ import 'package:meko_project/models/body/violation/violation_model.dart';
 import 'package:meko_project/repository/favorite/favorite_repo.dart';
 import 'package:meko_project/repository/report/report_repo.dart';
 import 'package:meko_project/repository/reviews/review_repo.dart';
+import 'package:meko_project/repository/rating/rating_repo.dart';
 import 'package:meko_project/repository/violation/violation_repo.dart';
 import 'package:meko_project/routers/app_router_paths.dart';
 import 'package:meko_project/screens/chat_page/chat_page_screen.dart';
@@ -48,6 +49,73 @@ class _PostDetailPageState extends State<PostDetailPage> {
     getUser();
     controller = TextEditingController();
     focusNode = FocusNode();
+  }
+
+  void _showRatingBottomSheet(BuildContext context, PostDetailCubit vm, PostDetailState state) {
+    showModalBottomSheet(
+      context: context,
+      isDismissible: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (context) {
+        int current = state.myRating ?? state.item.rating ?? 0;
+        return StatefulBuilder(
+          builder: (context, setStateSB) {
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Text('Chọn số sao đánh giá', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                      const Spacer(),
+                      IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: List.generate(5, (index) {
+                      final filled = current > index;
+                      return GestureDetector(
+                        onTap: () {
+                          setStateSB(() {
+                            current = index + 1;
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: Icon(filled ? Icons.star : Icons.star_border, size: 32, color: Colors.amber),
+                        ),
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: AppButton(
+                      onTap: () async {
+                        await vm.submitRating(current);
+                        if (context.mounted) Navigator.pop(context);
+                      },
+                      child: Container(
+                        height: 40,
+                        decoration: BoxDecoration(color: AppColor.cMain, borderRadius: BorderRadius.circular(8)),
+                        child: Center(
+                          child: Text('Gửi đánh giá', style: TextStyle(color: Colors.white)),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -97,6 +165,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
         reviewRepo: getIt<ReviewRepo>(),
         violationRepo: getIt<ViolationRepo>(),
         reportRepo: getIt<ReportRepo>(),
+        ratingRepo: getIt<RatingRepo>(),
       )..init((widget.item.id == 0) ? (widget.item.postId ?? 0) : widget.item.id),
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -347,6 +416,33 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                 const SizedBox(width: 8),
                                 Text('Lưu', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                               ],
+                            ),
+                            const SizedBox(height: 10),
+                            GestureDetector(
+                              onTap: () async {
+                                final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                                if (isCheckShowAuth) {
+                                  Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                                  return;
+                                }
+                                _showRatingBottomSheet(context, vm, state);
+                              },
+                              child: Row(
+                                children: [
+                                  const Text('Đánh giá của bạn:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                                  const SizedBox(width: 8),
+                                  ...List.generate(5, (index) {
+                                    final current = state.myRating ?? state.item.rating ?? 0;
+                                    final filled = current > index;
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                                      child: Icon(filled ? Icons.star : Icons.star_border, size: 22, color: Colors.amber),
+                                    );
+                                  }),
+                                  const SizedBox(width: 8),
+                                  Text('${state.myRating ?? state.item.rating ?? 0}/5', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                                ],
+                              ),
                             ),
                           ],
                         ),

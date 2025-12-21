@@ -15,6 +15,7 @@ import 'package:meko_project/repository/payment/payment_repo.dart';
 import 'package:meko_project/repository/post/post_repo.dart';
 import 'package:meko_project/repository/report/report_repo.dart';
 import 'package:meko_project/repository/reviews/review_repo.dart';
+import 'package:meko_project/repository/rating/rating_repo.dart';
 import 'package:meko_project/repository/user/user_repo.dart';
 import 'package:meko_project/repository/violation/violation_repo.dart';
 import 'package:sqflite/sqflite.dart';
@@ -47,6 +48,9 @@ class ServiceLocator {
     });
     getIt.registerLazySingleton<ReviewRepo>(() {
       return ReviewRepo(restClient: getIt<RestClient>());
+    });
+    getIt.registerLazySingleton<RatingRepo>(() {
+      return RatingRepo(restClient: getIt<RestClient>());
     });
     getIt.registerLazySingleton<ReportRepo>(() {
       return ReportRepo(restClient: getIt<RestClient>());

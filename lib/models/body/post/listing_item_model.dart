@@ -25,6 +25,7 @@ class ListingItem {
   final String? provinceName;
   final String? reasonReject;
   final String? reasonViolation;
+  final int? rating;
   const ListingItem({
     required this.id,
     required this.userPostId,
@@ -52,6 +53,7 @@ class ListingItem {
     this.provinceName,
     this.reasonReject,
     this.reasonViolation,
+    this.rating,
   });
 
   factory ListingItem.fromJson(Map<String, dynamic> json) {
@@ -85,6 +87,7 @@ class ListingItem {
       provinceName: json['provinceName']?.toString(),
       reasonReject: json['reasonReject']?.toString(),
       reasonViolation: json['reasonViolation']?.toString(),
+      rating: json['rating'] ?? 0,
     );
   }
 
@@ -117,6 +120,7 @@ class ListingItem {
       'provinceName': provinceName,
       'reasonReject': reasonReject,
       'reasonViolation': reasonViolation,
+      'rating': rating,
     };
   }
 }

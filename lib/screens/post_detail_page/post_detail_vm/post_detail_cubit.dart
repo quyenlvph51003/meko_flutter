@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meko_project/consts/app_colcor.dart';
 import 'package:meko_project/models/body/post/listing_item_model.dart';
 import 'package:meko_project/models/body/review/reply_model.dart';
 import 'package:meko_project/models/body/review/review_model.dart';
@@ -9,6 +10,7 @@ import 'package:meko_project/models/body/violation/violation_model.dart';
 import 'package:meko_project/repository/favorite/favorite_repo.dart';
 import 'package:meko_project/repository/report/report_repo.dart';
 import 'package:meko_project/repository/reviews/review_repo.dart';
+import 'package:meko_project/repository/rating/rating_repo.dart';
 import 'package:meko_project/repository/violation/violation_repo.dart';
 import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import 'post_detail_state.dart';
@@ -20,6 +22,7 @@ class PostDetailCubit extends Cubit<PostDetailState> {
   final ReviewRepo reviewRepo;
   final ViolationRepo violationRepo;
   final ReportRepo reportRepo;
+  final RatingRepo ratingRepo;
   PostDetailCubit({
     required ListingItem item,
     required this.loader,
@@ -27,6 +30,7 @@ class PostDetailCubit extends Cubit<PostDetailState> {
     required this.reviewRepo,
     required this.violationRepo,
     required this.reportRepo,
+    required this.ratingRepo,
   }) : super(
          PostDetailState(
            item: item,
@@ -38,12 +42,32 @@ class PostDetailCubit extends Cubit<PostDetailState> {
            autoFocus: true,
            isEdit: false,
            violations: [],
+           myRating: null,
          ),
        );
   Future<void> init(int id) async {
     final itemPost = await loader(id);
     await fetchListReview(postId: id);
-    emit(state.copyWith(item: itemPost, currentImageIndex: 0, isLiked: itemPost.isFavorite));
+    emit(state.copyWith(item: itemPost, currentImageIndex: 0, isLiked: itemPost.isFavorite, myRating: itemPost.rating));
+  }
+
+  // rating
+  Future<void> submitRating(int rating) async {
+    final postId = state.item.id == 0 ? (state.item.postId ?? 0) : state.item.id;
+    final ok = await ratingRepo.ratePost(postId: postId, rating: rating);
+    if (ok) {
+      emit(state.copyWith(myRating: rating));
+      Fluttertoast.showToast(
+        msg: 'Đã gửi đánh giá',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: AppColor.cMain,
+        textColor: Colors.white,
+        fontSize: 16,
+      );
+    } else {
+      Fluttertoast.showToast(msg: 'Gửi đánh giá thất bại');
+    }
   }
 
   //createReview
