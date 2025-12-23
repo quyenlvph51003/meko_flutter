@@ -77,9 +77,13 @@ class _ChatPageScreenState extends State<ChatPage> {
 
       /// ACK join
       if (evt == 'join_conversation_ack') {
+        final int newId = data['conversation_id'];
         setState(() {
-          widget.conversationId = data['conversation_id'];
+          widget.conversationId = newId;
         });
+        if (!mounted) return;
+        // Sau khi có conversation_id, tải lịch sử tin nhắn (trường hợp từ detail post sang chưa có id)
+        context.read<ChatPageCubit>().fetchMessages(newId);
         return;
       }
 

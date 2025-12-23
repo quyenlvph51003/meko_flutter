@@ -62,7 +62,7 @@ class ListingItem {
 
     return ListingItem(
       id: json['id'] ?? 0,
-      userPostId: json['userPostId'] ?? 0,
+      userPostId: json['userId'] ?? 0,
       userNamePoster: json['userNamePoster']?.toString() ?? '',
       avatarPoster: json['avatarPoster']?.toString(),
       title: json['title']?.toString() ?? '',
@@ -95,7 +95,7 @@ class ListingItem {
     String? fmt(DateTime? d) => d?.toUtc().toIso8601String();
     return {
       'id': id,
-      'userPostId': userPostId,
+      'userId': userPostId,
       'userNamePoster': userNamePoster,
       'avatarPoster': avatarPoster,
       'title': title,

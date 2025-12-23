@@ -749,6 +749,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                   // conversationId: null,
                                   avt: item.avatarPoster ?? '',
                                   partner_id: item.userPostId,
+                                  // partner_id: item.u,
                                 ),
                               ),
                             );
