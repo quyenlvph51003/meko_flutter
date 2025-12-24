@@ -72,7 +72,7 @@ class TabHomeCubit extends Cubit<TabHomeState> {
       emit(state.copyWith(categoriesLoading: false, categoriesError: result.message, categories: []));
     }
   }
- 
+
   Future<void> fetchPosts({int page = 0, bool? isLoadMore = false}) async {
     final user = await SqliteHelper.getUserSql();
     print(user?.id);
@@ -89,7 +89,7 @@ class TabHomeCubit extends Cubit<TabHomeState> {
 
     if (result.success && result.data != null) {
       if (isLoadMore ?? false) {
-        print(result.data!.content.isEmpty);
+        // print(result.data!.content.isEmpty);
         emit(
           state.copyWith(
             posts: [...state.posts, ...result.data!.content],

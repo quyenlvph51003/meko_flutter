@@ -58,7 +58,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
       builder: (context) {
-        int current = state.myRating ?? state.item.rating ?? 0;
+        double current = state.myRating ?? state.item.rating ?? 0;
         return StatefulBuilder(
           builder: (context, setStateSB) {
             return Padding(

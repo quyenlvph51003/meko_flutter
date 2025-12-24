@@ -52,7 +52,7 @@ class PostDetailCubit extends Cubit<PostDetailState> {
   }
 
   // rating
-  Future<void> submitRating(int rating) async {
+  Future<void> submitRating(double rating) async {
     final postId = state.item.id == 0 ? (state.item.postId ?? 0) : state.item.id;
     final ok = await ratingRepo.ratePost(postId: postId, rating: rating);
     if (ok) {

@@ -6,7 +6,7 @@ class RatingRepo {
   final RestClient restClient;
   RatingRepo({required this.restClient});
 
-  Future<bool> ratePost({required int postId, required int rating}) async {
+  Future<bool> ratePost({required int postId, required double rating}) async {
     try {
       final response = await restClient.post(ApiPath.ratingRate, data: {'postId': postId, 'rating': rating});
       return response.statusCode == 200;

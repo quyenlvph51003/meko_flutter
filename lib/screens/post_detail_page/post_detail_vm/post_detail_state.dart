@@ -20,7 +20,7 @@ class PostDetailState extends Equatable {
   final bool? isEdit;
   final List<ViolationModel> violations;
   ViolationModel? violationSelected;
-  final int? myRating;
+  final double? myRating;
   PostDetailState({
     required this.item,
     required this.currentImageIndex,
@@ -50,7 +50,7 @@ class PostDetailState extends Equatable {
     bool? isEdit,
     List<ViolationModel>? violations,
     ViolationModel? violationSelected,
-    int? myRating,
+    double? myRating,
   }) {
     return PostDetailState(
       item: item ?? this.item,
@@ -82,7 +82,7 @@ class PostDetailState extends Equatable {
     bool? isEdit,
     List<ViolationModel>? violations,
     ViolationModel? violationSelected,
-    int? myRating,
+    double? myRating,
   }) {
     return PostDetailState(
       item: item ?? this.item,

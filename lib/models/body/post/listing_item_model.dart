@@ -25,7 +25,7 @@ class ListingItem {
   final String? provinceName;
   final String? reasonReject;
   final String? reasonViolation;
-  final int? rating;
+  final double? rating;
   const ListingItem({
     required this.id,
     required this.userPostId,
@@ -87,7 +87,7 @@ class ListingItem {
       provinceName: json['provinceName']?.toString(),
       reasonReject: json['reasonReject']?.toString(),
       reasonViolation: json['reasonViolation']?.toString(),
-      rating: json['rating'] ?? 0,
+      rating: json['rating'] == null ? null : (json['rating'] as num).toDouble(),
     );
   }
 
