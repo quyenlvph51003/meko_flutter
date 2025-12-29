@@ -18,6 +18,7 @@ import 'package:meko_project/repository/rating/rating_repo.dart';
 import 'package:meko_project/repository/violation/violation_repo.dart';
 import 'package:meko_project/routers/app_router_paths.dart';
 import 'package:meko_project/screens/chat_page/chat_page_screen.dart';
+import 'package:meko_project/screens/order_page/order_page.dart';
 import 'package:meko_project/utils/converts/forrmat_uttils.dart';
 import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import 'package:meko_project/widget/app_button/app_button.dart';
@@ -153,6 +154,30 @@ class _PostDetailPageState extends State<PostDetailPage> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi khi mở gọi: $e')));
     }
+  }
+
+  void onOrder(BuildContext context, ListingItem item) async {
+    // Check đăng nhập
+    final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+    if (isCheckShowAuth) {
+      Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+      return;
+    }
+
+    // Check không mua sản phẩm của chính mình
+    if (user?.id == item.userPostId) {
+      Fluttertoast.showToast(
+        msg: 'Bạn không thể mua sản phẩm của chính mình',
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => OrderPage(item: item)),
+    );
   }
 
   @override
@@ -765,21 +790,37 @@ class _PostDetailPageState extends State<PostDetailPage> {
                           ),
                         ),
                         const SizedBox(width: 12),
+
+                        InkWell(
+                          onTap: () {
+                            callPhone(context, state.item.phoneNumber);
+                          },
+                          child: Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(Icons.call, color: Colors.grey[600], size: 20),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: AppButton(
                             onTap: () {
-                              callPhone(context, state.item.phoneNumber);
+                              onOrder(context, state.item);
                             },
                             child: Container(
                               height: 48,
-                              decoration: BoxDecoration(color: AppColor.color5, borderRadius: BorderRadius.circular(8)),
+                              decoration: BoxDecoration(color: AppColor.cMain, borderRadius: BorderRadius.circular(8)),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: const [
-                                  Icon(Icons.call, color: Colors.white, size: 18),
+                                  Icon(Icons.shopping_cart_outlined, color: Colors.white, size: 18),
                                   SizedBox(width: 8),
                                   Text(
-                                    'Gọi điện cho người bán',
+                                    'Đặt hàng',
                                     style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14),
                                   ),
                                 ],
@@ -787,6 +828,28 @@ class _PostDetailPageState extends State<PostDetailPage> {
                             ),
                           ),
                         ),
+                        // Expanded(
+                        //   child: AppButton(
+                        //     onTap: () {
+                        //       callPhone(context, state.item.phoneNumber);
+                        //     },
+                        //     child: Container(
+                        //       height: 48,
+                        //       decoration: BoxDecoration(color: AppColor.color5, borderRadius: BorderRadius.circular(8)),
+                        //       child: Row(
+                        //         mainAxisAlignment: MainAxisAlignment.center,
+                        //         children: const [
+                        //           Icon(Icons.call, color: Colors.white, size: 18),
+                        //           SizedBox(width: 8),
+                        //           Text(
+                        //             'Gọi điện cho người bán',
+                        //             style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14),
+                        //           ),
+                        //         ],
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
@@ -799,6 +862,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
     );
   }
 }
+
+
 
 Widget _buildReply({ReplyModel? reply, UserModel? user, required BuildContext context, required PostDetailCubit vm, bool? isDetail}) {
   return Row(
