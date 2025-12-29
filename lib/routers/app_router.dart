@@ -12,6 +12,7 @@ import 'package:meko_project/screens/packages_page/packages_page.dart';
 import 'package:meko_project/screens/create_post_page/create_post_page.dart';
 import 'package:meko_project/screens/purcharse_create_post/purcharse_create_post.dart';
 import 'package:meko_project/screens/search_page/search_page.dart';
+import 'package:meko_project/screens/shipper_page/shipper_screen.dart';
 import 'package:meko_project/screens/sign_up_page/sign_up_page.dart';
 import 'package:meko_project/screens/splash_page/splash_page.dart';
 import 'package:meko_project/screens/tab/homes_page/home_page.dart';
@@ -108,8 +109,10 @@ class AppRouter {
         return MyReviewPage();
       case AppRouterPaths.walletHistory:
         return TransactionHistoryScreen();
-      case AppRouterPaths.chatAiPage:
-        return MekoChatAiPage();
+        case AppRouterPaths.shipperScreen:
+        return ShipperScreen();
+      // case AppRouterPaths.chatAiPage:
+      //   return MekoChatAiPage();
       default:
         return SizedBox();
     }

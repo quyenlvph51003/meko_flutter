@@ -149,7 +149,8 @@ class _TabHomeViewState extends State<_TabHomeView> {
                                           Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
                                           return;
                                         }
-                                        Fluttertoast.showToast(msg: 'Chức năng này đang được phát triển', backgroundColor: Colors.red);
+                                        Navigator.pushNamed(context, AppRouterPaths.shipperScreen);
+                                        // Fluttertoast.showToast(msg: 'Chức năng này đang được phát triển', backgroundColor: Colors.red);
                                       },
                                       child: const Padding(
                                         padding: EdgeInsets.all(8),
