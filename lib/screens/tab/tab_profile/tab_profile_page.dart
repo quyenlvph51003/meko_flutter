@@ -241,6 +241,19 @@ class TabProfilePageState extends State<TabProfilePage> with TickerProviderState
                                   Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
                                   return;
                                 }
+                                Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.orderListPage, (route) => true);
+                              },
+                              icon: Icons.shopping_bag_outlined,
+                              title: 'Đơn hàng của tôi',
+                            ),
+                            dividerInset(),
+                            itemTile(
+                              onTap: () async {
+                                final isCheckShowAuth = await SqliteHelper.isCheckShowAuth(context);
+                                if (isCheckShowAuth) {
+                                  Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.login, (route) => true);
+                                  return;
+                                }
                                 Navigator.of(context).pushNamedAndRemoveUntil(AppRouterPaths.packagePages, (route) => true);
                               },
                               icon: Icons.list,

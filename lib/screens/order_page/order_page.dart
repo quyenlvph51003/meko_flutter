@@ -5,13 +5,16 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meko_project/consts/app_colcor.dart';
 import 'package:meko_project/consts/app_dimens.dart';
 import 'package:meko_project/consts/app_images.dart';
+import 'package:meko_project/domains/dependency_injection/service_locator.dart';
 import 'package:meko_project/models/body/post/listing_item_model.dart';
-import 'package:meko_project/screens/shipper_page/shipper_screen.dart';
+import 'package:meko_project/repository/order/order_repo.dart';
 import 'package:meko_project/utils/converts/forrmat_uttils.dart';
 import 'package:meko_project/widget/app_button/app_button.dart';
 
 import 'order_vm/order_cubit.dart';
 import 'order_vm/order_state.dart';
+import 'order_vm/widget/order_detail.dart';
+import 'widgets/address_picker_bottom_sheet.dart';
 
 class OrderPage extends StatelessWidget {
   final ListingItem item;
@@ -21,8 +24,10 @@ class OrderPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => OrderCubit(item: item)..loadUser(),
-      child: const OrderView(),
+      create: (context) {
+        return OrderCubit(item: item, orderRepository: getIt<OrderRepository>())..loadUser();
+      },
+      child: OrderView(),
     );
   }
 }
@@ -50,6 +55,8 @@ class _OrderViewState extends State<OrderView> {
   }
 
   void showSuccessDialog(BuildContext context, OrderState state) {
+    final cubit = context.read<OrderCubit>(); // Lưu reference trước
+    final orderCode = state.createdOrder?.orderCode ?? '';
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -75,9 +82,13 @@ class _OrderViewState extends State<OrderView> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Mã đơn hàng: ${state.createdOrder?.orderCode ?? ''}',
+                'Mã đơn hàng: $orderCode',
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColor.cMain),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: AppColor.cMain,
+                ),
               ),
               const SizedBox(height: 4),
               Text(
@@ -90,16 +101,19 @@ class _OrderViewState extends State<OrderView> {
                 width: double.infinity,
                 child: AppButton(
                   onTap: () {
-                    Navigator.pop(ctx);
-                    Navigator.pop(context);
-                    if (state.createdOrder != null) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ShipperOrderDetailScreen(order: state.createdOrder!),
+                    Navigator.pop(ctx); // Đóng dialog
+                    final item = state.item;
+                    cubit.loadOrderByCode(orderCode); // Load trước
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => OrderDetailPage(
+                          orderCode: orderCode,
+                          productImage: item?.images.isNotEmpty == true ? item!.images.first : null,
+                          productName: item?.title,
                         ),
-                      );
-                    }
+                      ),
+                    );
                   },
                   child: Container(
                     height: 44,
@@ -146,6 +160,17 @@ class _OrderViewState extends State<OrderView> {
     );
   }
 
+
+  void navigateToDetail(BuildContext context, String orderCode) {
+    context.read<OrderCubit>().loadOrderByCode(orderCode);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => BlocProvider.value(
+        value: context.read<OrderCubit>(),
+        child: const OrderDetailView(),
+      )),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return BlocListener<OrderCubit, OrderState>(
@@ -202,7 +227,7 @@ class _OrderViewState extends State<OrderView> {
                   DeliverySection(
                     nameController: nameController,
                     phoneController: phoneController,
-                    addressController: addressController,
+                    addressDetailController: addressController,
                   ),
                   const SizedBox(height: 8),
                   const PaymentSection(),
@@ -249,7 +274,7 @@ class ProductSection extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.network(
-                      item.images.isNotEmpty ? item.images.first : '',
+                      item!.images.isNotEmpty ? item.images.first : '',
                       width: 100,
                       height: 100,
                       fit: BoxFit.cover,
@@ -269,7 +294,7 @@ class ProductSection extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          item.title,
+                          item!.title,
                           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -282,7 +307,11 @@ class ProductSection extends StatelessWidget {
                         const SizedBox(height: 8),
                         Text(
                           FormatUtils.formatCurrency(state.unitPrice),
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.red),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
                         ),
                       ],
                     ),
@@ -322,7 +351,9 @@ class ProductSection extends StatelessWidget {
                           height: 36,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            border: Border.symmetric(vertical: BorderSide(color: Colors.grey[300]!)),
+                            border: Border.symmetric(
+                              vertical: BorderSide(color: Colors.grey[300]!),
+                            ),
                           ),
                           child: Text(
                             '${state.quantity}',
@@ -336,7 +367,9 @@ class ProductSection extends StatelessWidget {
                             height: 36,
                             decoration: BoxDecoration(
                               color: Colors.grey[100],
-                              borderRadius: const BorderRadius.horizontal(right: Radius.circular(7)),
+                              borderRadius: const BorderRadius.horizontal(
+                                right: Radius.circular(7),
+                              ),
                             ),
                             child: const Icon(Icons.add, size: 18),
                           ),
@@ -382,8 +415,8 @@ class SellerSection extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
-                        image: item.avatarPoster != null
-                            ? NetworkImage(item.avatarPoster!)
+                        image: item?.avatarPoster != null
+                            ? NetworkImage(item!.avatarPoster!)
                             : const AssetImage(AppImages.img_avt_default) as ImageProvider,
                         fit: BoxFit.cover,
                       ),
@@ -395,7 +428,7 @@ class SellerSection extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          item.userNamePoster,
+                          item?.userNamePoster??'',
                           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: 4),
@@ -405,7 +438,7 @@ class SellerSection extends StatelessWidget {
                             const SizedBox(width: 4),
                             Expanded(
                               child: Text(
-                                item.address,
+                                item!.address,
                                 style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -429,13 +462,13 @@ class SellerSection extends StatelessWidget {
 class DeliverySection extends StatelessWidget {
   final TextEditingController nameController;
   final TextEditingController phoneController;
-  final TextEditingController addressController;
+  final TextEditingController addressDetailController;
 
   const DeliverySection({
     Key? key,
     required this.nameController,
     required this.phoneController,
-    required this.addressController,
+    required this.addressDetailController,
   }) : super(key: key);
 
   @override
@@ -476,17 +509,93 @@ class DeliverySection extends StatelessWidget {
             onChanged: vm.updatePhone,
           ),
           const SizedBox(height: 12),
+          // Chọn Tỉnh/Huyện/Xã
+          _AddressPickerField(),
+          const SizedBox(height: 12),
+          // Địa chỉ chi tiết (số nhà, đường)
           OrderTextField(
-            controller: addressController,
-            label: 'Địa chỉ nhận hàng',
-            hint: 'Nhập địa chỉ chi tiết',
-            icon: Icons.location_on_outlined,
+            controller: addressDetailController,
+            label: 'Địa chỉ chi tiết',
+            hint: 'Số nhà, tên đường...',
+            icon: Icons.home_outlined,
             maxLines: 2,
-            onChanged: vm.updateAddress,
+            onChanged: vm.updateAddressDetail,
           ),
         ],
       ),
     );
+  }
+}
+
+class _AddressPickerField extends StatelessWidget {
+  const _AddressPickerField();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<OrderCubit, OrderState>(
+      buildWhen: (prev, curr) => prev.address != curr.address,
+      builder: (context, state) {
+        final hasAddress = state.address.isNotEmpty;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Tỉnh/Huyện/Xã',
+              style: TextStyle(fontSize: 13, color: Colors.grey[700], fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () => _showAddressPicker(context),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: hasAddress ? AppColor.cMain : Colors.grey[200]!),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.location_on_outlined,
+                      size: 20,
+                      color: hasAddress ? AppColor.cMain : Colors.grey[500],
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        hasAddress ? state.address : 'Chọn Tỉnh/Thành phố, Quận/Huyện, Phường/Xã',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: hasAddress ? Colors.black87 : Colors.grey[400],
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Icon(
+                      Icons.keyboard_arrow_down,
+                      color: Colors.grey[500],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showAddressPicker(BuildContext context) async {
+    final result = await AddressPickerBottomSheet.show(context);
+    if (result != null && context.mounted) {
+      context.read<OrderCubit>().updateShippingAddress(
+        provinceId: result.province.provinceId,
+        districtId: result.district.districtId,
+        wardCode: result.ward.wardCode,
+        address: result.fullAddress,
+      );
+    }
   }
 }
 
@@ -666,16 +775,22 @@ class PaymentOption extends StatelessWidget {
               height: 22,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: isSelected ? AppColor.cMain : Colors.grey[300]!, width: 2),
+                border: Border.all(
+                  color: isSelected ? AppColor.cMain : Colors.grey[300]!,
+                  width: 2,
+                ),
               ),
               child: isSelected
                   ? Center(
-                child: Container(
-                  width: 12,
-                  height: 12,
-                  decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColor.cMain),
-                ),
-              )
+                      child: Container(
+                        width: 12,
+                        height: 12,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColor.cMain,
+                        ),
+                      ),
+                    )
                   : null,
             ),
           ],
@@ -703,10 +818,7 @@ class NoteSection extends StatelessWidget {
             children: [
               const Icon(Icons.note_outlined, size: 20, color: AppColor.cMain),
               const SizedBox(width: 8),
-              const Text(
-                'Ghi chú',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-              ),
+              const Text('Ghi chú', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
             ],
           ),
           const SizedBox(height: 12),
@@ -765,10 +877,7 @@ class PriceSummarySection extends StatelessWidget {
               PriceRow(label: 'Số lượng', value: 'x${state.quantity}'),
               const SizedBox(height: 8),
               const PriceRow(label: 'Phí vận chuyển', value: 'Liên hệ người bán'),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12),
-                child: Divider(height: 1),
-              ),
+              const Padding(padding: EdgeInsets.symmetric(vertical: 12), child: Divider(height: 1)),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -778,7 +887,11 @@ class PriceSummarySection extends StatelessWidget {
                   ),
                   Text(
                     FormatUtils.formatCurrency(state.totalPrice),
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
                   ),
                 ],
               ),
@@ -849,7 +962,11 @@ class OrderBottomBar extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       FormatUtils.formatCurrency(state.totalPrice),
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
                     ),
                   ],
                 ),
@@ -868,14 +985,21 @@ class OrderBottomBar extends StatelessWidget {
                     child: Center(
                       child: isLoading
                           ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
-                      )
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Colors.white,
+                              ),
+                            )
                           : const Text(
-                        'Đặt hàng',
-                        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
-                      ),
+                              'Đặt hàng',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                     ),
                   ),
                 ),

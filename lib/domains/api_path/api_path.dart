@@ -61,4 +61,20 @@ class ApiPath {
 
   //rating
   static const String ratingRate = 'rating/rate';
+
+  // order
+  static const String orderCreate = 'order/create';
+  static const String orderByCode = 'order/code';
+  static const String orderById = 'order/detail-by-id';
+  static const String orderList = 'order/list';
+
+  // GHN webhook (nếu cần)
+  static const String orderWebhook = 'order/webhook';
+
+  // Order status updates
+  static const String orderUpdateStatus = 'order/update-status';
+  static const String orderUpdateBySeller = 'order/update-by-seller';
+
+  // GHN - Xác nhận đơn hàng (tạo vận đơn GHN)
+  static const String orderGhnCreate = 'order/ghn/create';
 }
