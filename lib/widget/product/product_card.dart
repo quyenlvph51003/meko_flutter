@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meko_project/consts/app_colcor.dart';
 import 'package:meko_project/consts/app_dimens.dart';
 import 'package:meko_project/consts/app_images.dart';
 import 'package:meko_project/consts/app_paths.dart';
@@ -91,6 +92,22 @@ class _ProductCartState extends State<ProductCart> {
                     ],
                   ),
                 ),
+                if (widget.item.oldProductPercent != null)
+                  Positioned(
+                    bottom: 8,
+                    left: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColor.getProductConditionColor(widget.item.oldProductPercent).withValues(alpha: 0.9),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        '${widget.item.oldProductPercent}%',
+                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),

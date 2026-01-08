@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meko_project/consts/app_colcor.dart';
-import 'package:meko_project/consts/app_dimens.dart';
 import 'package:meko_project/global_data/data_local/hive_db.dart';
 import 'package:meko_project/routers/app_router_paths.dart';
 import 'package:meko_project/screens/login_page/login_page.dart';
@@ -36,7 +35,13 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final screenWidth = MediaQuery.of(context).size.width;
     final pages = const [TabHomePage(), PostManagerPage(), TabChatPage(), TabProfilePage()];
+
+    // Use default BottomNavigationBar height (kBottomNavigationBarHeight = 56)
+    const double bottomNavHeight = kBottomNavigationBarHeight;
+    final fabSize = screenWidth < 360 ? 48.0 : 56.0;
+    final fabIconSize = screenWidth < 360 ? 28.0 : 32.0;
 
     return BlocListener<HomeCubit, HomeState>(
       // listenWhen: (p, c) => c.shouldShowPostSheet,
@@ -69,45 +74,42 @@ class _HomePageState extends State<HomePage> {
               right: 0,
               bottom: 0,
               child: Container(
-                height: 65 + bottomPadding,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 4, offset: const Offset(0, -1))],
                 ),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 65,
-                      child: BlocBuilder<HomeCubit, HomeState>(
-                        buildWhen: (p, c) => p.currentIndex != c.currentIndex || p.isLoggedIn != c.isLoggedIn || p.uiRev != c.uiRev,
-                        builder: (context, state) {
-                          return BottomNavigationBar(
-                            currentIndex: state.currentIndex,
-                            onTap: (index) {
-                              context.read<HomeCubit>().changeTab(index);
-                            },
-                            type: BottomNavigationBarType.fixed,
-                            selectedItemColor: AppColor.cMain,
-                            unselectedItemColor: Colors.grey,
-                            showUnselectedLabels: true,
-                            items: const [
-                              BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home_rounded), label: 'Trang chủ'),
-                              BottomNavigationBarItem(icon: Icon(Icons.label_outline), activeIcon: Icon(Icons.label), label: 'Quản lý tin'),
-                              BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), activeIcon: Icon(Icons.chat_bubble), label: 'Chat'),
-                              BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'Tài khoản'),
-                            ],
-                          );
+                child: SafeArea(
+                  top: false,
+                  child: BlocBuilder<HomeCubit, HomeState>(
+                    buildWhen: (p, c) => p.currentIndex != c.currentIndex || p.isLoggedIn != c.isLoggedIn || p.uiRev != c.uiRev,
+                    builder: (context, state) {
+                      return BottomNavigationBar(
+                        currentIndex: state.currentIndex,
+                        onTap: (index) {
+                          context.read<HomeCubit>().changeTab(index);
                         },
-                      ),
-                    ),
-                    SizedBox(height: bottomPadding),
-                  ],
+                        type: BottomNavigationBarType.fixed,
+                        selectedItemColor: AppColor.cMain,
+                        unselectedItemColor: Colors.grey,
+                        showUnselectedLabels: true,
+                        selectedFontSize: 11,
+                        unselectedFontSize: 11,
+                        iconSize: 24,
+                        items: const [
+                          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home_rounded), label: 'Trang chủ'),
+                          BottomNavigationBarItem(icon: Icon(Icons.label_outline), activeIcon: Icon(Icons.label), label: 'Quản lý tin'),
+                          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), activeIcon: Icon(Icons.chat_bubble), label: 'Chat'),
+                          BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'Tài khoản'),
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
             Positioned(
-              left: AppDimens.getWidth(context) / 2 - 28,
-              bottom: 35 + bottomPadding,
+              left: (screenWidth - fabSize) / 2,
+              bottom: (bottomNavHeight / 2) + bottomPadding,
               child: GestureDetector(
                 onTap: () async {
                   HapticFeedback.mediumImpact();
@@ -120,14 +122,14 @@ class _HomePageState extends State<HomePage> {
                   }
                 },
                 child: Container(
-                  width: 56,
-                  height: 56,
+                  width: fabSize,
+                  height: fabSize,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: AppColor.cMain,
                     boxShadow: [BoxShadow(color: AppColor.color8.withOpacity(0.4), blurRadius: 12, offset: const Offset(0, 4))],
                   ),
-                  child: const Icon(Icons.add_rounded, color: Colors.white, size: 32),
+                  child: Icon(Icons.add_rounded, color: Colors.white, size: fabIconSize),
                 ),
               ),
             ),
