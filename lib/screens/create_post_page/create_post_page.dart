@@ -564,6 +564,38 @@ class _PostCreateScreenState extends State<PostCreateScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
+                  Text('Độ mới của sản phẩm', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Slider(
+                          value: state.oldProductPercent.toDouble(),
+                          min: 1,
+                          max: 100,
+                          divisions: 99,
+                          activeColor: AppColor.cMain,
+                          inactiveColor: Colors.grey.shade300,
+                          label: '${state.oldProductPercent}%',
+                          onChanged: (value) {
+                            context.read<PostCreateCubit>().setOldProductPercent(value.toInt());
+                          },
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppColor.cMain,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          '${state.oldProductPercent}%',
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
                   Text('Khu vực', style: TextStyle(fontSize: 14, color: Colors.grey)),
                   const SizedBox(height: 8),
                   GestureDetector(
@@ -610,35 +642,41 @@ class _PostCreateScreenState extends State<PostCreateScreen> {
                   const SizedBox(height: 16),
                   Text('Gói đăng', style: TextStyle(fontSize: 14, color: Colors.grey)),
                   const SizedBox(height: 8),
-                  SizedBox(
-                    height: 30,
-                    child: Center(
-                      child: Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () async {
-                              final result = await Navigator.of(context).pushNamed(AppRouterPaths.createPurcharsePost);
-                              if (result != null) {
-                                context.read<PostCreateCubit>().selectUserPayment(result as UserPaymentModel);
-                              }
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(color: AppColor.cGray.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(10)),
-                              child: Icon(Icons.add, color: AppColor.cMain),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Visibility(
-                            visible: state.userPaymentSelected != null,
-                            child: Text(
-                              '${state.userPaymentSelected?.packageName ?? ''} - Hạn sử dụng: ${state.userPaymentSelected?.durationUsed ?? 0} ngày',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ),
-                        ],
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          final result = await Navigator.of(context).pushNamed(AppRouterPaths.createPurcharsePost);
+                          if (result != null) {
+                            context.read<PostCreateCubit>().selectUserPayment(result as UserPaymentModel);
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(color: AppColor.cGray.withValues(alpha: 0.5), borderRadius: BorderRadius.circular(10)),
+                          child: Icon(Icons.add, color: AppColor.cMain),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      if (state.userPaymentSelected != null)
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: AppColor.cMain.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: AppColor.cMain, width: 1),
+                            ),
+                            child: Text(
+                              '${state.userPaymentSelected?.packageName ?? ''}\nHạn sử dụng: ${state.userPaymentSelected?.durationUsed ?? 0} ngày',
+                              style: TextStyle(fontSize: 14, color: AppColor.cMain),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 24),
                   AppButtonCommon(
