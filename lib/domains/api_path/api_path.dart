@@ -77,4 +77,10 @@ class ApiPath {
 
   // GHN - Xác nhận đơn hàng (tạo vận đơn GHN)
   static const String orderGhnCreate = 'order/ghn/create';
+
+  // Order - Hủy đơn hàng (cho buyer khi đơn chưa được seller xác nhận)
+  static const String orderCancelStatus = 'order/order-status';
+
+  // Order - Cập nhật thông tin đơn hàng (cho buyer khi đơn chờ xác nhận)
+  static const String orderUpdate = 'order/update';
 }

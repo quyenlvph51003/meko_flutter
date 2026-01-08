@@ -114,8 +114,8 @@ class AppRouter {
         return ShipperScreen();
       case AppRouterPaths.orderListPage:
         return OrderListPage(initialTab: map?['initialTab'] ?? 0);
-      // case AppRouterPaths.chatAiPage:
-      //   return MekoChatAiPage();
+      case AppRouterPaths.chatAiPage:
+        return MekoChatAiPage();
       default:
         return SizedBox();
     }
