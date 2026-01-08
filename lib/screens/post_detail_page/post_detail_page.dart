@@ -504,6 +504,30 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                 ),
                               ],
                             ),
+                            if (item.oldProductPercent != null) ...[
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  Icon(Icons.verified, size: 16, color: AppColor.getProductConditionColor(item.oldProductPercent)),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Độ mới: ',
+                                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: AppColor.getProductConditionColor(item.oldProductPercent),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      '${item.oldProductPercent}%',
+                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ],
                         ),
                       ),

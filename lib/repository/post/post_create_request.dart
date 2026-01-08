@@ -17,6 +17,7 @@ class PostCreateRequest {
   String? phoneNumber;
   int? paymentId;
   List<XFile>? images;
+  int? oldProductPercent;
 
   PostCreateRequest({
     this.title,
@@ -30,6 +31,7 @@ class PostCreateRequest {
     this.phoneNumber,
     this.paymentId,
     this.images,
+    this.oldProductPercent,
   });
 
   Map<String, dynamic> toJson() {
@@ -44,6 +46,7 @@ class PostCreateRequest {
     if (price != null) data['price'] = price;
     if (phoneNumber != null) data['phoneNumber'] = phoneNumber;
     if (paymentId != null) data['paymentId'] = paymentId;
+    if (oldProductPercent != null) data['oldProductPercent'] = oldProductPercent;
     return data;
   }
 

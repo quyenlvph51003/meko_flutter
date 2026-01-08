@@ -76,7 +76,7 @@ class PostCreateCubit extends Cubit<PostCreateState> {
   void setNullSubCategories() {
     emit(
       state.copyWithNullable(
-        subCategories: null,
+        resetSubCategories: true,
         rebuild: state.rebuild + 1,
         provinceSelectedCached: state.provinceSelectedCached,
         wardSelectedCached: state.wardSelectedCached,
@@ -143,6 +143,10 @@ class PostCreateCubit extends Cubit<PostCreateState> {
     emit(state.copyWith(userPaymentSelected: userPayment, rebuild: state.rebuild + 1));
   }
 
+  void setOldProductPercent(int percent) {
+    emit(state.copyWith(oldProductPercent: percent, rebuild: state.rebuild + 1));
+  }
+
   Future<void> createPost({
     required String title,
     required String description,
@@ -185,6 +189,7 @@ class PostCreateCubit extends Cubit<PostCreateState> {
       address: address,
       userId: user?.id,
       paymentId: state.userPaymentSelected?.id,
+      oldProductPercent: state.oldProductPercent,
     );
 
     if (state.selectedCategories.isNotEmpty) {

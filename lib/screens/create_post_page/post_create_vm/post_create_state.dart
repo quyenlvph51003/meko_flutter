@@ -14,6 +14,7 @@ class PostCreateState extends Equatable {
   final int rebuild;
   final bool? isSubmitting;
   final UserPaymentModel? userPaymentSelected;
+  final int oldProductPercent;
   PostCreateState({
     this.isLoading,
     this.categories = const [],
@@ -28,6 +29,7 @@ class PostCreateState extends Equatable {
     this.rebuild = 0,
     this.isSubmitting,
     this.userPaymentSelected,
+    this.oldProductPercent = 80,
   });
 
   PostCreateState copyWith({
@@ -44,6 +46,7 @@ class PostCreateState extends Equatable {
     int? rebuild,
     bool? isSubmitting,
     UserPaymentModel? userPaymentSelected,
+    int? oldProductPercent,
   }) {
     return PostCreateState(
       isLoading: isLoading ?? this.isLoading,
@@ -59,6 +62,7 @@ class PostCreateState extends Equatable {
       rebuild: rebuild ?? this.rebuild,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       userPaymentSelected: userPaymentSelected ?? this.userPaymentSelected,
+      oldProductPercent: oldProductPercent ?? this.oldProductPercent,
     );
   }
 
@@ -72,11 +76,13 @@ class PostCreateState extends Equatable {
     WardModel? wardSelectedCached,
     int? rebuild,
     UserPaymentModel? userPaymentSelected,
+    bool resetSelectedCategories = false,
+    bool resetSubCategories = false,
   }) {
     return PostCreateState(
       isLoading: isLoading,
       categories: categories,
-      selectedCategories: selectedCategories ?? [],
+      selectedCategories: resetSelectedCategories ? [] : (selectedCategories ?? this.selectedCategories),
       provinces: provinces,
       wards: wards ?? this.wards,
       provinceSelected: provinceSelected,
@@ -84,9 +90,10 @@ class PostCreateState extends Equatable {
       provinceSelectedCached: provinceSelectedCached,
       wardSelectedCached: wardSelectedCached,
       rebuild: rebuild ?? this.rebuild,
-      subCategories: subCategories ?? [],
+      subCategories: resetSubCategories ? [] : (subCategories ?? this.subCategories),
       isSubmitting: isSubmitting,
-      userPaymentSelected: userPaymentSelected,
+      userPaymentSelected: userPaymentSelected ?? this.userPaymentSelected,
+      oldProductPercent: oldProductPercent,
     );
   }
 
@@ -105,5 +112,6 @@ class PostCreateState extends Equatable {
     rebuild,
     isSubmitting,
     userPaymentSelected,
+    oldProductPercent,
   ];
 }

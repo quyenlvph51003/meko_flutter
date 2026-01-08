@@ -19,6 +19,7 @@ class PostUpdateState extends Equatable {
   final bool? isLoadingUpdate;
   final bool? isLoadingExtension;
   final UserPaymentModel? userPayment;
+  final int? oldProductPercent;
 
   PostUpdateState({
     this.listing,
@@ -37,6 +38,7 @@ class PostUpdateState extends Equatable {
     this.isLoadingUpdate,
     this.userPayment,
     this.isLoadingExtension,
+    this.oldProductPercent,
   });
 
   PostUpdateState copyWith({
@@ -56,6 +58,7 @@ class PostUpdateState extends Equatable {
     bool? isLoadingUpdate,
     UserPaymentModel? userPayment,
     bool? isLoadingExtension,
+    int? oldProductPercent,
   }) {
     return PostUpdateState(
       listing: listing ?? this.listing,
@@ -74,6 +77,7 @@ class PostUpdateState extends Equatable {
       isLoadingUpdate: isLoadingUpdate ?? this.isLoadingUpdate,
       userPayment: userPayment ?? this.userPayment,
       isLoadingExtension: isLoadingExtension ?? this.isLoadingExtension,
+      oldProductPercent: oldProductPercent ?? this.oldProductPercent,
     );
   }
 
@@ -112,7 +116,6 @@ class PostUpdateState extends Equatable {
   }
 
   @override
-  // TODO: implement props
   List<Object?> get props => [
     listing,
     isLoading,
@@ -130,5 +133,6 @@ class PostUpdateState extends Equatable {
     isLoadingUpdate,
     userPayment,
     isLoadingExtension,
+    oldProductPercent,
   ];
 }
