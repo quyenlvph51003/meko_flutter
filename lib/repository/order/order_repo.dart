@@ -1,9 +1,11 @@
 import 'package:meko_project/domains/api_path/api_path.dart';
 import 'package:meko_project/domains/rest_client/rest_client.dart';
 import 'package:meko_project/domains/rest_client/rest_client_extension.dart';
+import 'package:meko_project/models/body/order/confirm_order_request.dart';
 import 'package:meko_project/models/body/order/order_list_response.dart';
 import 'package:meko_project/models/body/order/order_request.dart';
 import 'package:meko_project/models/body/order/order_response.dart';
+import 'package:meko_project/models/body/order/update_order_request.dart';
 import 'package:meko_project/models/response_common.dart';
 
 class OrderRepository {
@@ -160,12 +162,75 @@ class OrderRepository {
   }
 
   /// Xác nhận đơn hàng - Tạo vận đơn GHN (cho seller)
-  Future<ResponseCommon<OrderResponse>> confirmOrderGHN(int orderId) async {
+  Future<ResponseCommon<OrderResponse>> confirmOrderGHN(
+    int orderId,
+    ConfirmOrderRequest request,
+  ) async {
     try {
       final url = '${ApiPath.orderGhnCreate}/$orderId';
       print('=== Calling API: $url ===');
+      print('=== Request body: ${request.toJson()} ===');
 
-      final response = await restClient.post(url);
+      final response = await restClient.post(url, data: request.toJson());
+      print('=== API Response: ${response.data} ===');
+
+      return ResponseCommon<OrderResponse>.fromJson(
+        response.data,
+        (json) => OrderResponse.fromJson(json),
+      );
+    } catch (e) {
+      print('=== API Error: $e ===');
+      return ResponseCommon<OrderResponse>(
+        datetime: '',
+        errorCode: 500,
+        message: e.toString(),
+        data: null,
+        content: [],
+        success: false,
+      );
+    }
+  }
+
+  /// Hủy đơn hàng (cho buyer khi đơn chưa được seller xác nhận - trạng thái CREATED)
+  /// API: PUT api/order/order-status/{orderId}
+  Future<ResponseCommon<OrderResponse>> cancelOrder(int orderId) async {
+    try {
+      final url = '${ApiPath.orderCancelStatus}/$orderId';
+      print('=== Calling API: $url ===');
+      print('=== Request body: {"status": "CANCELLED"} ===');
+
+      final response = await restClient.put(url, data: {'status': 'CANCELLED'});
+      print('=== API Response: ${response.data} ===');
+
+      return ResponseCommon<OrderResponse>.fromJson(
+        response.data,
+        (json) => OrderResponse.fromJson(json),
+      );
+    } catch (e) {
+      print('=== API Error: $e ===');
+      return ResponseCommon<OrderResponse>(
+        datetime: '',
+        errorCode: 500,
+        message: e.toString(),
+        data: null,
+        content: [],
+        success: false,
+      );
+    }
+  }
+
+  /// Cập nhật thông tin đơn hàng (cho buyer khi đơn chờ xác nhận - trạng thái CREATED)
+  /// API: PUT api/order/update/{orderId}
+  Future<ResponseCommon<OrderResponse>> updateOrder(
+    int orderId,
+    UpdateOrderRequest request,
+  ) async {
+    try {
+      final url = '${ApiPath.orderUpdate}/$orderId';
+      print('=== Calling API: $url ===');
+      print('=== Request body: ${request.toJson()} ===');
+
+      final response = await restClient.put(url, data: request.toJson());
       print('=== API Response: ${response.data} ===');
 
       return ResponseCommon<OrderResponse>.fromJson(

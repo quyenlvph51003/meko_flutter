@@ -8,6 +8,8 @@ import 'package:meko_project/models/body/order/order_response.dart';
 import 'package:meko_project/models/body/post/listing_item_model.dart';
 import 'package:meko_project/repository/order/order_repo.dart';
 import 'package:meko_project/repository/post/post_repo.dart';
+import 'package:meko_project/screens/order_page/widgets/confirm_order_page.dart';
+import 'package:meko_project/screens/order_page/widgets/update_order_page.dart';
 import 'package:meko_project/utils/converts/forrmat_uttils.dart';
 import 'package:meko_project/utils/data_local_helper/sqlite_helper.dart';
 import '../order_cubit.dart';
@@ -419,6 +421,10 @@ class OrderDetailView extends StatelessWidget {
                 if (_isSellerCreatedOrder(order))
                   _buildConfirmOrderButton(context, order),
 
+                // Nút Sửa và Hủy đơn hàng (chỉ hiển thị cho buyer với đơn CREATED)
+                if (_isBuyerCreatedOrder(order))
+                  _buildBuyerActionButtons(context, order),
+
                 const SizedBox(height: 32),
               ],
             ),
@@ -435,116 +441,240 @@ class OrderDetailView extends StatelessWidget {
         order.orderStatus == 'CREATED';
   }
 
-  Widget _buildConfirmOrderButton(BuildContext context, OrderResponse order) {
-    return BlocBuilder<OrderCubit, OrderState>(
-      buildWhen: (prev, curr) =>
-          prev.confirmStatus != curr.confirmStatus ||
-          prev.confirmingOrderId != curr.confirmingOrderId,
-      builder: (context, state) {
-        final isConfirming = state.confirmStatus == OrderConfirmStatus.loading &&
-            state.confirmingOrderId == order.id;
+  /// Kiểm tra có phải buyer đang xem đơn CREATED không (chờ xác nhận)
+  bool _isBuyerCreatedOrder(OrderResponse order) {
+    return currentUserId != null &&
+        currentUserId == order.customerId &&
+        order.orderStatus == 'CREATED';
+  }
 
-        return Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+  Widget _buildConfirmOrderButton(BuildContext context, OrderResponse order) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColor.cMain.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(Icons.check_circle_outline, color: AppColor.cMain, size: 22),
-                  ),
-                  const SizedBox(width: 12),
-                  const Expanded(
-                    child: Text(
-                      'Xác nhận đơn hàng',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Xác nhận để tạo vận đơn GHN và chuyển hàng cho shipper.',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 13,
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColor.cMain.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                child: Icon(Icons.check_circle_outline, color: AppColor.cMain, size: 22),
               ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: isConfirming ? null : () => _onConfirmOrder(context, order),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColor.cMain,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    disabledBackgroundColor: AppColor.cMain.withOpacity(0.6),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Text(
+                  'Xác nhận đơn hàng',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
-                  child: isConfirming
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : const Text(
-                          'Xác nhận đơn hàng',
-                          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-                        ),
                 ),
               ),
             ],
           ),
-        );
-      },
+          const SizedBox(height: 12),
+          Text(
+            'Xác nhận để tạo vận đơn GHN và chuyển hàng cho shipper.',
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => _onConfirmOrder(context, order),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColor.cMain,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'Xác nhận đơn hàng',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Future<void> _onConfirmOrder(BuildContext context, OrderResponse order) async {
-    final cubit = context.read<OrderCubit>();
-    final success = await cubit.confirmOrder(order.id);
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ConfirmOrderPage(order: order),
+      ),
+    );
 
-    if (success) {
-      Fluttertoast.showToast(
-        msg: 'Xác nhận đơn hàng thành công',
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-      );
-    } else {
-      final errorMsg = cubit.state.errorMessage ?? 'Xác nhận đơn hàng thất bại';
-      Fluttertoast.showToast(
-        msg: errorMsg,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
+    // Nếu xác nhận thành công thì reload lại order detail
+    if (result == true) {
+      context.read<OrderCubit>().loadOrderByCode(order.orderCode);
     }
-    cubit.resetConfirmStatus();
+  }
+
+  Widget _buildBuyerActionButtons(BuildContext context, OrderResponse order) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.edit_note, color: Colors.blue, size: 22),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Text(
+                  'Thao tác đơn hàng',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Bạn có thể sửa hoặc hủy đơn hàng khi người bán chưa xác nhận.',
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              // Nút Sửa đơn hàng
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => _onEditOrder(context, order),
+                  icon: const Icon(Icons.edit_outlined, size: 18),
+                  label: const Text('Sửa đơn hàng'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColor.cMain,
+                    side: BorderSide(color: AppColor.cMain),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Nút Hủy đơn hàng
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => _onCancelOrder(context, order),
+                  icon: const Icon(Icons.cancel_outlined, size: 18),
+                  label: const Text('Hủy đơn'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.red,
+                    side: const BorderSide(color: Colors.red),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _onEditOrder(BuildContext context, OrderResponse order) async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => UpdateOrderPage(order: order),
+      ),
+    );
+
+    if (result == true) {
+      context.read<OrderCubit>().loadOrderByCode(order.orderCode);
+    }
+  }
+
+  Future<void> _onCancelOrder(BuildContext context, OrderResponse order) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Xác nhận hủy đơn'),
+        content: const Text('Bạn có chắc chắn muốn hủy đơn hàng này không?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Không'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Hủy đơn'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final orderRepo = getIt<OrderRepository>();
+      final response = await orderRepo.cancelOrder(order.id);
+
+      if (response.success) {
+        Fluttertoast.showToast(
+          msg: 'Hủy đơn hàng thành công',
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+        context.read<OrderCubit>().loadOrderByCode(order.orderCode);
+      } else {
+        Fluttertoast.showToast(
+          msg: response.message ?? 'Hủy đơn hàng thất bại',
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
+      }
+    }
   }
 
   Widget _buildHeaderBackground() {
@@ -678,14 +808,6 @@ class OrderDetailView extends StatelessWidget {
             subtitle: _getOrderStatusDescription(order.orderStatus),
             status: order.orderStatus,
             isActive: true,
-            showLine: true,
-          ),
-          _buildTimelineItem(
-            icon: Icons.payments_outlined,
-            title: 'Thanh toán',
-            subtitle: _getPaymentDescription(order.paymentStatus, order.paymentMethod),
-            status: order.paymentStatus,
-            isActive: order.paymentStatus == 'PAID',
             showLine: true,
           ),
           _buildTimelineItem(
@@ -1095,13 +1217,13 @@ class OrderDetailView extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: _getStatusColor(order.paymentStatus).withOpacity(0.1),
+                  color: (order.orderStatus == 'COMPLETED' ? Colors.green : Colors.orange).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  _translatePaymentStatus(order.paymentStatus),
+                  order.orderStatus == 'COMPLETED' ? 'Đã thanh toán' : 'Chưa thanh toán',
                   style: TextStyle(
-                    color: _getStatusColor(order.paymentStatus),
+                    color: order.orderStatus == 'COMPLETED' ? Colors.green : Colors.orange,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                   ),
@@ -1326,17 +1448,6 @@ class OrderDetailView extends StatelessWidget {
     }
   }
 
-  String _translatePaymentStatus(String status) {
-    switch (status) {
-      case 'PAID':
-        return 'Đã thanh toán';
-      case 'UNPAID':
-        return 'Chưa thanh toán';
-      default:
-        return status;
-    }
-  }
-
   String _translatePaymentMethod(String? method) {
     if (method == null || method.isEmpty) {
       return 'Tiền mặt';
@@ -1370,16 +1481,6 @@ class OrderDetailView extends StatelessWidget {
       default:
         return 'Đang xử lý';
     }
-  }
-
-  String _getPaymentDescription(String paymentStatus, String? paymentMethod) {
-    if (paymentStatus == 'PAID') {
-      return 'Đã thanh toán thành công';
-    }
-    if (paymentMethod == 'COD' || paymentMethod == 'CASH' || paymentMethod == null || paymentMethod.isEmpty) {
-      return 'Thanh toán tiền mặt khi nhận hàng';
-    }
-    return 'Chờ thanh toán';
   }
 
   String _getShippingDescription(String status) {

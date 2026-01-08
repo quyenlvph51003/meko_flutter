@@ -7,6 +7,8 @@ import 'package:meko_project/models/body/order/order_response.dart';
 import 'package:meko_project/repository/order/order_repo.dart';
 import 'package:meko_project/screens/order_page/order_vm/order_cubit.dart';
 import 'package:meko_project/screens/order_page/order_vm/order_state.dart';
+import 'package:meko_project/screens/order_page/widgets/confirm_order_page.dart';
+import 'package:meko_project/screens/order_page/widgets/update_order_page.dart';
 import 'package:meko_project/utils/converts/forrmat_uttils.dart';
 
 import 'order_detail.dart';
@@ -265,6 +267,10 @@ class _OrderCard extends StatelessWidget {
   bool get _isSellerCreatedOrder =>
       filterType == OrderFilterType.selling && order.orderStatus == 'CREATED';
 
+  /// Kiểm tra có phải buyer đang xem đơn CREATED không (chờ xác nhận)
+  bool get _isBuyerCreatedOrder =>
+      filterType == OrderFilterType.buying && order.orderStatus == 'CREATED';
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -417,6 +423,12 @@ class _OrderCard extends StatelessWidget {
                     const SizedBox(height: 12),
                     _buildConfirmButton(context),
                   ],
+
+                  // Cancel and Edit buttons for buyer's CREATED orders
+                  if (_isBuyerCreatedOrder) ...[
+                    const SizedBox(height: 12),
+                    _buildBuyerActionButtons(context),
+                  ],
                 ],
               ),
             ),
@@ -427,65 +439,132 @@ class _OrderCard extends StatelessWidget {
   }
 
   Widget _buildConfirmButton(BuildContext context) {
-    return BlocBuilder<OrderCubit, OrderState>(
-      buildWhen: (prev, curr) =>
-          prev.confirmStatus != curr.confirmStatus ||
-          prev.confirmingOrderId != curr.confirmingOrderId,
-      builder: (context, state) {
-        final isConfirming = state.confirmStatus == OrderConfirmStatus.loading &&
-            state.confirmingOrderId == order.id;
-
-        return SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: isConfirming ? null : () => _onConfirmOrder(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColor.cMain,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              disabledBackgroundColor: AppColor.cMain.withOpacity(0.6),
-            ),
-            child: isConfirming
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                : const Text(
-                    'Xác nhận đơn hàng',
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-                  ),
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () => _onConfirmOrder(context),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColor.cMain,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
           ),
-        );
-      },
+        ),
+        child: const Text(
+          'Xác nhận đơn hàng',
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+        ),
+      ),
     );
   }
 
   Future<void> _onConfirmOrder(BuildContext context) async {
-    final cubit = context.read<OrderCubit>();
-    final success = await cubit.confirmOrder(order.id);
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ConfirmOrderPage(order: order),
+      ),
+    );
 
-    if (success) {
-      Fluttertoast.showToast(
-        msg: 'Xác nhận đơn hàng thành công',
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-      );
-    } else {
-      final errorMsg = cubit.state.errorMessage ?? 'Xác nhận đơn hàng thất bại';
-      Fluttertoast.showToast(
-        msg: errorMsg,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
+    // Nếu xác nhận thành công thì refresh danh sách
+    if (result == true) {
+      context.read<OrderCubit>().refreshOrders();
     }
-    cubit.resetConfirmStatus();
+  }
+
+  Widget _buildBuyerActionButtons(BuildContext context) {
+    return Row(
+      children: [
+        // Nút Sửa đơn hàng
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: () => _onEditOrder(context),
+            icon: const Icon(Icons.edit_outlined, size: 18),
+            label: const Text('Sửa'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColor.cMain,
+              side: BorderSide(color: AppColor.cMain),
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        // Nút Hủy đơn hàng
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: () => _onCancelOrder(context),
+            icon: const Icon(Icons.cancel_outlined, size: 18),
+            label: const Text('Hủy đơn'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.red,
+              side: const BorderSide(color: Colors.red),
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _onEditOrder(BuildContext context) async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => UpdateOrderPage(order: order),
+      ),
+    );
+
+    if (result == true) {
+      context.read<OrderCubit>().refreshOrders();
+    }
+  }
+
+  Future<void> _onCancelOrder(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Xác nhận hủy đơn'),
+        content: const Text('Bạn có chắc chắn muốn hủy đơn hàng này không?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Không'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Hủy đơn'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final orderRepo = getIt<OrderRepository>();
+      final response = await orderRepo.cancelOrder(order.id);
+
+      if (response.success) {
+        Fluttertoast.showToast(
+          msg: 'Hủy đơn hàng thành công',
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+        context.read<OrderCubit>().refreshOrders();
+      } else {
+        Fluttertoast.showToast(
+          msg: response.message ?? 'Hủy đơn hàng thất bại',
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
+      }
+    }
   }
 
   Widget _buildStatusBadge(String status) {
