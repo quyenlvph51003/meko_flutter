@@ -10,6 +10,8 @@ import 'package:meko_project/repository/favorite/favorite_repo.dart';
 import 'package:meko_project/repository/history/history_repo.dart';
 import 'package:meko_project/repository/location/province_repo.dart';
 import 'package:meko_project/repository/location/ward_repo.dart';
+import 'package:meko_project/repository/order/order_repo.dart';
+import 'package:meko_project/repository/ghn/ghn_address_repo.dart';
 import 'package:meko_project/repository/package/package_repository.dart';
 import 'package:meko_project/repository/payment/payment_repo.dart';
 import 'package:meko_project/repository/post/post_repo.dart';
@@ -63,6 +65,12 @@ class ServiceLocator {
     });
     getIt.registerLazySingleton<PackageRepository>(() {
       return PackageRepository(restClient: getIt<RestClient>());
+    });
+    getIt.registerLazySingleton<OrderRepository>(() {
+      return OrderRepository(restClient: getIt<RestClient>());
+    });
+    getIt.registerLazySingleton<GHNAddressRepo>(() {
+      return GHNAddressRepo();
     });
   }
 }

@@ -13,6 +13,7 @@ import 'package:meko_project/screens/create_post_page/create_post_page.dart';
 import 'package:meko_project/screens/purcharse_create_post/purcharse_create_post.dart';
 import 'package:meko_project/screens/search_page/search_page.dart';
 import 'package:meko_project/screens/shipper_page/shipper_screen.dart';
+import 'package:meko_project/screens/order_page/order_vm/widget/order_list_page.dart';
 import 'package:meko_project/screens/sign_up_page/sign_up_page.dart';
 import 'package:meko_project/screens/splash_page/splash_page.dart';
 import 'package:meko_project/screens/tab/homes_page/home_page.dart';
@@ -111,6 +112,8 @@ class AppRouter {
         return TransactionHistoryScreen();
         case AppRouterPaths.shipperScreen:
         return ShipperScreen();
+      case AppRouterPaths.orderListPage:
+        return OrderListPage(initialTab: map?['initialTab'] ?? 0);
       // case AppRouterPaths.chatAiPage:
       //   return MekoChatAiPage();
       default:

@@ -592,6 +592,40 @@ class _PostUpdateScreenState extends State<PostUpdateScreen> {
                   ),
                   const SizedBox(height: 16),
 
+                  // Độ mới của sản phẩm
+                  Text('Độ mới của sản phẩm', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Slider(
+                          value: (state.oldProductPercent ?? state.listing?.oldProductPercent ?? 80).toDouble(),
+                          min: 1,
+                          max: 100,
+                          divisions: 99,
+                          activeColor: AppColor.cMain,
+                          inactiveColor: Colors.grey.shade300,
+                          label: '${state.oldProductPercent ?? state.listing?.oldProductPercent ?? 80}%',
+                          onChanged: (value) {
+                            context.read<PostUpdateCubit>().setOldProductPercent(value.toInt());
+                          },
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppColor.cMain,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          '${state.oldProductPercent ?? state.listing?.oldProductPercent ?? 80}%',
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
                   // 7️⃣ Khu vực
                   Text('Khu vực', style: TextStyle(fontSize: 14, color: Colors.grey)),
                   const SizedBox(height: 8),

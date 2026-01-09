@@ -17,6 +17,7 @@ class PostUpdateRequest {
   String? phoneNumber;
   List<String>? oldImages;
   List<XFile>? images;
+  int? oldProductPercent;
 
   PostUpdateRequest({
     this.postId,
@@ -30,6 +31,7 @@ class PostUpdateRequest {
     this.phoneNumber,
     this.oldImages,
     this.images,
+    this.oldProductPercent,
   });
 
   Map<String, dynamic> toJson() {
@@ -44,6 +46,7 @@ class PostUpdateRequest {
     if (price != null) data['price'] = price;
     if (phoneNumber != null) data['phoneNumber'] = phoneNumber;
     if (oldImages != null) data['oldImages'] = oldImages;
+    if (oldProductPercent != null) data['oldProductPercent'] = oldProductPercent;
     return data;
   }
 

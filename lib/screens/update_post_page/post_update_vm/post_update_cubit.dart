@@ -104,11 +104,20 @@ class PostUpdateCubit extends Cubit<PostUpdateState> {
     try {
       final post = await postRepository.getPostDetail(id: id);
       if (post.isSuccess) {
-        emit(state.copyWith(isLoading: false, listing: post.data, rebuild: state.rebuild + 1));
+        emit(state.copyWith(
+          isLoading: false,
+          listing: post.data,
+          oldProductPercent: post.data?.oldProductPercent ?? 80,
+          rebuild: state.rebuild + 1,
+        ));
       }
     } catch (e) {
       emit(state.copyWith(isLoading: false));
     }
+  }
+
+  void setOldProductPercent(int percent) {
+    emit(state.copyWith(oldProductPercent: percent, rebuild: state.rebuild + 1));
   }
 
   //fetch Category
@@ -221,6 +230,7 @@ class PostUpdateCubit extends Cubit<PostUpdateState> {
       description: description,
       price: price,
       phoneNumber: phone,
+      oldProductPercent: state.oldProductPercent ?? state.listing?.oldProductPercent ?? 80,
     );
 
     if (state.selectedCategories.isNotEmpty) {

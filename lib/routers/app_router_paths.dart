@@ -25,4 +25,5 @@ class AppRouterPaths {
   static const String walletHistory = 'walletHistoryPage';
   static const String chatAiPage = 'chatAiPage';
   static const String shipperScreen = 'shipperScreen';
+  static const String orderListPage = '/orderListPage';
 }

@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'package:flutter/material.dart';
 
 class AppColor {
   static const Color white = Color(0xFFFFFFFF);
@@ -64,4 +64,19 @@ class AppColor {
   static const Color color44 = Color(0xFF5C23FE);
   static const Color color45 = Color(0xFF4C48FF);
   static const Color color46 = Color(0xFF3F3BFE);
+
+  /// Lấy màu dựa trên % độ mới của sản phẩm
+  /// >= 80%: Xanh lá (tốt)
+  /// >= 60%: Xanh dương (khá)
+  /// >= 40%: Vàng (trung bình)
+  /// >= 20%: Cam (kém)
+  /// < 20%: Đỏ (rất kém)
+  static Color getProductConditionColor(int? percent) {
+    if (percent == null) return Colors.grey;
+    if (percent >= 80) return Colors.green;
+    if (percent >= 60) return Colors.lightGreen;
+    if (percent >= 40) return Colors.orange;
+    if (percent >= 20) return Colors.deepOrange;
+    return Colors.red;
+  }
 }
