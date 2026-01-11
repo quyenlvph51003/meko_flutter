@@ -467,7 +467,7 @@ class EmptyState extends StatelessWidget {
                                   ),
                                 ),
                                 Visibility(
-                                  visible: item.status == 'PENDING',
+                                  visible: item.status != 'VIOLATION' && item.status != 'APPROVED' && state.currentTab != PostStatus.VIOLATION,
                                   child: GestureDetector(
                                     onTap: () {
                                       Navigator.of(context).pushNamed(AppRouterPaths.updatePostPage, arguments: {'postId': item.id});

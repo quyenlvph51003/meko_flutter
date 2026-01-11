@@ -797,7 +797,7 @@ class _PostUpdateScreenState extends State<PostUpdateScreen> {
                   const SizedBox(height: 10),
                   // 9️⃣ Submit button
                   Visibility(
-                    visible: state.listing?.status != 'VIOLATION',
+                    visible: state.listing?.status != 'VIOLATION' && state.listing?.status != 'EXPIRED' && state.listing?.status != 'REJECTED',
                     child: SizedBox(
                       width: double.infinity,
                       child: AppButtonCommon(
