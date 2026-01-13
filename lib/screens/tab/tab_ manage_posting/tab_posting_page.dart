@@ -478,6 +478,38 @@ class EmptyState extends StatelessWidget {
                                     ),
                                   ),
                                 ),
+                                // Button ẩn bài viết cho tab Đang hiển thị
+                                Visibility(
+                                  visible: item.status == 'APPROVED',
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (dialogContext) => AlertDialog(
+                                          title: Text('Ẩn bài viết'),
+                                          content: Text('Bạn có chắc chắn muốn ẩn bài viết này không?'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.pop(dialogContext),
+                                              child: Text('Hủy'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(dialogContext);
+                                                context.read<PostManagerCubit>().hidePost(item.id);
+                                              },
+                                              child: Text('Ẩn', style: TextStyle(color: Colors.red)),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    child: Padding(
+                                      padding: EdgeInsets.only(left: 4),
+                                      child: Icon(Icons.visibility_off, color: Colors.grey, size: 20),
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                             SizedBox(height: 4),

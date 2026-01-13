@@ -40,6 +40,15 @@ class PostManagerCubit extends Cubit<PostManagerState> {
     await getPostByStatus(page: state.page + 1, isLoading: false, isLoadmore: true);
   }
 
+  // Ẩn bài viết
+  Future<void> hidePost(int postId) async {
+    final result = await postRepo.updatePostStatus(postId: postId, status: PostStatus.HIDDEN);
+    if (result) {
+      // Refresh lại danh sách
+      await getPostByStatus();
+    }
+  }
+
   //call api post by status
   Future<void> getPostByStatus({int page = 0, int size = 10, bool isLoading = true, bool isLoadmore = false}) async {
     print('page ${page}');
